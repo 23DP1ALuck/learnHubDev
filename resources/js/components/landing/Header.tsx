@@ -6,7 +6,6 @@ import {
 } from '@headlessui/react'
 import clsx from 'clsx'
 
-import { Button } from '@/components/ui/button'
 import { Container } from '@/components/ui/container'
 import { Logo } from '@/components/icons/Logo'
 import { NavLink } from '@/components/NavLink'
@@ -82,12 +81,12 @@ function MobileNavigation() {
 
 export function Header() {
     return (
-        <header className="py-10 bg-white">
+        <header className="py-10">
             <Container>
                 <nav className="relative z-50 flex justify-between">
                     <div className="flex items-center md:gap-x-12">
                         <Link href="#" aria-label="Home">
-                            <Logo className="h-10 w-auto" />
+                            <Logo/>
                         </Link>
                         <div className="hidden md:flex md:gap-x-6">
                             <NavLink href="#features">Features</NavLink>
@@ -99,11 +98,11 @@ export function Header() {
                         <div className="hidden md:block">
                             <NavLink href="/login">Sign in</NavLink>
                         </div>
-                        <NavLink href="/register">
-                          <span>
+                        <Link href="/register" className="w-fit p-2 bg-[#6366F1] text-white rounded-full">
+                          <span className="font-bold">
                             Get started <span className="hidden lg:inline">today</span>
                           </span>
-                        </NavLink>
+                        </Link>
                         <div className="-mr-1 md:hidden">
                             <MobileNavigation />
                         </div>

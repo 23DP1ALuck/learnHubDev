@@ -2,6 +2,8 @@ import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import {Header} from "@/components/landing/Header";
+import { Hero } from '@/components/landing/Hero';
+import { PrimaryFeatures } from '@/components/landing/PrimaryFeatures';
 
 export default function Welcome({
     canRegister = true,
@@ -50,6 +52,10 @@ export default function Welcome({
                 {/*    </nav>*/}
                 {/*</header>*/}
                 <Header/>
+                <main>
+                    <Hero/>
+                    <PrimaryFeatures />
+                </main>
 
             {/*</div>*/}
         </>
