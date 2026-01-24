@@ -69,11 +69,11 @@ function MobileNavigation() {
                 transition
                 className="absolute inset-x-0 top-full mt-4 flex origin-top flex-col rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 shadow-xl ring-1 ring-slate-900/5 data-closed:scale-95 data-closed:opacity-0 data-enter:duration-150 data-enter:ease-out data-leave:duration-100 data-leave:ease-in"
             >
-                <MobileNavLink href="#features">Features</MobileNavLink>
-                <MobileNavLink href="#testimonials">Testimonials</MobileNavLink>
-                <MobileNavLink href="#pricing">Pricing</MobileNavLink>
+                <MobileNavLink href="#features">Funkcijas</MobileNavLink>
+                <MobileNavLink href="#aboutUs">Par mums</MobileNavLink>
+                <MobileNavLink href="#contacts">Kontakti</MobileNavLink>
                 <hr className="m-2 border-slate-300/40" />
-                <MobileNavLink href="/login">Sign in</MobileNavLink>
+                <MobileNavLink href="/login">Ieiet</MobileNavLink>
             </PopoverPanel>
         </Popover>
     )
@@ -89,18 +89,18 @@ export function Header() {
                             <Logo/>
                         </Link>
                         <div className="hidden md:flex md:gap-x-6">
-                            <NavLink href="#features">Features</NavLink>
-                            <NavLink href="#testimonials">Testimonials</NavLink>
-                            <NavLink href="#pricing">Pricing</NavLink>
+                            <NavLink href="#features">Funkcijas</NavLink>
+                            <NavLink href="#aboutUs">Par mums</NavLink>
+                            <NavLink href="#contacts">Kontakti</NavLink>
                         </div>
                     </div>
                     <div className="flex items-center gap-x-5 md:gap-x-8">
                         <div className="hidden md:block">
-                            <NavLink href="/login">Sign in</NavLink>
+                            <NavLink href="/login">Ieiet</NavLink>
                         </div>
-                        <Link href="/register" className="w-fit p-2 bg-[#6366F1] text-white rounded-full">
+                        <Link href="/register" className="w-fit py-2 px-3 bg-[#6366F1] text-white rounded-full">
                           <span className="font-bold">
-                            Get started <span className="hidden lg:inline">today</span>
+                            Pievienojies <span className="hidden lg:inline">jau</span> tagad
                           </span>
                         </Link>
                         <div className="-mr-1 md:hidden">

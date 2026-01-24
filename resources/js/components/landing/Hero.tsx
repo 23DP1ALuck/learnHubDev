@@ -27,7 +27,7 @@ export function Hero() {
         <Link className="bg-black/80 rounded-full font-semibold px-3.5 py-2.5" href="/register">Sākt bez maksas</Link>
         <Link
           href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-          className="rounded-full flex justify-center items-center"
+          className="px-4 rounded-full flex justify-center items-center border border-black/20"
         >
           <svg
             aria-hidden="true"
