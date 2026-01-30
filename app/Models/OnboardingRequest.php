@@ -16,7 +16,8 @@ class OnboardingRequest extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'organization_type',
         'organization_name',
@@ -48,7 +49,8 @@ class OnboardingRequest extends Model
     protected function casts(): array
     {
         return [
-            'name' => 'string',
+            'first_name' => 'string',
+            'last_name' => 'string',
             'email' => 'string',
             'organization_type' => 'string',
             'organization_name' => 'string',

@@ -29,9 +29,9 @@ class OnboardingRequestController extends Controller
      */
     public function store(StoreOnboardingRequestRequest $request)
     {
-//        OnboardingRequest::create($request->validated());
+        OnboardingRequest::create($request->validated());
 
-        dd($request->validated());;
+        return redirect()->back()->with('success', 'Your request has been submitted successfully.');
     }
 
     /**

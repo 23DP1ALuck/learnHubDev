@@ -6,53 +6,27 @@ import { PrimaryFeatures } from '@/components/landing/PrimaryFeatures';
 import {AboutUs} from "@/components/landing/AboutUs";
 import {Contacts} from "@/components/landing/Contacts";
 import {Footer} from "@/components/landing/Footer";
+import {useEffect} from "react";
+import {Flash} from "@/types";
+import {toast} from "sonner";
+import moment from "moment";
 
-export default function Welcome({
-    canRegister = true,
-}: {
-    canRegister?: boolean;
-}) {
-    const { auth } = usePage<SharedData>().props;
-
+export default function Welcome() {
+    const {flash} = usePage<Flash>().props;
+    useEffect(() => {
+        if(flash?.success){
+            const formatted = moment().format("dddd, MMMM DD, YYYY [at] h:mm A");
+            toast(flash.success, {
+                description: formatted,
+                action: {
+                    label: "Undo",
+                    onClick: () => console.log("Undo"),
+                },
+            })
+        }
+    },[flash]);
     return (
         <>
-            {/*<Head title="Welcome">*/}
-            {/*    <link rel="preconnect" href="https://fonts.bunny.net" />*/}
-            {/*    <link*/}
-            {/*        href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"*/}
-            {/*        rel="stylesheet"*/}
-            {/*    />*/}
-            {/*</Head>*/}
-            {/*<div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 ">*/}
-                {/*<header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">*/}
-                {/*    <nav className="flex items-center justify-end gap-4">*/}
-                {/*        {auth.user ? (*/}
-                {/*            <Link*/}
-                {/*                href={dashboard()}*/}
-                {/*                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"*/}
-                {/*            >*/}
-                {/*                Dashboard*/}
-                {/*            </Link>*/}
-                {/*        ) : (*/}
-                {/*            <>*/}
-                {/*                <Link*/}
-                {/*                    href={login()}*/}
-                {/*                    className="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"*/}
-                {/*                >*/}
-                {/*                    Log in*/}
-                {/*                </Link>*/}
-                {/*                {canRegister && (*/}
-                {/*                    <Link*/}
-                {/*                        href={register()}*/}
-                {/*                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"*/}
-                {/*                    >*/}
-                {/*                        Register*/}
-                {/*                    </Link>*/}
-                {/*                )}*/}
-                {/*            </>*/}
-                {/*        )}*/}
-                {/*    </nav>*/}
-                {/*</header>*/}
                 <Header/>
                 <main>
                     <Hero/>
@@ -61,8 +35,6 @@ export default function Welcome({
                     <Contacts/>
                     <Footer/>
                 </main>
-
-            {/*</div>*/}
         </>
     );
 }

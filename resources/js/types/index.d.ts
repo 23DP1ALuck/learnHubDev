@@ -28,6 +28,11 @@ export interface SharedData {
     sidebarOpen: boolean;
     [key: string]: unknown;
 }
+type Flash = {
+    flash?: {
+        success?: string;
+    };
+}
 
 export interface User {
     id: number;
