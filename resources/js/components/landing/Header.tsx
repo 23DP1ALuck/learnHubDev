@@ -6,6 +6,7 @@ import {
 } from '@headlessui/react'
 import clsx from 'clsx'
 
+import OnboardingRequestDialog from '@/components/onboarding-request-dialog'
 import { Container } from '@/components/ui/container'
 import { Logo } from '@/components/icons/Logo'
 import { NavLink } from '@/components/NavLink'
@@ -98,11 +99,20 @@ export function Header() {
                         <div className="hidden md:block">
                             <NavLink href="/login">Ieiet</NavLink>
                         </div>
-                        <Link href="/register" className="w-fit py-2 px-3 bg-[#6366F1] text-white rounded-full">
-                          <span className="font-bold">
-                            Pievienojies <span className="hidden lg:inline">jau</span> tagad
-                          </span>
-                        </Link>
+                        <OnboardingRequestDialog>
+                            <button
+                                type="button"
+                                className="w-fit rounded-full bg-[#6366F1] px-3 py-2 text-white cursor-pointer"
+                            >
+                                <span className="font-bold">
+                                    Pievienojies{' '}
+                                    <span className="hidden lg:inline">
+                                        jau
+                                    </span>{' '}
+                                    tagad
+                                </span>
+                            </button>
+                        </OnboardingRequestDialog>
                         <div className="-mr-1 md:hidden">
                             <MobileNavigation />
                         </div>

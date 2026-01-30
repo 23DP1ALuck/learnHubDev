@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OnboardingRequestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -9,6 +10,8 @@ Route::get('/', function () {
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
+
+Route::post('onboarding-requests', [OnboardingRequestController::class, 'store'])->name('onboarding-requests.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

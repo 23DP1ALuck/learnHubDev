@@ -1,4 +1,5 @@
 import { Container } from '@/components/landing/Container'
+import OnboardingRequestDialog from '@/components/onboarding-request-dialog'
 import { Link } from '@inertiajs/react';
 
 export function Hero() {
@@ -24,7 +25,14 @@ export function Hero() {
           un ātra atgriezeniskā saite.
       </p>
       <div className="mt-10 flex justify-center gap-x-6">
-        <Link className="bg-black/80 rounded-full font-semibold px-3.5 py-2.5" href="/register">Sākt bez maksas</Link>
+        <OnboardingRequestDialog>
+          <button
+            type="button"
+            className="bg-black/80 rounded-full font-semibold px-3.5 py-2.5"
+          >
+            Sākt bez maksas
+          </button>
+        </OnboardingRequestDialog>
         <Link
           href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           className="px-4 rounded-full flex justify-center items-center border border-black/20"
