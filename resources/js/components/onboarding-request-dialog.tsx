@@ -37,12 +37,11 @@ export default function OnboardingRequestDialog({
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-black/60">Request access</DialogTitle>
+                    <DialogTitle className="text-black/60">Pieprasīt piekļuvi</DialogTitle>
                     <DialogDescription>
-                        Fill out the form and we will get back to you.
+                        Aizpildiet veidlapu, un mēs ar jums sazināsimies.
                     </DialogDescription>
                 </DialogHeader>
-
                 <Form
                     key={formKey}
                     action="/onboarding-requests"
@@ -56,7 +55,7 @@ export default function OnboardingRequestDialog({
                             <div className="grid gap-4">
                                 <div className="grid gap-2">
                                     <Label htmlFor="first_name" className="text-black/70">
-                                        First name
+                                        Vārds
                                     </Label>
                                     <Input
                                         id="first_name"
@@ -64,14 +63,14 @@ export default function OnboardingRequestDialog({
                                         type="text"
                                         required
                                         autoComplete="name"
-                                        placeholder="Full name"
+                                        placeholder="Vārds"
                                         className="text-gray-700"
                                     />
                                     <InputError message={errors.first_name} />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="last_name" className="text-black/70">
-                                        Last name
+                                        Uzvārds
                                     </Label>
                                     <Input
                                         id="last_name"
@@ -79,7 +78,7 @@ export default function OnboardingRequestDialog({
                                         type="text"
                                         required
                                         autoComplete="name"
-                                        placeholder="Last name"
+                                        placeholder="Uzvārds"
                                         className="text-gray-700"
                                     />
                                     <InputError message={errors.last_name} />
@@ -87,7 +86,7 @@ export default function OnboardingRequestDialog({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="onboarding_email" className="text-black/70">
-                                        Email address
+                                        E-pasts
                                     </Label>
                                     <Input
                                         id="onboarding_email"
@@ -103,7 +102,7 @@ export default function OnboardingRequestDialog({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="onboarding_organization_type" className="text-black/70">
-                                        Organization type
+                                        Organizācijas tips
                                     </Label>
                                     <input
                                         type="hidden"
@@ -116,12 +115,12 @@ export default function OnboardingRequestDialog({
                                         onValueChange={setOrganizationType}
                                     >
                                         <SelectTrigger id="onboarding_organization_type" className="text-black/70">
-                                            <SelectValue placeholder="Select…" />
+                                            <SelectValue placeholder="Izvelēties…" />
                                         </SelectTrigger>
 
                                         <SelectContent>
-                                            <SelectItem value="individual">Individual</SelectItem>
-                                            <SelectItem value="school">School</SelectItem>
+                                            <SelectItem value="individual">Kursa veidotājs</SelectItem>
+                                            <SelectItem value="school">Skola</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError
@@ -131,14 +130,15 @@ export default function OnboardingRequestDialog({
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="onboarding_organization_name" className="text-black/70">
-                                        Organization name
+                                        {organizationType === "individual" ? "Kursa nosaukums" : "Organizācijas nosaukums"}
                                     </Label>
                                     <Input
                                         id="onboarding_organization_name"
                                         name="organization_name"
                                         type="text"
                                         required
-                                        placeholder="Your organization"
+                                        placeholder=
+                                            {organizationType === "individual" ? "Jūsu kurss" : "Jūsu organizācija"}
                                         className="text-gray-700"
                                     />
                                     <InputError
