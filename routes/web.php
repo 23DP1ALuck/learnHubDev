@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OnboardingRequestController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -14,8 +15,10 @@ Route::get('/', function () {
 Route::post('onboarding-requests', [OnboardingRequestController::class, 'store'])->name('onboarding-requests.store');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+    Route::get('dashboard', function (Request $request) {
+        $role = $request->user()?->role;
+
+        return Inertia::render($role === 'admin' ? 'admin/dashboard' : 'dashboard');
     })->name('dashboard');
 });
 
