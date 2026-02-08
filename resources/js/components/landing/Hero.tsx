@@ -28,7 +28,7 @@ export function Hero() {
         <OnboardingRequestDialog>
           <button
             type="button"
-            className="bg-black/80 rounded-full font-semibold px-3.5 py-2.5"
+            className="bg-[#6366F1] text-white rounded-full font-semibold px-3.5 py-2.5"
           >
             Sākt bez maksas
           </button>

@@ -46,3 +46,14 @@ export interface User {
     role: 'admin' | 'user';
     [key: string]: unknown; // This allows for additional properties...
 }
+export type OnboardingRequest = {
+    id: number;
+    created_at: Date;
+    updated_at: Date;
+    first_name: string;
+    last_name: string;
+    email: string;
+    organization_name: string;
+    organization_type: 'individual' | 'organization';
+    status: 'pending' | 'approved' | 'rejected';
+}

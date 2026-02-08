@@ -1,7 +1,7 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { type BreadcrumbItem, type SharedData } from '@/types';
+import {type BreadcrumbItem, OnboardingRequest, type SharedData} from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -11,9 +11,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AdminDashboard() {
+export default function AdminDashboard({onboardingRequests}: {onboardingRequests: OnboardingRequest[]}) {
     const { auth } = usePage<SharedData>().props;
-
+    console.log(onboardingRequests);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
