@@ -9,7 +9,13 @@ export function useActiveUrl() {
     function urlIsActive(
         urlToCheck: NonNullable<InertiaLinkProps['href']>,
         currentUrl?: string,
+        primaryPath?: boolean // flag if you want to compare a base path
     ) {
+        console.log(primaryPath)
+        if (primaryPath){
+            const primaryPathUrlToCompare = currentUrl ?? currentUrlPath.split('/')[1];
+            return `/${toUrl(urlToCheck).split('/')[1]}` === `/${primaryPathUrlToCompare}`;
+        }
         const urlToCompare = currentUrl ?? currentUrlPath;
         return toUrl(urlToCheck) === urlToCompare;
     }
