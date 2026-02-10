@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOnboardingRequestRequest;
 use App\Http\Requests\UpdateOnboardingRequestRequest;
 use App\Models\OnboardingRequest;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OnboardingRequestController extends Controller
 {
@@ -13,7 +15,7 @@ class OnboardingRequestController extends Controller
      */
     public function index()
     {
-        //
+        return Inertia::render('admin/onboarding-requests', []);
     }
 
     /**
@@ -21,7 +23,7 @@ class OnboardingRequestController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**

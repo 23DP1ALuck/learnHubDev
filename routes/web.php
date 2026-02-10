@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
-use Illuminate\Http\Request;
+use App\Http\Middleware\CheckIsAdmin;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -17,6 +17,9 @@ Route::post('onboarding-requests', [OnboardingRequestController::class, 'store']
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
+    Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
 });
 
 require __DIR__.'/settings.php';
