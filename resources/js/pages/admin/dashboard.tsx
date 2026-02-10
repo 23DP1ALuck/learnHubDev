@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {type BreadcrumbItem, OnboardingRequest, type SharedData} from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import {RecentActivity} from "@/components/dashboard/admin/RecentActivity";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +18,7 @@ export default function AdminDashboard({onboardingRequests}: {onboardingRequests
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 p-6 dark:border-sidebar-border">
                     <h2 className="text-lg font-semibold">Admin dashboard</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -25,7 +26,10 @@ export default function AdminDashboard({onboardingRequests}: {onboardingRequests
                     </p>
                 </div>
 
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+                <div className="grid auto-rows-min gap-4 md:grid-cols-4">
+                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    </div>
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
@@ -36,8 +40,12 @@ export default function AdminDashboard({onboardingRequests}: {onboardingRequests
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
+                <div className="grid gap-4 md:grid-cols-6 ">
+                    <div className="flex col-span-4 rounded-xl border border-sidebar-border/70">
+                        <RecentActivity />
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );
 }
-
