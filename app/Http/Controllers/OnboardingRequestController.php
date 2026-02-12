@@ -15,7 +15,12 @@ class OnboardingRequestController extends Controller
      */
     public function index()
     {
-        return Inertia::render('admin/onboarding-requests', []);
+        $requests = OnboardingRequest::where('status', 'pending')
+            ->latest()
+            ->paginate(5);
+        return Inertia::render('admin/onboarding-requests', [
+            'onboardingRequests' => $requests,
+        ]);
     }
 
     /**
