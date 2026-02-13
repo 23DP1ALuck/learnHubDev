@@ -38,7 +38,6 @@ class OnboardingRequest extends Model
      * @var list<string>
      */
     protected $hidden = [
-        'status',
     ];
 
     /**
