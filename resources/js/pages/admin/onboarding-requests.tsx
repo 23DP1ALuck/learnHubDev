@@ -11,16 +11,24 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: onboardingRequests().url,
     },
 ];
-export default function OnboardingRequests({onboardingRequests}: { onboardingRequests: OnboardingRequest[]}) {
+type Metrics = {
+    approved: number,
+    pending: number,
+    rejected: number,
+}
+export default function OnboardingRequests({onboardingRequests, metrics}: { onboardingRequests: OnboardingRequest[], metrics: Metrics}) {
     console.log(onboardingRequests);
         return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <OnboardingRequestMetricCard onboardingRequestType={'pending'} count={15}/>
-                    <OnboardingRequestMetricCard onboardingRequestType={'approved'} count={3}/>
-                    <OnboardingRequestMetricCard onboardingRequestType={'rejected'} count={4}/>
+                    {Object.entries(metrics).map(([onboardingRequestType, count]) => (
+                        <OnboardingRequestMetricCard
+                            key={onboardingRequestType}
+                            onboardingRequestType={onboardingRequestType as OnboardingRequest['status']}
+                            count={count}/>
+                    ))}
                 </div>
             </div>
         </AppLayout>)

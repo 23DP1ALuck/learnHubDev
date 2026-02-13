@@ -6,6 +6,7 @@ use App\Http\Requests\StoreOnboardingRequestRequest;
 use App\Http\Requests\UpdateOnboardingRequestRequest;
 use App\Models\OnboardingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OnboardingRequestController extends Controller
@@ -18,8 +19,14 @@ class OnboardingRequestController extends Controller
         $requests = OnboardingRequest::where('status', 'pending')
             ->latest()
             ->paginate(5);
+        $countsByStatus = OnboardingRequest::query()
+            ->selectRaw('SUM(status="approved") as approved,
+             SUM(status="rejected") as rejected,
+             SUM(status="pending") as pending')
+            ->first();
         return Inertia::render('admin/onboarding-requests', [
             'onboardingRequests' => $requests,
+            'metrics' => $countsByStatus
         ]);
     }
 
