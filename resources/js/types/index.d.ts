@@ -57,3 +57,13 @@ export type OnboardingRequest = {
     organization_type: 'individual' | 'organization';
     status: 'pending' | 'approved' | 'rejected';
 }
+export interface PaginatedData {
+    current_page: number,
+    last_page: number,
+    total: number,
+    next_page_url?: string,
+    prev_page_url?: string,
+    links: [
+        {active: boolean,url?: string,label: string,page?: number}
+    ]
+}

@@ -1,10 +1,16 @@
 import AppLayout from "@/layouts/app-layout";
 import {Head} from "@inertiajs/react";
-import {PlaceholderPattern} from "@/components/ui/placeholder-pattern";
-import {RecentActivity} from "@/components/dashboard/admin/RecentActivity";
-import type {BreadcrumbItem, OnboardingRequest} from "@/types";
-import {dashboard, onboardingRequests} from "@/routes";
+import type {BreadcrumbItem, OnboardingRequest, PaginatedData} from "@/types";
+import {onboardingRequests} from "@/routes";
 import {OnboardingRequestMetricCard} from "@/components/dashboard/admin/OnboardingRequestMetricCard";
+import {OnboardingRequestsList} from "@/components/dashboard/admin/OnboardingRequestsList";
+import {
+    Pagination,
+    PaginationContent, PaginationEllipsis,
+    PaginationItem,
+    PaginationLink, PaginationNext,
+    PaginationPrevious
+} from "@/components/ui/pagination";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: "Onboarding requests",
@@ -16,7 +22,8 @@ type Metrics = {
     pending: number,
     rejected: number,
 }
-export default function OnboardingRequests({onboardingRequests, metrics}: { onboardingRequests: OnboardingRequest[], metrics: Metrics}) {
+type PaginatedProps = PaginatedData & { data: OnboardingRequest[] }
+export default function OnboardingRequests({onboardingRequests, metrics}: { onboardingRequests: PaginatedProps, metrics: Metrics}) {
     console.log(onboardingRequests);
         return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -29,6 +36,29 @@ export default function OnboardingRequests({onboardingRequests, metrics}: { onbo
                             onboardingRequestType={onboardingRequestType as OnboardingRequest['status']}
                             count={count}/>
                     ))}
+                </div>
+                <div className="flex flex-col h-full">
+                    <Pagination>
+                        <PaginationContent>
+
+                            {onboardingRequests.links.map((link, index) => {
+                                if(index == 0){
+                                    return <PaginationItem>
+                                        <PaginationPrevious href={onboardingRequests.prev_page_url} isActive={link.active}/>
+                                    </PaginationItem>
+                                } else if (index == onboardingRequests.links.length-1){
+                                    return <PaginationItem>
+                                        <PaginationNext href={onboardingRequests.next_page_url} isActive={link.active}/>
+                                    </PaginationItem>
+                                }
+                                return <PaginationItem>
+                                    <PaginationLink href={link.url} isActive={link.active}>{index}</PaginationLink>
+                                </PaginationItem>
+                            })}
+
+                        </PaginationContent>
+                    </Pagination>
+                    <OnboardingRequestsList requests={onboardingRequests.data}/>
                 </div>
             </div>
         </AppLayout>)
