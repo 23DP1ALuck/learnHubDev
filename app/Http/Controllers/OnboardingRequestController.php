@@ -16,10 +16,16 @@ class OnboardingRequestController extends Controller
      */
     public function index()
     {
-        $requests = OnboardingRequest::where('status', 'pending')
+        $statuses = ['pending', 'approved', 'rejected']; // allowed statuses
+        $queryParam = request()->query('status', 'pending'); // get query param
+        if (!in_array($queryParam, $statuses)) {    // check if query param is valid
+            return redirect()->route('onboarding-requests')->with('error', 'Invalid status parameter.');
+        }
+        $requests = OnboardingRequest::where('status', $queryParam)
             ->latest()
-            ->paginate(5);
-        $countsByStatus = OnboardingRequest::query()
+            ->paginate(5)
+            ->withQueryString();
+        $countsByStatus = OnboardingRequest::query()    // get status metrics
             ->selectRaw('SUM(status="approved") as approved,
              SUM(status="rejected") as rejected,
              SUM(status="pending") as pending')
