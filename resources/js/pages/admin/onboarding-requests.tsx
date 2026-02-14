@@ -42,17 +42,17 @@ export default function OnboardingRequests({onboardingRequests, metrics}: { onbo
                         <PaginationContent>
 
                             {onboardingRequests.links.map((link, index) => {
-                                if(index == 0){
+                                if(index === 0){
                                     return <PaginationItem>
                                         <PaginationPrevious href={onboardingRequests.prev_page_url} isActive={link.active}/>
                                     </PaginationItem>
-                                } else if (index == onboardingRequests.links.length-1){
+                                } else if (index === onboardingRequests.links.length-1){
                                     return <PaginationItem>
                                         <PaginationNext href={onboardingRequests.next_page_url} isActive={link.active}/>
                                     </PaginationItem>
                                 }
                                 return <PaginationItem>
-                                    <PaginationLink href={link.url} isActive={link.active}>{index}</PaginationLink>
+                                    <PaginationLink href={link.url} isActive={link.active}>{link.label}</PaginationLink>
                                 </PaginationItem>
                             })}
 
