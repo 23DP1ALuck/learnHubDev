@@ -6,7 +6,7 @@ import {OnboardingRequestMetricCard} from "@/components/dashboard/admin/Onboardi
 import {OnboardingRequestsList} from "@/components/dashboard/admin/OnboardingRequestsList";
 import {
     Pagination,
-    PaginationContent, PaginationEllipsis,
+    PaginationContent,
     PaginationItem,
     PaginationLink, PaginationNext,
     PaginationPrevious
@@ -24,11 +24,10 @@ type Metrics = {
 }
 type PaginatedProps = PaginatedData & { data: OnboardingRequest[] }
 export default function OnboardingRequests({onboardingRequests, metrics}: { onboardingRequests: PaginatedProps, metrics: Metrics}) {
-    console.log(onboardingRequests);
         return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
-            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex flex-1 min-h-0 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     {Object.entries(metrics).map(([onboardingRequestType, count]) => (
                         <OnboardingRequestMetricCard
@@ -37,28 +36,26 @@ export default function OnboardingRequests({onboardingRequests, metrics}: { onbo
                             count={count}/>
                     ))}
                 </div>
-                <div className="flex flex-col h-full">
+                <div className="flex min-h-0 flex-1 flex-col gap-4">
                     <Pagination>
                         <PaginationContent>
-
                             {onboardingRequests.links.map((link, index) => {
                                 if(index === 0){
-                                    return <PaginationItem>
+                                    return <PaginationItem key={link.label ?? index}>
                                         <PaginationPrevious href={onboardingRequests.prev_page_url} isActive={link.active}/>
                                     </PaginationItem>
                                 } else if (index === onboardingRequests.links.length-1){
-                                    return <PaginationItem>
+                                    return <PaginationItem key={link.label ?? index}>
                                         <PaginationNext href={onboardingRequests.next_page_url} isActive={link.active}/>
                                     </PaginationItem>
                                 }
-                                return <PaginationItem>
+                                return <PaginationItem key={link.label ?? index}>
                                     <PaginationLink href={link.url} isActive={link.active}>{link.label}</PaginationLink>
                                 </PaginationItem>
                             })}
-
                         </PaginationContent>
                     </Pagination>
-                    <OnboardingRequestsList requests={onboardingRequests.data}/>
+                        <OnboardingRequestsList requests={onboardingRequests.data}/>
                 </div>
             </div>
         </AppLayout>)
