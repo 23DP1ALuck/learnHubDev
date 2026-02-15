@@ -17,7 +17,7 @@ export default function AppSidebarLayout({
             {auth?.user.role === 'admin' ? <Sidebar/> : <DashboardSidebar/>}
             <AppContent variant="sidebar" className="overflow-hidden">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                <div className="flex flex-1 flex-col">
+                <div className="flex flex-1 flex-col overflow-y-hidden">
                     {children}
                 </div>
             </AppContent>
