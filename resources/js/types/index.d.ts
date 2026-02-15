@@ -54,7 +54,7 @@ export type OnboardingRequest = {
     last_name: string;
     email: string;
     organization_name: string;
-    organization_type: 'individual' | 'organization';
+    organization_type: 'individual' | 'school';
     status: 'pending' | 'approved' | 'rejected';
 }
 export interface PaginatedData {
