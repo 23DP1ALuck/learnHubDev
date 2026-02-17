@@ -22,6 +22,7 @@ class OnboardingRequest extends Model
         'email',
         'organization_type',
         'organization_name',
+        'status',
     ];
 
     /**
