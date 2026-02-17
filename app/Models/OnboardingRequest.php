@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class OnboardingRequest extends Model
 {
@@ -55,5 +56,9 @@ class OnboardingRequest extends Model
             'organization_name' => 'string',
             'status' => 'string',
         ];
+    }
+    public function invites(): HasMany
+    {
+        return $this->hasMany(AccountInvites::class);
     }
 }
