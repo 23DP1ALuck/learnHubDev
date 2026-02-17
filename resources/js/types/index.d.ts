@@ -28,9 +28,10 @@ export interface SharedData {
     sidebarOpen: boolean;
     [key: string]: unknown;
 }
-type Flash = {
+export type Flash = {
     flash?: {
         success?: string;
+        invite_url?: string;
     };
 }
 

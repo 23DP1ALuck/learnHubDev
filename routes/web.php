@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Middleware\CheckIsAdmin;
@@ -20,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
+    Route::post('/account-invites', [AccountInvitesController::class, 'store'])->name('account-invites.store');
 });
 
 require __DIR__.'/settings.php';

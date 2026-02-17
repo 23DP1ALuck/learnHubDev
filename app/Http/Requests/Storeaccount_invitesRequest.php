@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class Storeaccount_invitesRequest extends FormRequest
 {
@@ -11,7 +12,9 @@ class Storeaccount_invitesRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        $user = $this->user();
+
+        return $user !== null && $user->role === 'admin';
     }
 
     /**
@@ -22,7 +25,13 @@ class Storeaccount_invitesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'invitation_type' => ['required', Rule::in(['onboarding_request', 'join_org'])],
+            'onboarding_request_id' => [
+                'nullable',
+                'integer',
+                Rule::requiredIf(fn () => $this->input('invitation_type') === 'onboarding_request'),
+                'exists:onboarding_requests,id',
+            ],
         ];
     }
 }

@@ -1,5 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
-import {Head} from "@inertiajs/react";
+import {Head, usePage} from "@inertiajs/react";
 import type {BreadcrumbItem, OnboardingRequest, PaginatedData} from "@/types";
 import {onboardingRequests} from "@/routes";
 import {OnboardingRequestMetricCard} from "@/components/dashboard/admin/OnboardingRequestMetricCard";
@@ -11,6 +11,10 @@ import {
     PaginationLink, PaginationNext,
     PaginationPrevious
 } from "@/components/ui/pagination";
+import {useEffect, useRef} from "react";
+import type {Flash} from "@/types";
+import {toast} from "sonner";
+import {useClipboard} from "@/hooks/use-clipboard";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: "Onboarding requests",
@@ -24,6 +28,26 @@ type Metrics = {
 }
 type PaginatedProps = PaginatedData & { data: OnboardingRequest[] }
 export default function OnboardingRequests({onboardingRequests, metrics}: { onboardingRequests: PaginatedProps, metrics: Metrics}) {
+    const {flash} = usePage<Flash>().props;
+    const [, copy] = useClipboard();
+    const lastInviteUrlRef = useRef<string | undefined>(undefined);
+
+    useEffect(() => {
+        if (!flash?.invite_url || flash.invite_url === lastInviteUrlRef.current) {
+            return;
+        }
+
+        lastInviteUrlRef.current = flash.invite_url;
+
+        toast("Invite link created", {
+            description: flash.invite_url,
+            action: {
+                label: "Copy",
+                onClick: () => copy(flash.invite_url as string),
+            },
+        });
+    }, [copy, flash?.invite_url]);
+
         return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />

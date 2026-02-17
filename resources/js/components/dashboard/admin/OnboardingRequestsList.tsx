@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { type OnboardingRequest } from "@/types";
 import { Check, Clock, Eye, MoreHorizontal, X } from "lucide-react";
 import moment from "moment";
+import {router} from "@inertiajs/react";
 
 const statusMeta = {
     pending: {
@@ -67,7 +68,20 @@ export const OnboardingRequestsList = ({
             </div>
         );
     }
-
+    const createInvite = (requestId: number) => {
+        router.post(
+            "/account-invites",
+            {
+                invitation_type: "onboarding_request",
+                onboarding_request_id: requestId,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => console.log("Invite created"),
+                onError: (errors) => console.log(errors),
+            }
+        );
+    };
     return (
         <div className="w-full relative overflow-auto rounded-xl border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-background">
                 <div className="min-w-[900px]">
@@ -137,6 +151,7 @@ export const OnboardingRequestsList = ({
                                     <div className="flex items-center justify-end gap-2">
                                         <Button
                                             size="sm"
+                                            onClick={() => createInvite(request.id)}
                                             className="bg-blue-600 text-white hover:bg-blue-700"
                                             disabled={
                                                 request.status !== "pending"
