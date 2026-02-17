@@ -16,7 +16,12 @@ class AccountInvites extends Model
      * @var list<string>
      */
     protected $fillable = [
-
+        'selector',
+        'verifier_hash',
+        'invitation_type',
+        'onboarding_request_id',
+        'expires_at',
+        'invited_by',
     ];
 
     /**
@@ -35,10 +40,7 @@ class AccountInvites extends Model
     protected $hidden = [
         'selector',
         'verifier_hash',
-        'invitation_type',
-        'invited_by',
         'onboarding_request_id',
-        'expires_at',
         'used_at',
         'created_at',
         'updated_at',
