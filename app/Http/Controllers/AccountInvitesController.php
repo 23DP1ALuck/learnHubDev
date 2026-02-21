@@ -10,6 +10,7 @@ use App\Exceptions\InviteUsedException;
 use App\Exceptions\OnboardingRequestNotFoundException;
 use App\Http\Requests\Storeaccount_invitesRequest;
 use App\Http\Requests\Updateaccount_invitesRequest;
+use App\Mail\InviteEmail;
 use App\Models\AccountInvites;
 use App\Models\OnboardingRequest;
 use App\Models\Organization;
@@ -18,6 +19,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -55,13 +57,14 @@ class AccountInvitesController extends Controller
         $selector = bin2hex(random_bytes(32));
         $verifier = bin2hex(random_bytes(32));
 
-        $invite = DB::transaction(function () use (
+        [$invite, $onboardingRequest] = DB::transaction(function () use (
             $invitationType,
             $onboardingRequestId,
             $selector,
             $verifier,
             $request
         ) {
+            $onboardingRequest = null;
             if ($invitationType === 'onboarding_request') {
                 $onboardingRequest = OnboardingRequest::lockForUpdate()->find($onboardingRequestId);
                 if (!$onboardingRequest) {
@@ -75,7 +78,7 @@ class AccountInvitesController extends Controller
                 }
             }
 
-            return AccountInvites::create([
+            $invite = AccountInvites::create([
                 'selector' => $selector,
                 'verifier_hash' => hash('sha256', $verifier),
                 'invitation_type' => $invitationType,
@@ -83,6 +86,8 @@ class AccountInvitesController extends Controller
                 'expires_at' => now()->addDays(2),
                 'invited_by' => $request->user()->id,
             ]);
+
+            return [$invite, $onboardingRequest];
         });
 
         if (!$invite) {
@@ -92,15 +97,47 @@ class AccountInvitesController extends Controller
         }
 
         $url = url('/join/' . $selector . '.' . $verifier);
+        $mailSent = false;
+        $mailError = null;
 
-        if ($request->expectsJson()) {
-            return response()->json(['url' => $url]);
+        if ($onboardingRequest) {
+            try {
+                Mail::to($onboardingRequest->email)->send(new InviteEmail(
+                    inviteUrl: $url,
+                    recipientName: $onboardingRequest->first_name,
+                    organizationName: $onboardingRequest->organization_name,
+                    expiresAt: $invite->expires_at,
+                ));
+                $mailSent = true;
+            } catch (\Throwable $e) {
+                report($e);
+                $mailError = 'Invite created, but email failed to send.';
+            }
         }
 
-        return redirect()
+        if ($request->expectsJson()) {
+            return response()->json([
+                'url' => $url,
+                'emailed' => $mailSent,
+                'email' => $onboardingRequest?->email,
+            ]);
+        }
+
+        $redirect = redirect()
             ->route('onboarding-requests')
-            ->with('success', 'Invite created successfully.')
             ->with('invite_url', $url);
+
+        if ($mailSent) {
+            return $redirect->with('success', 'Invite emailed successfully.');
+        }
+
+        if ($mailError) {
+            return $redirect
+                ->with('success', 'Invite created successfully.')
+                ->with('error', $mailError);
+        }
+
+        return $redirect->with('success', 'Invite created successfully.');
     }
 
     /**
