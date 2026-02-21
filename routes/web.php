@@ -23,5 +23,7 @@ Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () 
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
     Route::post('/account-invites', [AccountInvitesController::class, 'store'])->name('account-invites.store');
 });
+Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
+Route::post('/join/{token}', [AccountInvitesController::class, 'join']);
 
 require __DIR__.'/settings.php';

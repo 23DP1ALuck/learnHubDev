@@ -22,6 +22,7 @@ class AccountInvites extends Model
         'onboarding_request_id',
         'expires_at',
         'invited_by',
+        'used_at',
     ];
 
     /**
