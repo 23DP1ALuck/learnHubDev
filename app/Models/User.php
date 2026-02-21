@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,7 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'status'
     ];
 
     /**
@@ -55,5 +57,10 @@ class User extends Authenticatable
     public function invites(): HasMany
     {
         return $this->hasMany(AccountInvites::class, 'invited_by');
+    }
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'users_organizations')
+            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges']);
     }
 }
