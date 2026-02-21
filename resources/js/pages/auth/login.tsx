@@ -8,7 +8,10 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import {Form, Head, usePage} from '@inertiajs/react';
+import {Flash} from "@/types";
+import {useEffect} from "react";
+import {toast} from "sonner";
 
 interface LoginProps {
     status?: string;
@@ -19,6 +22,15 @@ export default function Login({
     status,
     canResetPassword,
 }: LoginProps) {
+    const {flash} = usePage<Flash>().props;
+    useEffect(() => {
+        if(flash?.error){
+            toast.error(flash.error)
+        }
+        if(flash?.success){
+            toast.success(flash.success)
+        }
+    },[flash?.success, flash?.error])
     return (
         <AuthLayout
             title="Log in to your account"

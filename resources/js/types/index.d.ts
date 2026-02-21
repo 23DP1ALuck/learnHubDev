@@ -32,6 +32,7 @@ export type Flash = {
     flash?: {
         success?: string;
         invite_url?: string;
+        error?: string;
     };
 }
 
