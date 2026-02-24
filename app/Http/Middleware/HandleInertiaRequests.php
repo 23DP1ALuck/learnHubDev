@@ -41,6 +41,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'org' => fn () => $request->user()
+                ? $request->user()->organizations()->first()
+                : null,
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
                 'invite_url' => fn() => $request->session()->get('invite_url'),

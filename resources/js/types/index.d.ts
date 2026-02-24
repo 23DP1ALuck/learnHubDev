@@ -25,8 +25,16 @@ export interface NavItem {
 export interface SharedData {
     name: string;
     auth: Auth;
+    org: Organization;
     sidebarOpen: boolean;
     [key: string]: unknown;
+}
+export type Organization = {
+    id: number;
+    organization_type: 'individual' | 'school';
+    organization_name: string;
+    created_at: Date;
+    updated_at: Date;
 }
 export type Flash = {
     flash?: {
