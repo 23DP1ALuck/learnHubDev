@@ -30,4 +30,8 @@ class Topic extends Model
             'updated_at' => 'datetime',
         ];
     }
+    public function module()
+    {
+        return $this->belongsTo(Module::class, 'module_id');
+    }
 }
