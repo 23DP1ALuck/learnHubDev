@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTopicRequest;
 use App\Models\Module;
 use App\Models\Topic;
+use Helper;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class TopicController extends Controller
 {
@@ -34,7 +36,7 @@ class TopicController extends Controller
                     ]);
                 });
             } catch (QueryException $e) {
-                if ($attempt < $maxAttempts && $this->isUniqueConstraintViolation($e)) {
+                if ($attempt < $maxAttempts && Helper::isUniqueConstraintViolation($e)) {
                     continue;
                 }
 
@@ -42,7 +44,7 @@ class TopicController extends Controller
             }
         }
 
-        throw new \RuntimeException('Unable to generate next topic id.');
+        throw new RuntimeException('Unable to generate next topic id.');
     }
 
     private function nextTopicId(int $moduleId): int
@@ -54,13 +56,5 @@ class TopicController extends Controller
             ->value('topic_id');
 
         return ((int) ($lastTopicId ?? 0)) + 1;
-    }
-
-    private function isUniqueConstraintViolation(QueryException $e): bool
-    {
-        $sqlState = $e->errorInfo[0] ?? null;
-        $driverErrorCode = $e->errorInfo[1] ?? null;
-
-        return $sqlState === '23505' || $driverErrorCode === 19 || $driverErrorCode === 1062;
     }
 }
