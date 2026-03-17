@@ -1,6 +1,6 @@
 import {NavItem} from "@/types";
-import {dashboard, onboardingRequests} from "@/routes";
-import {Calendar, LayoutGrid, Settings} from "lucide-react";
+import {dashboard, onboardingRequests, organizations} from "@/routes";
+import {Building, Calendar, LayoutGrid, Settings} from "lucide-react";
 import {edit as editProfile} from "@/routes/profile";
 
 export const adminNavItems: NavItem[] = [
@@ -18,6 +18,11 @@ export const adminNavItems: NavItem[] = [
         title: 'Onboarding requests',
         href: onboardingRequests(),
         icon: Calendar
+    },
+    {
+        title: 'Organizations',
+        href: organizations(),
+        icon: Building
     }
 ]
 export const userNavItems: NavItem[] = [
@@ -32,3 +37,12 @@ export const userNavItems: NavItem[] = [
         icon: Settings,
     },
 ]
+export const studentNavItems: NavItem[] = [
+    ...userNavItems,
+    {
+        title: 'Modules',
+        href: onboardingRequests(),
+        icon: Calendar
+    }
+]
+

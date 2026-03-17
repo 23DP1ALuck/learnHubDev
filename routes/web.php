@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrganizationsPageController;
 use App\Http\Middleware\CheckIsAdmin;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
+    Route::get('organizations', [OrganizationsPageController::class, 'index'])->name('organizations');
     Route::post('/account-invites', [AccountInvitesController::class, 'store'])->name('account-invites.store');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
