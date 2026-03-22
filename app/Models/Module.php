@@ -29,4 +29,9 @@ class Module extends Model
         return $this->hasMany(Topic::class);
     }
 
+    public function groupModuleTeachers(): HasMany
+    {
+        return $this->hasMany(GroupModuleTeacher::class);
+    }
+
 }

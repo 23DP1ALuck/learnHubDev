@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
@@ -26,5 +27,9 @@ class Organization extends Model
     {
         return $this->belongsToMany(User::class, 'users_organizations')
             ->withPivot(['joined_on', 'role_in_org', 'admin_privileges']);
+    }
+    public function schoolGroups(): HasMany
+    {
+        return $this->hasMany(SchoolGroup::class, 'school_id');
     }
 }

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
@@ -62,5 +63,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Organization::class, 'users_organizations')
             ->withPivot(['joined_on', 'role_in_org', 'admin_privileges']);
+    }
+    public function teacher(): HasOne
+    {
+        return $this->hasOne(Teacher::class);
     }
 }
