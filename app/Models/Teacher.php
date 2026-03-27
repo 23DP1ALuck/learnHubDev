@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teacher extends Model
 {
+    public $incrementing = false;
+
+    protected $primaryKey = 'user_id';
+
+    protected $keyType = 'int';
+
     protected $fillable = [
         "speciality"
     ];

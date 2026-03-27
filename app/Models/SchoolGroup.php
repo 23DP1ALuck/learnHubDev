@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Awobaz\Compoships\Compoships;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SchoolGroup extends Model
@@ -31,6 +30,6 @@ class SchoolGroup extends Model
     }
     public function groupModulesTeachers()
     {
-        return $this->hasMany(GroupModuleTeacher::class, ['group_id', 'organisation_id'], ['group_id', 'school_id']);
+        return $this->hasMany(GroupModuleTeacher::class, ['group_id', 'school_id'], ['group_id', 'school_id']);
     }
 }

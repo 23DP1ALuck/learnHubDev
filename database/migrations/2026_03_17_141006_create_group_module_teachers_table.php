@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('school_year', 10)->nullable();
 
             $table->primary([
-                'organisation_id',
+                'school_id',
                 'group_id',
                 'module_id',
                 'teacher_id'
