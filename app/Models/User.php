@@ -64,6 +64,24 @@ class User extends Authenticatable
         return $this->belongsToMany(Organization::class, 'users_organizations')
             ->withPivot(['joined_on', 'role_in_org', 'admin_privileges']);
     }
+
+    public function ownedOrganizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'users_organizations')
+            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges'])
+            ->wherePivot('role_in_org', 'ORGANIZATION_OWNER');
+    }
+
+    public function currentOrganization(): ?Organization
+    {
+        return $this->currentOwnedOrganization() ?? $this->organizations()->first();
+    }
+
+    public function currentOwnedOrganization(): ?Organization
+    {
+        return $this->ownedOrganizations()->first();
+    }
+
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);

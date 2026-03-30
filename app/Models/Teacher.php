@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     public $incrementing = false;
+    public $timestamps = false;
 
     protected $primaryKey = 'user_id';
 
     protected $keyType = 'int';
 
     protected $fillable = [
+        "user_id",
         "speciality"
     ];
     protected function casts(): array
@@ -23,6 +25,6 @@ class Teacher extends Model
     }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
