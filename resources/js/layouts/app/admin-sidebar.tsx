@@ -10,14 +10,12 @@ import {
 } from '@/components/ui/sidebar';
 import { useActiveUrl } from '@/hooks/use-active-url';
 import { dashboard } from '@/routes';
-import { edit as editProfile } from '@/routes/profile';
-import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import Logo from '@/components/icons/Logo';
-import {userNavItems} from "@/layouts/dashboard/navitems";
+import {adminNavItems} from "@/layouts/app/navitems";
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
-
+    console.log(adminNavItems)
     return (
         <UISidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -36,7 +34,7 @@ export function Sidebar() {
 
             <SidebarContent>
                 <SidebarMenu>
-                    {userNavItems.map((item) => (
+                    {adminNavItems.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
