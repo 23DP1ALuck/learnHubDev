@@ -3,6 +3,8 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    organizationRole?: OrganizationRole | null;
+    canManageOrganization?: boolean;
 }
 
 export interface BreadcrumbItem {
@@ -20,21 +22,28 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    embedItems?: NavItem[];
 }
 
 export interface SharedData {
     name: string;
     auth: Auth;
-    org: Organization;
+    org: Organization | null;
     sidebarOpen: boolean;
     [key: string]: unknown;
 }
+export type OrganizationRole = 'STUDENT' | 'TEACHER' | 'ORGANIZATION_OWNER';
 export type Organization = {
     id: number;
     organization_type: 'individual' | 'school';
     organization_name: string;
-    created_at: Date;
-    updated_at: Date;
+    created_at: string;
+    updated_at: string;
+    pivot?: {
+        joined_on: string | null;
+        role_in_org: OrganizationRole;
+        admin_privileges: boolean;
+    };
 }
 export type Flash = {
     flash?: {
@@ -55,6 +64,35 @@ export interface User {
     updated_at: string;
     role: 'admin' | 'user';
     [key: string]: unknown; // This allows for additional properties...
+}
+export type OrganizationMember = {
+    id: number;
+    name: string;
+    email: string;
+    status: 'active' | 'invited' | 'disabled';
+    role_in_org: OrganizationRole;
+    admin_privileges: boolean;
+    joined_on: string | null;
+    created_at: string;
+}
+export type OrganizationInvite = {
+    id: number;
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    role_in_org: OrganizationRole | null;
+    created_at: string | null;
+    expires_at: string | null;
+    used_at: string | null;
+    status: 'pending' | 'used' | 'expired';
+    inviter_name: string | null;
+}
+export type OrganizationStats = {
+    members: number;
+    teachers: number;
+    students: number;
+    school_groups: number;
+    pending_invites: number;
 }
 export type OnboardingRequest = {
     id: number;

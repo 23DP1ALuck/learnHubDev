@@ -32,7 +32,7 @@ export function NavUser() {
                         >
                             {auth.user.role === 'admin' ?
                                 <UserInfo user={auth.user} showEmail={true}/> :
-                                <UserInfo user={auth.user} showOrganization={true}  organization={org}/>
+                                <UserInfo user={auth.user} showOrganization={true}  organization={org ?? undefined}/>
                             }
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
