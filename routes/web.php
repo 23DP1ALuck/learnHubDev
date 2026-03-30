@@ -30,7 +30,6 @@ Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () 
 
 Route::middleware(['auth', 'verified', CheckIsOrganizationOwner::class])
     ->group(function () {
-        Route::get('dashboard', [OrganizationOwnerController::class, 'dashboard'])->name('dashboard');
         Route::get('organization', [OrganizationOwnerController::class, 'organization'])->name('organization');
         Route::get('organization/users', [OrganizationOwnerController::class, 'users'])->name('users');
         Route::get('organization/invitations', [OrganizationOwnerController::class, 'invitations'])->name('invitations');

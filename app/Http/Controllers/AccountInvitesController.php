@@ -206,7 +206,7 @@ class AccountInvitesController extends Controller
         }
 
         $redirect = redirect()
-            ->route('owner.invitations')
+            ->route('invitations')
             ->with('invite_url', $url);
 
         if ($mailSent) {
