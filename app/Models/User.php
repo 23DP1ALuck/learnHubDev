@@ -74,7 +74,7 @@ class User extends Authenticatable
 
     public function currentOrganization(): ?Organization
     {
-        return $this->currentOwnedOrganization() ?? $this->organizations()->first();
+        return $this->organizations()->first();
     }
 
     public function currentOwnedOrganization(): ?Organization

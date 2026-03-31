@@ -5,6 +5,7 @@ use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrganizationOwnerController;
 use App\Http\Controllers\OrganizationsPageController;
+use App\Http\Controllers\SessionController;
 use App\Http\Middleware\CheckIsAdmin;
 use App\Http\Middleware\CheckIsOrganizationOwner;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,7 @@ Route::post('onboarding-requests', [OnboardingRequestController::class, 'store']
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
 });
 Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');

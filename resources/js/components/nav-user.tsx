@@ -15,13 +15,18 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
+import {JoinedOrg} from "@/components/dashboard/shared/joined-org";
+import {useState} from "react";
 
 export function NavUser() {
-    const { auth, org } = usePage<SharedData>().props;
+    const { auth, session } = usePage<SharedData>().props;
+    console.log(session);
     const { state } = useSidebar();
     const isMobile = useIsMobile();
+    const [open, setOpen] = useState(false);
     return (
         <SidebarMenu>
+            <JoinedOrg organizations={auth.organizations} showList={open} onOpenChange={setOpen}/>
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -32,7 +37,7 @@ export function NavUser() {
                         >
                             {auth.user.role === 'admin' ?
                                 <UserInfo user={auth.user} showEmail={true}/> :
-                                <UserInfo user={auth.user} showOrganization={true}  organization={org ?? undefined}/>
+                                <UserInfo user={auth.user} showOrganization={true}  organization={session.activeOrganization ?? undefined}/>
                             }
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
@@ -48,7 +53,7 @@ export function NavUser() {
                                   : 'bottom'
                         }
                     >
-                        <UserMenuContent user={auth.user} />
+                        <UserMenuContent user={auth.user} setOpen={setOpen} />
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>

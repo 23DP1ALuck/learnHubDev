@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Organization;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,8 @@ class HandleInertiaRequests extends Middleware
             ? $this->resolveCurrentOrganization($request->user())
             : null;
 
+        $currentUser = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -48,10 +51,14 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'organizationRole' => $currentOrganization?->pivot?->role_in_org,
                 'canManageOrganization' => (bool) $currentOrganization?->pivot?->admin_privileges===true,
+                'organizations' => $currentUser instanceof User ? $this->listOrganizations($request->user()) : null,
             ],
-            'org' => $currentOrganization,
+            'session' => [
+                "activeOrganization" => $request->session()->get('activeOrganization'),
+            ],
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
+                'afterLogin' => fn() => $request->session()->get('afterLogin'),
                 'invite_url' => fn() => $request->session()->get('invite_url'),
                 'error' => fn() => $request->session()->get('error'),
             ],
@@ -62,5 +69,8 @@ class HandleInertiaRequests extends Middleware
     private function resolveCurrentOrganization(User $user): ?Organization
     {
         return $user->currentOrganization();
+    }
+    private function listOrganizations(User $user): Collection{
+        return $user->organizations()->get();
     }
 }

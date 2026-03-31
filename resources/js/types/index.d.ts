@@ -5,6 +5,8 @@ export interface Auth {
     user: User;
     organizationRole?: OrganizationRole | null;
     canManageOrganization?: boolean;
+    organizations: Organization[];
+    activeOrganization?: Organization | null;
 }
 
 export interface BreadcrumbItem {
@@ -28,9 +30,13 @@ export interface NavItem {
 export interface SharedData {
     name: string;
     auth: Auth;
+    session: Session;
     org: Organization | null;
     sidebarOpen: boolean;
     [key: string]: unknown;
+}
+export interface Session {
+    activeOrganization?: Organization | null;
 }
 export type OrganizationRole = 'STUDENT' | 'TEACHER' | 'ORGANIZATION_OWNER';
 export type Organization = {
@@ -50,6 +56,7 @@ export type Flash = {
         success?: string;
         invite_url?: string;
         error?: string;
+        afterLogin?: boolean;
     };
 }
 

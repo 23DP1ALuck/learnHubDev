@@ -3,8 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard as ownerDashboard, invitations as ownerInvitations, organization as ownerOrganization, users as ownerUsers } from '@/routes';
-import type { BreadcrumbItem, Organization, OrganizationInvite, OrganizationMember, OrganizationStats } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import type {
+    BreadcrumbItem, Flash,
+    Organization,
+    OrganizationInvite,
+    OrganizationMember,
+    OrganizationStats,
+    SharedData
+} from '@/types';
+import {Head, Link, usePage} from '@inertiajs/react';
+import {JoinedOrg} from "@/components/dashboard/shared/joined-org";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,10 +46,15 @@ export default function OwnerDashboard({
     latestMembers: OrganizationMember[];
     latestInvites: OrganizationInvite[];
 }) {
+    const {flash} = usePage<Flash>().props;
+    const {auth} = usePage<SharedData>().props;
+    if(flash?.afterLogin){
+        console.log(auth.organizations);
+    }
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Organization dashboard" />
-
+            {flash?.afterLogin && <JoinedOrg organizations={auth.organizations} showList={true}/>}
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <Card className="border-sidebar-border/70">
                     <CardHeader>
