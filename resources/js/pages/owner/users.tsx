@@ -1,11 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { users as ownerUsers } from '@/routes';
+import {organization as ownerOrganization, organizations, users as ownerUsers} from '@/routes';
 import type { BreadcrumbItem, Organization, OrganizationMember, OrganizationStats } from '@/types';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Organization',
+        href: ownerOrganization().url,
+    },
     {
         title: 'Users',
         href: ownerUsers().url,

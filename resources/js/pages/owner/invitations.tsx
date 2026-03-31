@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Spinner } from '@/components/ui/spinner';
 import { useClipboard } from '@/hooks/use-clipboard';
 import AppLayout from '@/layouts/app-layout';
-import { invitations as ownerInvitations } from '@/routes';
+import {invitations as ownerInvitations, organization as ownerOrganization} from '@/routes';
 import { store as storeInvitation } from '@/routes/invitations';
 import type { BreadcrumbItem, Flash, Organization, OrganizationInvite, OrganizationStats, OrganizationRole, SharedData } from '@/types';
 import { Form, Head, usePage } from '@inertiajs/react';
@@ -16,6 +16,10 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Organization',
+        href: ownerOrganization().url,
+    },
     {
         title: 'Invitations',
         href: ownerInvitations().url,
