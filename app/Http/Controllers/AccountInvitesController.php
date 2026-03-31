@@ -15,6 +15,7 @@ use App\Mail\InviteEmail;
 use App\Models\AccountInvites;
 use App\Models\OnboardingRequest;
 use App\Models\Organization;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -458,6 +459,15 @@ class AccountInvitesController extends Controller
             Teacher::query()->firstOrCreate(
                 ['user_id' => $user->id],
                 ['speciality' => null],
+            );
+        } elseif ($invite->role_in_org === 'STUDENT') {
+            Student::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'personal_code' => null,
+                    'school_id' => null,
+                    'group_id' => null,
+                ],
             );
         }
 
