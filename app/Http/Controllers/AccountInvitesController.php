@@ -398,6 +398,14 @@ class AccountInvitesController extends Controller
         ]);
 
         $invite->forceFill(['used_at' => now()])->save();
+
+        if($organization->organization_type === 'individual'){
+            Teacher::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                ['speciality' => null],
+            );
+        }
+
     }
 
     /**
