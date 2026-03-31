@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SchoolGroup extends Model
 {
@@ -31,5 +32,10 @@ class SchoolGroup extends Model
     public function groupModulesTeachers()
     {
         return $this->hasMany(GroupModuleTeacher::class, ['group_id', 'school_id'], ['group_id', 'school_id']);
+    }
+
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class, ['group_id', 'school_id'], ['group_id', 'school_id']);
     }
 }

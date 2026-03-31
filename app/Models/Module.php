@@ -34,4 +34,9 @@ class Module extends Model
         return $this->hasMany(GroupModuleTeacher::class);
     }
 
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(TopicAssignment::class, 'module_id');
+    }
+
 }

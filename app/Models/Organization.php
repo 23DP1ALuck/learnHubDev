@@ -38,4 +38,9 @@ class Organization extends Model
     {
         return $this->hasMany(AccountInvites::class);
     }
+
+    public function students(): HasMany
+    {
+        return $this->hasMany(Student::class, 'school_id');
+    }
 }

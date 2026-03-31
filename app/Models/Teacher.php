@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Teacher extends Model
 {
@@ -23,8 +25,13 @@ class Teacher extends Model
             'speciality' => 'string',
         ];
     }
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function groupModuleTeachers(): HasMany
+    {
+        return $this->hasMany(GroupModuleTeacher::class, 'teacher_id', 'user_id');
     }
 }
