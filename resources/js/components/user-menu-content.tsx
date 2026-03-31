@@ -12,14 +12,33 @@ import {SharedData, type User} from '@/types';
 import {Link, router, usePage} from '@inertiajs/react';
 import {Building2, LogOut, Settings} from 'lucide-react';
 import {JoinedOrg} from "@/components/dashboard/shared/joined-org";
-import {useState} from "react";
+import {FC, JSX, useState} from "react";
 
 interface UserMenuContentProps {
     user: User;
-    setOpen: (open: boolean) => void;
+    setOpen?: (open: boolean) => void;
+    showChangeOption?: boolean;
 }
 
-export function UserMenuContent({ user, setOpen }: UserMenuContentProps) {
+function ChangeOrganization({setOpen} : {setOpen : (open: boolean) => void}) : JSX.Element{
+    return <>
+        <DropdownMenuSeparator/>
+        <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+                <div
+                    className="block w-full cursor-pointer"
+                    onClick={() => setOpen(true)}
+                >
+                    <Building2 className="mr-2" />
+                    Change organization
+                </div>
+            </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator/>
+    </>
+}
+
+export function UserMenuContent({ user, setOpen, showChangeOption }: UserMenuContentProps) {
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -48,18 +67,11 @@ export function UserMenuContent({ user, setOpen }: UserMenuContentProps) {
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                    <div
-                        className="block w-full cursor-pointer"
-                        onClick={() => setOpen(true)}
-                    >
-                        <Building2 className="mr-2" />
-                        Change organization
-                    </div>
-                </DropdownMenuItem>
-            </DropdownMenuGroup>
+
+            {showChangeOption && setOpen &&(
+                <ChangeOrganization setOpen={setOpen}/>
+            )}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <Link

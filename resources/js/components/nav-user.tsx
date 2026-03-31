@@ -53,7 +53,8 @@ export function NavUser() {
                                   : 'bottom'
                         }
                     >
-                        <UserMenuContent user={auth.user} setOpen={setOpen} />
+                        {auth.organizations.length > 1 ? <UserMenuContent user={auth.user} setOpen={setOpen} /> : <UserMenuContent user={auth.user} showChangeOption={false}/>}
+
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>

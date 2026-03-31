@@ -54,7 +54,7 @@ export default function OwnerDashboard({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Organization dashboard" />
-            {flash?.afterLogin && <JoinedOrg organizations={auth.organizations} showList={true}/>}
+            {(flash?.afterLogin && auth.organizations.length > 1) && <JoinedOrg organizations={auth.organizations} showList={true}/>}
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <Card className="border-sidebar-border/70">
                     <CardHeader>
