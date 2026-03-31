@@ -15,6 +15,7 @@ use App\Mail\InviteEmail;
 use App\Models\AccountInvites;
 use App\Models\OnboardingRequest;
 use App\Models\Organization;
+use App\Models\SchoolGroup;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -400,10 +401,15 @@ class AccountInvitesController extends Controller
         $invite->forceFill(['used_at' => now()])->save();
 
         if($organization->organization_type === 'individual'){
-            Teacher::query()->firstOrCreate(
+            Teacher::query()->firstOrCreate( // individual is also a teacher
                 ['user_id' => $user->id],
                 ['speciality' => null],
             );
+            SchoolGroup::create([   // default group for individual
+                "group_id" => 1,
+                "school_id" => $organization->id,
+                "name" => "Course group"
+            ]);
         }
 
     }
