@@ -27,7 +27,7 @@ class Organization extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'users_organizations')
-            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges']);
+            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges', 'group_id']);
     }
     public function schoolGroups(): HasMany
     {
@@ -39,8 +39,10 @@ class Organization extends Model
         return $this->hasMany(AccountInvites::class);
     }
 
-    public function students(): HasMany
+    public function students(): BelongsToMany
     {
-        return $this->hasMany(Student::class, 'school_id');
+        return $this->belongsToMany(User::class, 'users_organizations')
+            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges', 'group_id'])
+            ->wherePivot('role_in_org', 'STUDENT');
     }
 }

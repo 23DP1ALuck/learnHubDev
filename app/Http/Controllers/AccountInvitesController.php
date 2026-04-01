@@ -462,10 +462,19 @@ class AccountInvitesController extends Controller
             ->exists();
 
         if (! $membershipExists) {
+            $groupId = null;
+
+            if ($invite->role_in_org === 'STUDENT' && $organization->organization_type === 'individual') {
+                $groupId = $organization->schoolGroups()
+                    ->where('name', 'Course group')
+                    ->value('group_id');
+            }
+
             $user->organizations()->attach($organization->id, [
                 'joined_on' => now()->toDateString(),
                 'role_in_org' => $invite->role_in_org,
                 'admin_privileges' => false,
+                'group_id' => $groupId,
             ]);
         }
 
@@ -477,11 +486,7 @@ class AccountInvitesController extends Controller
         } elseif ($invite->role_in_org === 'STUDENT') {
             Student::query()->firstOrCreate(
                 ['user_id' => $user->id],
-                [
-                    'personal_code' => null,
-                    'school_id' => null,
-                    'group_id' => null,
-                ],
+                ['personal_code' => null],
             );
         }
 
