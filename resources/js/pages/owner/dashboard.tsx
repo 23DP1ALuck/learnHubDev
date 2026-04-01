@@ -12,7 +12,7 @@ import type {
     SharedData
 } from '@/types';
 import {Head, Link, usePage} from '@inertiajs/react';
-import {JoinedOrg} from "@/components/dashboard/shared/joined-org";
+import {JoinedOrg} from "@/components/shared/joined-org";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,10 +51,11 @@ export default function OwnerDashboard({
     if(flash?.afterLogin){
         console.log(auth.organizations);
     }
+    console.log(auth.currentOrganization);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Organization dashboard" />
-            {(flash?.afterLogin && auth.organizations.length > 1) && <JoinedOrg organizations={auth.organizations} showList={true}/>}
+            {(flash?.afterLogin && auth.organizations.length > 1) && <JoinedOrg organizations={auth.organizations} showList={true} currentOrganization={auth.currentOrganization}/>}
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <Card className="border-sidebar-border/70">
                     <CardHeader>

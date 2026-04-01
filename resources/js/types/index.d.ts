@@ -4,6 +4,7 @@ import { LucideIcon } from 'lucide-react';
 export interface Auth {
     user: User;
     organizationRole?: OrganizationRole | null;
+    currentOrganization?: Organization | null;
     canManageOrganization?: boolean;
     organizations: Organization[];
     activeOrganization?: Organization | null;
@@ -100,6 +101,14 @@ export type OrganizationStats = {
     students: number;
     school_groups: number;
     pending_invites: number;
+}
+export type OrganizationGroup = {
+    group_id: number;
+    name: string;
+    students_count: number;
+    teachers_count: number;
+    modules_count: number;
+    created_at: string | null;
 }
 export type OnboardingRequest = {
     id: number;

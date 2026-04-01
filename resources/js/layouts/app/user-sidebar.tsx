@@ -57,8 +57,8 @@ export function Sidebar() {
                                 </SidebarMenuItem>
                             );
                         }
-                        return <div className="flex flex-col">
-                            <SidebarMenuItem key={item.title}>
+                        return <div className="flex flex-col" key={item.title}>
+                            <SidebarMenuItem>
                                 <SidebarMenuButton
                                     asChild
                                     isActive={urlIsActive(item.href, undefined, true)}

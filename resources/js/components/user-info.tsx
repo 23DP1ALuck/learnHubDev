@@ -6,12 +6,12 @@ export function UserInfo({
     user,
     showEmail = false,
     showOrganization = false,
-    organization = {} as Organization,
+    organizationName = "",
 }: {
     user: User;
     showEmail?: boolean;
     showOrganization?: boolean;
-    organization?: Organization;
+    organizationName?: string;
 }) {
     const getInitials = useInitials();
 
@@ -32,7 +32,7 @@ export function UserInfo({
                 )}
                 {showOrganization && (
                     <span className="truncate text-xs text-muted-foreground">
-                        {organization.organization_name}
+                        {organizationName}
                     </span>
                 )}
             </div>

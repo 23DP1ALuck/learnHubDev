@@ -38,23 +38,26 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        $currentOrganization = $request->user() instanceof User
-            ? $this->resolveCurrentOrganization($request->user())
-            : null;
+        $currentOrganizationId = $this->resolveCurrentOrganization($request);
 
         $currentUser = $request->user();
+        $currentOrganization = $currentUser instanceof User ? $currentUser
+            ->organizations()
+            ->where('id', $currentOrganizationId)
+            ->first(): null;
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'currentOrganization' => $currentOrganization,
                 'organizationRole' => $currentOrganization?->pivot?->role_in_org,
                 'canManageOrganization' => (bool) $currentOrganization?->pivot?->admin_privileges===true,
                 'organizations' => $currentUser instanceof User ? $this->listOrganizations($request->user()) : null,
             ],
             'session' => [
-                "activeOrganization" => $request->session()->get('activeOrganization'),
+                "activeOrganization" => (int) $currentOrganizationId ?? null,
             ],
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
@@ -66,9 +69,18 @@ class HandleInertiaRequests extends Middleware
         ];
     }
 
-    private function resolveCurrentOrganization(User $user): ?Organization
+    private function resolveCurrentOrganization(Request $request): ?int
     {
-        return $user->currentOrganization();
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return null;
+        }
+        $activeOrganizationId = $request->session()->get('activeOrganization');
+        if(!$activeOrganizationId){
+            return null;
+        }
+        return $activeOrganizationId;
     }
     private function listOrganizations(User $user): Collection{
         return $user->organizations()->get();

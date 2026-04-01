@@ -11,7 +11,7 @@ import { edit } from '@/routes/profile';
 import {SharedData, type User} from '@/types';
 import {Link, router, usePage} from '@inertiajs/react';
 import {Building2, LogOut, Settings} from 'lucide-react';
-import {JoinedOrg} from "@/components/dashboard/shared/joined-org";
+import {JoinedOrg} from "@/components/shared/joined-org";
 import {FC, JSX, useState} from "react";
 
 interface UserMenuContentProps {
@@ -34,7 +34,6 @@ function ChangeOrganization({setOpen} : {setOpen : (open: boolean) => void}) : J
                 </div>
             </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator/>
     </>
 }
 

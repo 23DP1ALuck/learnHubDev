@@ -19,9 +19,10 @@ type JoinedOrgProps = {
     organizations: Organization[];
     showList?: boolean;
     onOpenChange?: (open: boolean) => void;
+    currentOrganization?: Organization | null | undefined;
 };
-export const JoinedOrg = ({organizations, showList, onOpenChange} : JoinedOrgProps) => {
-
+export const JoinedOrg = ({organizations, showList, onOpenChange, currentOrganization} : JoinedOrgProps) => {
+    console.log("qweq", currentOrganization);
     return <Dialog open={showList} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
@@ -31,8 +32,8 @@ export const JoinedOrg = ({organizations, showList, onOpenChange} : JoinedOrgPro
                     </DialogDescription>
                 </DialogHeader>
                 <div>
-                    <Form className="mt-2 space-y-3" id="active-org-form" action={setActiveOrganization()}>
-                        <RadioGroup name="currentOrganization" defaultValue={organizations[0].id.toString()}>
+                    <Form className="mt-2 space-y-3" id="active-org-form" action={setActiveOrganization()} onSuccess={() => onOpenChange?.(false)}>
+                        <RadioGroup name="currentOrganization" defaultValue={currentOrganization?.id.toString()}>
                         {organizations.length > 1 && (
                             organizations.map((org) => (
                                 <div
