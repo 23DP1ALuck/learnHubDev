@@ -29,7 +29,7 @@ class SessionController extends Controller
                 ->with('error', "You don't belong to this organization");
         }
 
-        session()->put('activeOrganization', $organization);
+        session()->put('activeOrganization', $organization->id);
 
         return redirect()->route('dashboard')->with('success', 'Organization set successfully.');
     }

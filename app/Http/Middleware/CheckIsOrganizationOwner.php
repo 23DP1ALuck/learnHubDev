@@ -18,7 +18,7 @@ class CheckIsOrganizationOwner
         $user = $request->user();
         $currentOrg = session()->get('activeOrganization', '');
         if (! $user || ! $this->checkIsOrganizationOwner($user, $currentOrg)) {
-            abort(403);
+            return redirect()->back();
         }
 
         return $next($request);
