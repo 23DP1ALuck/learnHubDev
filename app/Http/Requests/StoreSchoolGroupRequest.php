@@ -25,7 +25,6 @@ class StoreSchoolGroupRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'school_id' => 'required|integer|exists:organizations,id',
         ];
 
     }
