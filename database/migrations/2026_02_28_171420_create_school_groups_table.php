@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('school_groups', function (Blueprint $table) {
             $table->unsignedBigInteger('group_id');
-            $table->foreignId('school_id')
-                ->constrained()
+            $table->unsignedBigInteger('school_id');
+            $table->foreign('school_id')
+                ->references('id')
+                ->on('organizations')
                 ->cascadeOnDelete();
 
             $table->timestamps();
