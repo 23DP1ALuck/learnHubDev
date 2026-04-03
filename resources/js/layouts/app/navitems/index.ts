@@ -1,6 +1,6 @@
 import {NavItem} from "@/types";
 import {dashboard, onboardingRequests, organizations} from "@/routes";
-import {Building, Calendar, LayoutGrid, Settings} from "lucide-react";
+import {Building, Calendar, LayoutGrid, Settings, Users} from "lucide-react";
 import {edit as editProfile} from "@/routes/profile";
 import {dashboard as ownerDashboard, invitations as ownerInvitations, organization as ownerOrganization, users as ownerUsers} from "@/routes";
 
@@ -38,7 +38,41 @@ export const userNavItems: NavItem[] = [
         icon: Settings,
     },
 ]
-export const ownerNavItems: NavItem[] = [
+export const schoolOwnerNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: ownerDashboard(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Organization',
+        href: ownerOrganization(),
+        icon: Building,
+        embedItems: [
+            {
+                title: 'Groups',
+                href: '/organization/groups',
+                icon: Users,
+            },
+            {
+                title: 'Users',
+                href: ownerUsers(),
+                icon: Calendar,
+            },
+            {
+                title: 'Invitations',
+                href: ownerInvitations(),
+                icon: Calendar,
+            },
+        ]
+    },
+    {
+        title: 'Settings',
+        href: editProfile(),
+        icon: Settings,
+    },
+]
+export const individualOwnerNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: ownerDashboard(),

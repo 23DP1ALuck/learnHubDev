@@ -10,16 +10,24 @@ import {
 } from '@/components/ui/sidebar';
 import { useActiveUrl } from '@/hooks/use-active-url';
 import { dashboard } from '@/routes';
-import {NavItem, type SharedData} from '@/types';
+import {Auth, NavItem, type SharedData} from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import Logo from '@/components/icons/Logo';
 import { dashboard as ownerDashboard } from "@/routes";
-import { ownerNavItems, userNavItems } from "@/layouts/app/navitems";
+import { schoolOwnerNavItems, individualOwnerNavItems, userNavItems } from "@/layouts/app/navitems";
+function setNavItems(auth: Auth) {
+    if(auth.canManageOrganization){
+        if(auth.currentOrganization?.organization_type === 'individual'){
+            return individualOwnerNavItems;
+        }
+        return schoolOwnerNavItems;
+    }
+    return userNavItems;
+}
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
     const { auth } = usePage<SharedData>().props;
-    console.log(auth);
-    const navItems = auth.canManageOrganization ? ownerNavItems : userNavItems;
+    const navItems = setNavItems(auth);
     const homeHref = auth.canManageOrganization ? ownerDashboard() : dashboard();
 
     return (
