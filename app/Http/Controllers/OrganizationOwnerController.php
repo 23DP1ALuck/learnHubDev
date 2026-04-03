@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\AccountInvites;
 use App\Models\Organization;
+use App\Models\SchoolGroup;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -94,6 +96,54 @@ class OrganizationOwnerController extends Controller
                 ['value' => 'TEACHER', 'label' => 'Teacher'],
                 ['value' => 'STUDENT', 'label' => 'Student'],
             ],
+        ]);
+    }
+
+    public function groups(Request $request): Response
+    {
+        $organization = $this->ownedOrganization($request);
+
+        abort_if($organization->organization_type !== 'school', 404);
+
+        $studentCounts = DB::table('users_organizations')
+            ->select('group_id', DB::raw('COUNT(*) as total'))
+            ->where('organization_id', $organization->id)
+            ->where('role_in_org', 'STUDENT')
+            ->whereNotNull('group_id')
+            ->groupBy('group_id')
+            ->pluck('total', 'group_id');
+
+        $teacherCounts = DB::table('group_module_teacher')
+            ->select('group_id', DB::raw('COUNT(DISTINCT teacher_id) as total'))
+            ->where('school_id', $organization->id)
+            ->groupBy('group_id')
+            ->pluck('total', 'group_id');
+
+        $moduleCounts = DB::table('group_module_teacher')
+            ->select('group_id', DB::raw('COUNT(DISTINCT module_id) as total'))
+            ->where('school_id', $organization->id)
+            ->groupBy('group_id')
+            ->pluck('total', 'group_id');
+
+        $groups = $organization->schoolGroups()
+            ->orderBy('name')
+            ->get()
+            ->map(function (SchoolGroup $group) use ($studentCounts, $teacherCounts, $moduleCounts) {
+                return [
+                    'group_id' => $group->group_id,
+                    'name' => $group->name,
+                    'students_count' => (int) ($studentCounts[$group->group_id] ?? 0),
+                    'teachers_count' => (int) ($teacherCounts[$group->group_id] ?? 0),
+                    'modules_count' => (int) ($moduleCounts[$group->group_id] ?? 0),
+                    'created_at' => optional($group->created_at)?->toISOString(),
+                ];
+            })
+            ->values();
+
+        return Inertia::render('owner/groups', [
+            'organization' => $this->organizationPayload($organization),
+            'stats' => $this->organizationStats($organization),
+            'groups' => $groups,
         ]);
     }
 
