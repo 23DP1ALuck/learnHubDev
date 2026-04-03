@@ -21,16 +21,12 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'personal_code',
-        'school_id',
-        'group_id',
     ];
 
     protected function casts(): array
     {
         return [
             'user_id' => 'integer',
-            'school_id' => 'integer',
-            'group_id' => 'integer',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
@@ -39,11 +35,6 @@ class Student extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function group(): BelongsTo
-    {
-        return $this->belongsTo(SchoolGroup::class, ['group_id', 'school_id'], ['group_id', 'school_id']);
     }
 
     public function submissions(): HasMany
