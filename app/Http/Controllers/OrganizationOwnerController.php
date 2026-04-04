@@ -175,7 +175,11 @@ class OrganizationOwnerController extends Controller
     }
     private function organizationStudents(Organization $organization): array
     {
-        return $organization->users()->wherePivot('role_in_org', 'STUDENT')->get()->toArray();
+        return $organization->users()
+            ->wherePivot('role_in_org', 'STUDENT')
+            ->wherePivotNull('group_id')
+            ->get()
+            ->toArray();
 
     }
     private function ownedOrganization(Request $request): Organization
