@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified', CheckIsOrganizationOwner::class])
 Route::middleware([CheckIsSchoolOwner::class])->group(function () {
     Route::get('organization/groups', [OrganizationOwnerController::class, 'groups'])->name('groups');
     Route::post('organization/groups', [SchoolGroupController::class, 'store'])->name('groups.store');
+    Route::patch('organization/groups/assign-students', [OrganizationOwnerController::class, 'assignStudents'])->name('groups.assign-students');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);

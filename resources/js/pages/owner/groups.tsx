@@ -1,9 +1,11 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type {BreadcrumbItem, Organization, OrganizationGroup, OrganizationStats, SharedData} from '@/types';
+import type {BreadcrumbItem, Organization, OrganizationGroup, OrganizationStats, SharedData, User} from '@/types';
 import {Head, usePage} from '@inertiajs/react';
 import {CreateGroups} from "@/components/org_owner/create-groups";
+import {Button} from "@/components/ui/button";
+import {AssignStudents} from "@/components/org_owner/assign-students";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,10 +22,12 @@ export default function OwnerGroupsPage({
     organization,
     stats,
     groups,
+    students
 }: {
     organization: Organization;
     stats: OrganizationStats;
     groups: OrganizationGroup[];
+    students: User[]
 }) {
     const totalAssignedStudents = groups.reduce((sum, group) => sum + group.students_count, 0);
     const totalAssignedTeachers = groups.reduce((sum, group) => sum + group.teachers_count, 0);
@@ -80,6 +84,8 @@ export default function OwnerGroupsPage({
                                             <th className="px-4 py-3 font-medium">Teachers</th>
                                             <th className="px-4 py-3 font-medium">Modules</th>
                                             <th className="px-4 py-3 font-medium">Created</th>
+                                            <th className="py-3 font-medium"></th>{/*placeholder*/}
+
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y text-sm">
@@ -96,6 +102,9 @@ export default function OwnerGroupsPage({
                                                 <td className="px-4 py-3 text-muted-foreground">{group.modules_count}</td>
                                                 <td className="px-4 py-3 text-muted-foreground">
                                                     {group.created_at ? new Date(group.created_at).toLocaleDateString() : 'Unknown'}
+                                                </td>
+                                                <td className="text-center py-3 text-muted-foreground">
+                                                    <AssignStudents group={group} students={students}/>
                                                 </td>
                                             </tr>
                                         ))}

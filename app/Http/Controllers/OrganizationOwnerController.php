@@ -101,6 +101,7 @@ class OrganizationOwnerController extends Controller
 
     public function groups(Request $request): Response
     {
+        // TODO: refactor queries
         $organization = $this->ownedOrganization($request);
 
         abort_if($organization->organization_type !== 'school', 404);
@@ -144,9 +145,39 @@ class OrganizationOwnerController extends Controller
             'organization' => $this->organizationPayload($organization),
             'stats' => $this->organizationStats($organization),
             'groups' => $groups,
+            'students' => $this->organizationStudents($organization),
         ]);
     }
+    public function assignStudents(Request $request)
+    {
+        $studentId = $request->input('student_id');
+        $groupId = $request->input('group_id');
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        $student = User::query()->where('id', $studentId)->first();
+        if(!$student){
+            return redirect()->back()->with('error', 'Student not found');
+        }
+        if(!$student->organizations()->wherePivot('organization_id', $organizationId)->exists()){
+            return redirect()->back()->with('error', 'Student doesn\'t belong to this organization');
+        }
+        $group = SchoolGroup::query()->where('group_id', $groupId)->first();
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+        if(!$organization->schoolGroups()->where('group_id', $groupId)->exists()){
+            return redirect()->back()->with('error', 'Group is not a part of this organization');
+        }
 
+        $student->organizations()->updateExistingPivot($organization, array('group_id' => $groupId));
+
+        return redirect()->route('groups')->with('success', 'Student assigned to group successfully');
+    }
+    private function organizationStudents(Organization $organization): array
+    {
+        return $organization->users()->wherePivot('role_in_org', 'STUDENT')->get()->toArray();
+
+    }
     private function ownedOrganization(Request $request): Organization
     {
         $organization = $request->user()?->currentOwnedOrganization();
@@ -182,7 +213,6 @@ class OrganizationOwnerController extends Controller
             'updated_at' => optional($organization->updated_at)?->toISOString(),
         ];
     }
-
     private function memberPayload(User $user): array
     {
         return [
