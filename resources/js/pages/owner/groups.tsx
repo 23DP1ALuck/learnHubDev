@@ -75,39 +75,38 @@ export default function OwnerGroupsPage({
                                 No groups yet. Add your first school group from the backend flow when ready.
                             </div>
                         ) : (
-                            <div className="overflow-x-auto rounded-lg border">
+                            <div className="w-full max-h-[250px] overflow-y-auto rounded-lg border">
                                 <table className="min-w-full divide-y">
-                                    <thead className="bg-muted/50 text-left text-sm">
-                                        <tr>
-                                            <th className="px-4 py-3 font-medium">Group</th>
-                                            <th className="px-4 py-3 font-medium">Students</th>
-                                            <th className="px-4 py-3 font-medium">Teachers</th>
-                                            <th className="px-4 py-3 font-medium">Modules</th>
-                                            <th className="px-4 py-3 font-medium">Created</th>
-                                            <th className="py-3 font-medium"></th>{/*placeholder*/}
-
-                                        </tr>
+                                    <thead className="bg-gray-100  text-left text-sm sticky top-0 z-10">
+                                    <tr>
+                                        <th className="px-4 py-3 font-medium">Group</th>
+                                        <th className="px-4 py-3 font-medium">Students</th>
+                                        <th className="px-4 py-3 font-medium">Teachers</th>
+                                        <th className="px-4 py-3 font-medium">Modules</th>
+                                        <th className="px-4 py-3 font-medium">Created</th>
+                                        <th className="py-3 font-medium"></th>
+                                    </tr>
                                     </thead>
                                     <tbody className="divide-y text-sm">
-                                        {groups.map((group) => (
-                                            <tr key={group.group_id}>
-                                                <td className="px-4 py-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <p className="font-medium">{group.name}</p>
-                                                        <Badge variant="secondary">#{group.group_id}</Badge>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 text-muted-foreground">{group.students_count}</td>
-                                                <td className="px-4 py-3 text-muted-foreground">{group.teachers_count}</td>
-                                                <td className="px-4 py-3 text-muted-foreground">{group.modules_count}</td>
-                                                <td className="px-4 py-3 text-muted-foreground">
-                                                    {group.created_at ? new Date(group.created_at).toLocaleDateString() : 'Unknown'}
-                                                </td>
-                                                <td className="text-center py-3 text-muted-foreground">
-                                                    <AssignStudents group={group} students={students}/>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                    {groups.map((group) => (
+                                        <tr key={group.group_id}>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <p className="font-medium">{group.name}</p>
+                                                    <Badge variant="secondary">#{group.group_id}</Badge>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-muted-foreground">{group.students_count}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">{group.teachers_count}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">{group.modules_count}</td>
+                                            <td className="px-4 py-3 text-muted-foreground">
+                                                {group.created_at ? new Date(group.created_at).toLocaleDateString() : 'Unknown'}
+                                            </td>
+                                            <td className="py-3 text-center text-muted-foreground">
+                                                <AssignStudents group={group} students={students} />
+                                            </td>
+                                        </tr>
+                                    ))}
                                     </tbody>
                                 </table>
                             </div>
