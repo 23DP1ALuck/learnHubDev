@@ -1,10 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type {BreadcrumbItem, Organization, OrganizationGroup, OrganizationStats, SharedData, User} from '@/types';
-import {Head, usePage} from '@inertiajs/react';
+import type { BreadcrumbItem, Organization, OrganizationGroup, OrganizationStats, User } from '@/types';
+import { Head } from '@inertiajs/react';
 import {CreateGroups} from "@/components/org_owner/create-groups";
-import {Button} from "@/components/ui/button";
 import {AssignStudents} from "@/components/org_owner/assign-students";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,22 +21,22 @@ export default function OwnerGroupsPage({
     organization,
     stats,
     groups,
-    students
+    students,
 }: {
     organization: Organization;
     stats: OrganizationStats;
     groups: OrganizationGroup[];
-    students: User[]
+    students: User[];
 }) {
     const totalAssignedStudents = groups.reduce((sum, group) => sum + group.students_count, 0);
     const totalAssignedTeachers = groups.reduce((sum, group) => sum + group.teachers_count, 0);
-    const {auth, session} = usePage<SharedData>().props;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Organization groups" />
 
-            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
-                <Card className="border-sidebar-border/70">
+            <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden rounded-xl p-4">
+                <Card className="shrink-0 border-sidebar-border/70">
                     <CardHeader>
                         <CardTitle>{organization.organization_name} groups</CardTitle>
                         <CardDescription>
@@ -63,19 +62,21 @@ export default function OwnerGroupsPage({
                         </div>
                     </CardContent>
                 </Card>
-                <CreateGroups org={session.activeOrganization}/>
-                <Card className="border-sidebar-border/70">
-                    <CardHeader>
+                <div className="shrink-0">
+                    <CreateGroups org={organization} />
+                </div>
+                <Card className="flex min-h-0 flex-1 flex-col border-sidebar-border/70">
+                    <CardHeader className="shrink-0">
                         <CardTitle>Group list</CardTitle>
                         <CardDescription>A simple overview of your current school groups.</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex min-h-0 flex-1 flex-col">
                         {groups.length === 0 ? (
-                            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+                            <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
                                 No groups yet. Add your first school group from the backend flow when ready.
                             </div>
                         ) : (
-                            <div className="w-full max-h-[250px] overflow-y-auto rounded-lg border">
+                            <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto rounded-lg border">
                                 <table className="min-w-full divide-y">
                                     <thead className="bg-gray-100  text-left text-sm sticky top-0 z-10">
                                     <tr>
