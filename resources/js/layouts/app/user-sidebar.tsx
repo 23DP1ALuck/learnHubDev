@@ -10,20 +10,31 @@ import {
 } from '@/components/ui/sidebar';
 import { useActiveUrl } from '@/hooks/use-active-url';
 import { dashboard } from '@/routes';
-import {Auth, NavItem, type SharedData} from '@/types';
+import { Auth, NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import Logo from '@/components/icons/Logo';
-import { dashboard as ownerDashboard } from "@/routes";
-import { schoolOwnerNavItems, individualOwnerNavItems, userNavItems } from "@/layouts/app/navitems";
+import { dashboard as ownerDashboard } from '@/routes';
+import { individualOwnerNavItems, schoolOwnerNavItems, studentNavItems, teacherNavItems, userNavItems } from '@/layouts/app/navitems';
+
 function setNavItems(auth: Auth) {
-    if(auth.canManageOrganization){
-        if(auth.currentOrganization?.organization_type === 'individual'){
+    if (auth.canManageOrganization) {
+        if (auth.currentOrganization?.organization_type === 'individual') {
             return individualOwnerNavItems;
         }
         return schoolOwnerNavItems;
     }
+
+    if (auth.organizationRole === 'TEACHER') {
+        return teacherNavItems;
+    }
+
+    if (auth.organizationRole === 'STUDENT') {
+        return studentNavItems;
+    }
+
     return userNavItems;
 }
+
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
     const { auth } = usePage<SharedData>().props;

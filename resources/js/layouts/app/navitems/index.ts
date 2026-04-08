@@ -1,8 +1,28 @@
-import {NavItem} from "@/types";
-import {dashboard, onboardingRequests, organizations} from "@/routes";
-import {Building, Calendar, LayoutGrid, Settings, Users} from "lucide-react";
-import {edit as editProfile} from "@/routes/profile";
-import {dashboard as ownerDashboard, invitations as ownerInvitations, organization as ownerOrganization, users as ownerUsers} from "@/routes";
+import type { NavItem } from '@/types';
+import { dashboard, onboardingRequests, organizations } from '@/routes';
+import { edit as editProfile } from '@/routes/profile';
+import {
+    dashboard as ownerDashboard,
+    invitations as ownerInvitations,
+    organization as ownerOrganization,
+    users as ownerUsers,
+} from '@/routes';
+import { BookOpen, Building, Calendar, LayoutGrid, Settings, Users } from 'lucide-react';
+
+const teacherModulesHref = '/teacher/modules';
+
+export const userNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Settings',
+        href: editProfile(),
+        icon: Settings,
+    },
+];
 
 export const adminNavItems: NavItem[] = [
     {
@@ -18,26 +38,33 @@ export const adminNavItems: NavItem[] = [
     {
         title: 'Onboarding requests',
         href: onboardingRequests(),
-        icon: Calendar
+        icon: Calendar,
     },
     {
         title: 'Organizations',
         href: organizations(),
-        icon: Building
-    }
-]
-export const userNavItems: NavItem[] = [
+        icon: Building,
+    },
+];
+
+export const teacherNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-            href: dashboard(),
+        href: dashboard(),
         icon: LayoutGrid,
     },
     {
+        title: 'Modules',
+        href: teacherModulesHref,
+        icon: BookOpen,
+    },
+    {
         title: 'Settings',
-            href: editProfile(),
+        href: editProfile(),
         icon: Settings,
     },
-]
+];
+
 export const schoolOwnerNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -64,19 +91,25 @@ export const schoolOwnerNavItems: NavItem[] = [
                 href: ownerInvitations(),
                 icon: Calendar,
             },
-        ]
+        ],
     },
     {
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
     },
-]
+];
+
 export const individualOwnerNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: ownerDashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Modules',
+        href: teacherModulesHref,
+        icon: BookOpen,
     },
     {
         title: 'Organization',
@@ -93,19 +126,13 @@ export const individualOwnerNavItems: NavItem[] = [
                 href: ownerInvitations(),
                 icon: Calendar,
             },
-        ]
+        ],
     },
     {
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
     },
-]
-export const studentNavItems: NavItem[] = [
-    ...userNavItems,
-    {
-        title: 'Modules',
-        href: onboardingRequests(),
-        icon: Calendar
-    }
-]
+];
+
+export const studentNavItems: NavItem[] = userNavItems;
