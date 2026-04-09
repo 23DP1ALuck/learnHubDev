@@ -16,6 +16,7 @@ type ModuleTopicsListProps = {
 };
 
 export default function ModuleTopicsList({ moduleId, topics }: ModuleTopicsListProps) {
+    console.log(topics);
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>

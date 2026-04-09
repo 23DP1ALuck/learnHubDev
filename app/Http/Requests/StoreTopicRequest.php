@@ -2,13 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\AuthorizesLearningContent;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTopicRequest extends FormRequest
 {
+    use AuthorizesLearningContent;
+
     public function authorize(): bool
     {
-        return true;
+        return $this->canManageLearningContent();
     }
 
     /**
@@ -23,4 +26,3 @@ class StoreTopicRequest extends FormRequest
         ];
     }
 }
-

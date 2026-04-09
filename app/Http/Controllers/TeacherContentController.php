@@ -107,7 +107,7 @@ class TeacherContentController extends Controller
 
         $topicSummary = $topics->map(function (Topic $topic) {
             return [
-                'topic_id' => $topic->id,
+                'topic_id' => $topic->topic_id,
                 'module_id' => $topic->module_id,
                 'name' => $topic->name,
                 'description' => $topic->description,

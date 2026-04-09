@@ -7,12 +7,13 @@ use App\Models\Module;
 use App\Models\Topic;
 use Helper;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class TopicController extends Controller
 {
-    public function store(StoreTopicRequest $request)
+    public function store(StoreTopicRequest $request): RedirectResponse
     {
         $validated = $request->validated();
         $moduleId = (int) $validated['module_id'];
@@ -20,7 +21,7 @@ class TopicController extends Controller
         $maxAttempts = 5;
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             try {
-                return DB::transaction(function () use ($validated, $moduleId) {
+                DB::transaction(function () use ($validated, $moduleId) {
                     Module::query()
                         ->where('id', $moduleId)
                         ->lockForUpdate()
@@ -35,6 +36,8 @@ class TopicController extends Controller
                         'description' => $validated['description'] ?? null,
                     ]);
                 });
+
+                return redirect()->back()->with('success', 'Topic created.');
             } catch (QueryException $e) {
                 if ($attempt < $maxAttempts && Helper::isUniqueConstraintViolation($e)) {
                     continue;
