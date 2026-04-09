@@ -44,11 +44,11 @@ export default function TeacherModulePage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
-            href: '/teacher/modules',
+            href: '/modules',
         },
         {
             title: module.name,
-            href: `/teacher/modules/${module.id}`,
+            href: `/modules/${module.id}`,
         },
     ];
 

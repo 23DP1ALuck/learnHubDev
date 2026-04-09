@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
 import {route} from "ziggy-js";
+import moment from "moment";
 
 type TeacherModule = {
     id: number;
@@ -47,8 +48,8 @@ export default function ModulesList({ modules }: ModulesListProps) {
                                     </div>
                                     <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                                         <span>Topics: {module.topics_count}</span>
-                                        <span>Start: {module.start_date || 'Not set'}</span>
-                                        <span>End: {module.end_date || 'Not set'}</span>
+                                        <span>Start: {module.start_date ? moment(module.start_date).format('MMM Do Y') : 'Not set'}</span>
+                                        <span>End: {module.end_date ? moment(module.end_date).format('MMM Do Y') : 'Not set'}</span>
                                     </div>
                                 </div>
                                 <span className="text-sm font-medium text-primary">Open</span>
