@@ -8,8 +8,9 @@ import {
     users as ownerUsers,
 } from '@/routes';
 import { BookOpen, Building, Calendar, LayoutGrid, Settings, Users } from 'lucide-react';
-
-const teacherModulesHref = '/teacher/modules';
+import {
+    modules as teacherModules,
+} from '@/routes/teacher';
 
 export const userNavItems: NavItem[] = [
     {
@@ -55,7 +56,7 @@ export const teacherNavItems: NavItem[] = [
     },
     {
         title: 'Modules',
-        href: teacherModulesHref,
+        href: teacherModules(),
         icon: BookOpen,
     },
     {
@@ -108,7 +109,7 @@ export const individualOwnerNavItems: NavItem[] = [
     },
     {
         title: 'Modules',
-        href: teacherModulesHref,
+        href: teacherModules(),
         icon: BookOpen,
     },
     {

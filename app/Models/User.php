@@ -82,6 +82,10 @@ class User extends Authenticatable
         return $this->ownedOrganizations()->first();
     }
 
+    public function modules(): HasMany
+    {
+        return $this->hasMany(Module::class, 'creator_id');
+    }
     public function teacher(): HasOne
     {
         return $this->hasOne(Teacher::class);

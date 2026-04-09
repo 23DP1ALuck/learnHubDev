@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Module extends Model
@@ -11,7 +12,9 @@ class Module extends Model
         'start_date',
         'name',
         'description',
-        'end_date'
+        'end_date',
+        'creator_id',
+        'organization_id'
     ];
     protected function casts(): array
     {
@@ -22,11 +25,21 @@ class Module extends Model
             'end_date' => 'date',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
+            'creator_id' => 'integer',
+            'organization_id' => 'integer',
         ];
     }
     public function topics(): HasMany
     {
         return $this->hasMany(Topic::class);
+    }
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     public function groupModuleTeachers(): HasMany

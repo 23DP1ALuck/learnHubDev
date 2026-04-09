@@ -58,10 +58,10 @@ Route::middleware([CheckIsSchoolOwner::class])->group(function () {
     Route::patch('organization/groups/assign-students', [OrganizationOwnerController::class, 'assignStudents'])->name('groups.assign-students');
 });
 Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->group(function () {
-    Route::get('teacher/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
-    Route::get('teacher/modules/{module}', [TeacherContentController::class, 'module'])->name('teacher.modules.show');
-    Route::get('teacher/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');
-    Route::get('teacher/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
+    Route::get('/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
+    Route::get('/modules/{module}', [TeacherContentController::class, 'module'])->name('teacher.modules.show');
+    Route::get('/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');
+    Route::get('/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
 
     Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
     Route::post('topics', [TopicController::class, 'store'])->name('topics.store');

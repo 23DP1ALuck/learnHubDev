@@ -11,24 +11,10 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use function PHPSTORM_META\map;
 
 class TeacherContentController extends Controller
 {
-//    id: number;
-//    name: string;
-//    description: string | null;
-//    start_date: string | null;
-//    end_date: string | null;
-//    topics_count: number;
-//    created_at: string | null;
-
-//    type ContentStats = {
-//    modules: number;
-//    topics: number;
-//    materials: number;
-//    assignments: number;
-//    tasks: number;
-//    };
     public function modules(Request $request): Response|RedirectResponse
     {
         $user = $request->user();
@@ -97,6 +83,50 @@ class TeacherContentController extends Controller
             'materials' => $materials,
             'assignments' => $assignments,
             'tasks' => $tasks,
+        ];
+    }
+    public function module(Request $request, Module $module){
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+        $data = $this->getModulePageInfo($request, $module);
+        return Inertia::render('teacher/module', [
+            "module" => $data["moduleSummary"],
+            "stats" => $data["moduleStats"],
+            "topics" => $data["topicSummary"],
+        ]);
+
+    }
+    private function getModulePageInfo(Request $request, Module $module): array{
+        $topics = Topic::query()
+            ->where('module_id', $module->id)
+            ->withCount(['materials', 'topicAssignments'])
+            ->get();
+
+        $topicSummary = $topics->map(function (Topic $topic) {
+            return [
+                'topic_id' => $topic->id,
+                'module_id' => $topic->module_id,
+                'name' => $topic->name,
+                'description' => $topic->description,
+                'materials_count' => $topic->materials_count,
+                'assignments_count' => $topic->topic_assignments_count,
+                'created_at' => $topic->created_at
+            ];
+        });
+        $topics = Topic::query()->where('module_id', $module->id);
+
+        $moduleStats = [
+            "topics" => $topics->count(),
+            "materials" => $topics->sum('materials_count'),
+            "topic_assignments" => $topics->sum('topic_assignments_count'),
+        ];
+        return [
+            'moduleSummary' => $module,
+            'moduleStats' => $moduleStats,
+            'topicSummary' => $topicSummary,
         ];
     }
 }
