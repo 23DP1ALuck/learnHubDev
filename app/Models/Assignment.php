@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Assignment extends Model
@@ -26,9 +27,18 @@ class Assignment extends Model
         ];
     }
 
-    public function topicAssignments(): HasMany
+    public function topics(): BelongsToMany
     {
-        return $this->hasMany(TopicAssignment::class, 'assignment_id');
+        return $this->belongsToMany(
+            Topic::class,
+            'topic_assignments',
+            'assignment_id',
+            'topic_id',
+            'id',
+            'topic_id',
+        )
+            ->whereColumn('topics.module_id', 'topic_assignments.module_id')
+            ->withPivot('module_id');
     }
 
     public function tasks(): HasMany

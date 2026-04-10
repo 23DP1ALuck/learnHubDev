@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Module extends Model
@@ -47,9 +48,16 @@ class Module extends Model
         return $this->hasMany(GroupModuleTeacher::class);
     }
 
-    public function assignments(): HasMany
+    public function assignments(): BelongsToMany
     {
-        return $this->hasMany(TopicAssignment::class, 'module_id');
+        return $this->belongsToMany(
+            Assignment::class,
+            'topic_assignments',
+            'module_id',
+            'assignment_id',
+            'id',
+            'id',
+        )->withPivot('topic_id');
     }
 
 }

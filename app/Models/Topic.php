@@ -5,6 +5,7 @@ namespace App\Models;
 use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Topic extends Model
@@ -45,8 +46,21 @@ class Topic extends Model
         return $this->hasMany(Material::class, ['topic_id', 'module_id'], ['topic_id', 'module_id']);
     }
 
-    public function topicAssignments(): HasMany
+    public function assignments(): BelongsToMany
     {
-        return $this->hasMany(TopicAssignment::class, ['topic_id', 'module_id'], ['topic_id', 'module_id']);
+        $relation = $this->belongsToMany(
+            Assignment::class,
+            'topic_assignments',
+            'topic_id',
+            'assignment_id',
+            'topic_id',
+            'id',
+        )->withPivot('module_id');
+
+        if ($this->module_id !== null) {
+            $relation->withPivotValue('module_id', $this->module_id);
+        }
+
+        return $relation;
     }
 }
