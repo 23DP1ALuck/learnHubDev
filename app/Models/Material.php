@@ -13,7 +13,9 @@ class Material extends Model
     use HasFactory, Compoships;
 
     public $incrementing = false;
+    protected $primaryKey = 'material_id';
 
+    protected $keyType = 'int';
     protected $fillable = [
         'module_id',
         'topic_id',

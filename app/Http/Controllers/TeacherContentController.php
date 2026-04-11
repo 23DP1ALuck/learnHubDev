@@ -193,4 +193,38 @@ class TeacherContentController extends Controller
             'assignments' => $data['assignmentsSummary'],
         ]);
     }
+    private function getMaterialPageInfo(Material $material): array{
+        $files = $material->fileLinks()->with('file')->get();
+
+        return [
+            'files' => $files,
+        ];
+    }
+    public function material(Request $request, Module $module, Topic $topic, Material $material): Response|RedirectResponse{
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+        $moduleSummary = [
+            'id' => $module->id,
+            'name' => $module->name,
+            'description' => $module->description
+        ];
+        $topicSummary = [
+            "topic_id"=>$topic->topic_id,
+            "module_id"=>$topic->module_id,
+            "name"=>$topic->name,
+            "description"=>$topic->description,
+            "created_at"=>$topic->created_at,
+        ];
+
+        $data = $this->getMaterialPageInfo($material);
+        return Inertia::render('teacher/material', [
+            'module' => $moduleSummary,
+            'topic' => $topicSummary,
+            'material' => $material,
+            'files' => $data['files'],
+        ]);
+    }
 }
