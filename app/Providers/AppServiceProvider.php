@@ -16,6 +16,9 @@ class AppServiceProvider extends ServiceProvider
             public function toResponse($request)
             {
                 $user = $request->user();
+                if( $user->role === 'admin'){
+                    return redirect()->route('dashboard');
+                }
                 $organization = $user->currentOrganization();
 
                 session()->put('activeOrganization', $organization->id);

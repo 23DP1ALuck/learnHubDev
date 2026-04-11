@@ -15,9 +15,9 @@ export default function AppSidebarLayout({
     return (
         <AppShell variant="sidebar">
             {auth?.user.role === 'admin' ? <Sidebar/> : <DashboardSidebar/>}
-            <AppContent variant="sidebar" className="overflow-hidden">
+            <AppContent variant="sidebar">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                <div className="flex flex-1 flex-col overflow-y-hidden">
+                <div className="flex flex-1 flex-col">
                     {children}
                 </div>
             </AppContent>
