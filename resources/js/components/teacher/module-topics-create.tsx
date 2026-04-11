@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/react';
+import {store as storeTopics} from "@/routes/topics"
 
 const textareaClassName =
     'min-h-24 max-h-[50dvh] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
@@ -22,7 +23,7 @@ export default function ModuleTopicsCreate({ moduleId }: ModuleTopicsCreateProps
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Form action="/topics" method="post" resetOnSuccess={['name', 'description']} className="grid gap-4">
+                <Form {...storeTopics.form()} method="post" resetOnSuccess={['name', 'description']} className="grid gap-4">
                     {({ processing, errors }) => (
                         <>
                             <input type="hidden" name="module_id" value={moduleId} />
