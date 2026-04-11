@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import {Badge} from "@/components/ui/badge";
 
 type ModuleSummary = {
     id: number;
@@ -32,7 +33,10 @@ export default function MaterialContext({ module, topic }: MaterialContextProps)
                     className="block rounded-lg border p-4 transition-colors hover:bg-muted/40"
                     prefetch
                 >
-                    <p className="font-medium">{module.name}</p>
+                    <div className="flex justify-between">
+                        <p className="font-medium">{module.name}</p>
+                        <Badge variant={"outline"}>Module</Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                         {module.description || 'No module description yet.'}
                     </p>
@@ -42,7 +46,10 @@ export default function MaterialContext({ module, topic }: MaterialContextProps)
                     className="block rounded-lg border p-4 transition-colors hover:bg-muted/40"
                     prefetch
                 >
-                    <p className="font-medium">{topic.name}</p>
+                    <div className="flex justify-between">
+                        <p className="font-medium">{topic.name}</p>
+                        <Badge variant={"outline"}>Topic</Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                         {topic.description || 'No topic description yet.'}
                     </p>
