@@ -233,4 +233,25 @@ class TeacherContentController extends Controller
             'files' => $data['files'],
         ]);
     }
+    public function assignment(Request $request, Assignment $assignment): Response|RedirectResponse{
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+        $data = $this->getAssignmentPageInfo($assignment);
+        return Inertia::render('teacher/assignment', [
+            'assignment' => $assignment,
+            'topics' => $data['topics'],
+            'tasks' => $data['tasks'],
+        ]);
+
+    }
+    private function getAssignmentPageInfo(Assignment $assignment): array{
+        $topics = $assignment->topics()->get();
+        $tasks = $assignment->tasks()->get();
+        return [
+            'topics' => $topics,
+            'tasks' => $tasks,
+        ];
+    }
 }
