@@ -21,6 +21,12 @@ type TopicSummary = {
     created_at: string | null;
 };
 
+type TopicOption = {
+    topic_id: number;
+    module_id: number;
+    name: string;
+};
+
 type MaterialSummary = {
     material_id: number;
     title: string;
@@ -43,11 +49,13 @@ export default function TeacherTopicPage({
     topic,
     materials,
     assignments,
+    moduleTopics,
 }: {
     module: ModuleSummary;
     topic: TopicSummary;
     materials: MaterialSummary[];
     assignments: AssignmentSummary[];
+    moduleTopics: TopicOption[];
 }) {
     const { flash } = usePage<Flash>().props;
 
@@ -102,7 +110,7 @@ export default function TeacherTopicPage({
 
                 <div className="grid gap-4 xl:grid-cols-2">
                     <TopicMaterialCreate moduleId={module.id} topicId={topic.topic_id} />
-                    <TopicAssignmentCreate moduleId={module.id} topicId={topic.topic_id} />
+                    <TopicAssignmentCreate availableTopics={moduleTopics} moduleId={module.id} topicId={topic.topic_id} />
                 </div>
 
                 <div className="grid gap-4 xl:grid-cols-2">

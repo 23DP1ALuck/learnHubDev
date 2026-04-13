@@ -167,9 +167,14 @@ class TeacherContentController extends Controller
         $materials = Material::query()->where('module_id', $topic->module_id)
             ->where('topic_id', $topic->topic_id)
             ->get();
+        $moduleTopics = Topic::query()
+            ->where('module_id', $topic->module_id)
+            ->orderBy('topic_id')
+            ->get(['topic_id', 'module_id', 'name']);
         return [
             'assignmentsSummary' => $assignmentsSummary,
             'materials' => $materials,
+            'moduleTopics' => $moduleTopics,
         ];
     }
     public function topic(Request $request, Module $module, Topic $topic): Response|RedirectResponse
@@ -191,6 +196,7 @@ class TeacherContentController extends Controller
             'topic' => $topic,
             'materials' => $data['materials'],
             'assignments' => $data['assignmentsSummary'],
+            'moduleTopics' => $data['moduleTopics'],
         ]);
     }
     private function getMaterialPageInfo(Material $material): array{

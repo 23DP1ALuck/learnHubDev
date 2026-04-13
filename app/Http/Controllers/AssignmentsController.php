@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\Topic;
-use App\Models\TopicAssignment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -32,20 +31,16 @@ class AssignmentsController extends Controller
                 ->values();
 
             foreach ($topics as $topicRef) {
-                Topic::query()
+                $topic = Topic::query()
                     ->where('module_id', $topicRef['module_id'])
                     ->where('topic_id', $topicRef['topic_id'])
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                TopicAssignment::create([
-                    'module_id' => $topicRef['module_id'],
-                    'topic_id' => $topicRef['topic_id'],
-                    'assignment_id' => $assignment->id,
-                ]);
+                $topic->assignments()->attach($assignment->id);
             }
 
-            $assignment->load('topicAssignments');
+            $assignment->load('topics');
         });
 
         return redirect()->back()->with('success', 'Assignment created.');

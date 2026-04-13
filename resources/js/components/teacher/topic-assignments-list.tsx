@@ -20,13 +20,13 @@ export default function TopicAssignmentsList({ assignments }: TopicAssignmentsLi
             <CardHeader>
                 <CardTitle>Assignments</CardTitle>
                 <CardDescription>
-                    Open an assignment to manage its tasks. Tasks intentionally do not have their own top-level list route.
+                    These are the assignments linked to this topic. One assignment can belong to multiple topics.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
                 {assignments.length === 0 ? (
                     <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        No assignments yet for this topic.
+                        No assignments are linked to this topic yet.
                     </div>
                 ) : (
                     assignments.map((assignment) => (

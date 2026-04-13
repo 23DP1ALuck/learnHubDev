@@ -29,9 +29,14 @@ type MaterialSummary = {
 
 type MaterialFileSummary = {
     id: number;
-    file_name: string;
-    file_path: string | null;
-    created_at: string | null;
+    module_id: number;
+    topic_id: number;
+    material_id: number;
+    file_id: number;
+    file: {
+        file_name: string;
+        file_path: string | null;
+    };
 };
 
 export default function TeacherMaterialPage({
