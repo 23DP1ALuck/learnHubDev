@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\AssignmentsController;
 use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MaterialFilesController;
 use App\Http\Controllers\MaterialsController;
 use App\Http\Controllers\ModulesController;
 use App\Http\Controllers\OrganizationOwnerController;
@@ -32,6 +33,7 @@ Route::post('onboarding-requests', [OnboardingRequestController::class, 'store']
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
+    Route::get('/download-material/{module}/{topic}/{material}/{file}', [MaterialFilesController::class, 'download'])->name('download-material');
 //    Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
 //    Route::post('topics', [TopicController::class, 'store'])->name('topics.store');
 //    Route::post('materials', [MaterialsController::class, 'store'])->name('materials.store');
@@ -67,6 +69,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
     Route::post('topics', [TopicController::class, 'store'])->name('topics.store');
     Route::post('materials', [MaterialsController::class, 'store'])->name('materials.store');
+    Route::post('material-files', [MaterialFilesController::class, 'store'])->name('material-files.store');
     Route::post('assignments', [AssignmentsController::class, 'store'])->name('assignments.store');
     Route::post('tasks', [TasksController::class, 'store'])->name('tasks.store');
 });
