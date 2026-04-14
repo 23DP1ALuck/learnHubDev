@@ -38,7 +38,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->unsignedBigInteger('task_id');
             $table->text('question_text');
-            $table->enum('task_type', ['TEST', 'TEXT', 'FILE', 'YES_NO', 'NUMBER']);
+            $table->enum('task_type', ['CHECKBOX', 'TEXT', 'FILE', 'TRUE_FALSE', 'NUMBER', 'CUSTOM_SELECT']);
             $table->decimal('max_points', 5, 2);
             $table->timestamps();
 
@@ -52,6 +52,19 @@ return new class extends Migration
             $table->string('answer');
 
             $table->primary(['assignment_id', 'task_id', 'answer_id']);
+            $table->foreign(['assignment_id', 'task_id'])
+                ->references(['assignment_id', 'task_id'])
+                ->on('tasks')
+                ->cascadeOnDelete();
+        });
+
+        Schema::create('task_options', function (Blueprint $table) {
+            $table->unsignedBigInteger('assignment_id');
+            $table->unsignedBigInteger('task_id');
+            $table->unsignedBigInteger('option_id');
+            $table->string('option_text');
+
+            $table->primary(['assignment_id', 'task_id', 'option_id']);
             $table->foreign(['assignment_id', 'task_id'])
                 ->references(['assignment_id', 'task_id'])
                 ->on('tasks')
@@ -122,6 +135,7 @@ return new class extends Migration
         Schema::dropIfExists('answer_files');
         Schema::dropIfExists('task_answers');
         Schema::dropIfExists('submissions');
+        Schema::dropIfExists('task_options');
         Schema::dropIfExists('task_correct_answers');
         Schema::dropIfExists('tasks');
         Schema::dropIfExists('topic_assignments');

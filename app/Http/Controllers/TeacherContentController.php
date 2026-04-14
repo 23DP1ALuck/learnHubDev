@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\Material;
 use App\Models\Module;
+use App\Models\Task;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -249,9 +250,20 @@ class TeacherContentController extends Controller
     private function getAssignmentPageInfo(Assignment $assignment): array{
         $topics = $assignment->topics()->get();
         $tasks = $assignment->tasks()->get();
+        $tasksSummary = $tasks->map(function (Task $task){
+            return [
+                'task_id' => $task->task_id,
+                'question_text' => $task->question_text,
+                'task_type' => $task->task_type,
+                'max_points' => $task->max_points,
+                'correct_answers' => $task->correctAnswers()->pluck('answer')->values(),
+                'options' => $task->options()->pluck('value')->values(),
+                'created_at' => $task->created_at,
+            ];
+        });
         return [
             'topics' => $topics,
-            'tasks' => $tasks,
+            'tasks' => $tasksSummary,
         ];
     }
 }

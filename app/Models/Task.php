@@ -43,6 +43,11 @@ class Task extends Model
         return $this->hasMany(TaskCorrectAnswer::class, ['assignment_id', 'task_id'], ['assignment_id', 'task_id']);
     }
 
+    public function options(): HasMany
+    {
+        return $this->hasMany(TaskOption::class, ['assignment_id', 'task_id'], ['assignment_id', 'task_id']);
+    }
+
     public function answers(): HasMany
     {
         return $this->hasMany(TaskAnswer::class, ['assignment_id', 'task_id'], ['assignment_id', 'task_id']);

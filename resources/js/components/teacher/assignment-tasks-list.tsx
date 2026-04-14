@@ -45,8 +45,8 @@ export default function AssignmentTasksList({ tasks }: AssignmentTasksListProps)
                                 </div>
                                 {task.correct_answers.length > 0 && (
                                     <div className="flex flex-wrap gap-2">
-                                        {task.correct_answers.map((answer) => (
-                                            <Badge key={answer} variant="outline">
+                                        {task.correct_answers.map((answer, index) => (
+                                            <Badge key={index} variant="outline">
                                                 {answer}
                                             </Badge>
                                         ))}
