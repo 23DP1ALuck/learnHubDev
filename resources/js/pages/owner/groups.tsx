@@ -1,10 +1,18 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, Organization, OrganizationGroup, OrganizationStats, User } from '@/types';
+import type {
+    BreadcrumbItem,
+    Organization,
+    OrganizationGroup,
+    OrganizationModule,
+    OrganizationStats,
+    User
+} from '@/types';
 import { Head } from '@inertiajs/react';
 import {CreateGroups} from "@/components/org_owner/create-groups";
 import {AssignStudents} from "@/components/org_owner/assign-students";
+import {AssignModules} from "@/components/org_owner/assign-modules";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,17 +24,18 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/organization/groups',
     },
 ];
-
+type OrganizationSummary = OrganizationModule & {teacher_name: string};
 export default function OwnerGroupsPage({
     organization,
     stats,
     groups,
-    students,
+    students, modules
 }: {
     organization: Organization;
     stats: OrganizationStats;
     groups: OrganizationGroup[];
     students: User[];
+    modules: OrganizationSummary[]
 }) {
     const totalAssignedStudents = groups.reduce((sum, group) => sum + group.students_count, 0);
     const totalAssignedTeachers = groups.reduce((sum, group) => sum + group.teachers_count, 0);
@@ -85,7 +94,7 @@ export default function OwnerGroupsPage({
                                         <th className="px-4 py-3 font-medium">Teachers</th>
                                         <th className="px-4 py-3 font-medium">Modules</th>
                                         <th className="px-4 py-3 font-medium">Created</th>
-                                        <th className="py-3 font-medium"></th>
+                                        <th colSpan={2} className="border-l border-black/20 py-3 font-medium text-center">Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody className="divide-y text-sm">
@@ -103,8 +112,11 @@ export default function OwnerGroupsPage({
                                             <td className="px-4 py-3 text-muted-foreground">
                                                 {group.created_at ? new Date(group.created_at).toLocaleDateString() : 'Unknown'}
                                             </td>
-                                            <td className="py-3 text-center text-muted-foreground">
+                                            <td className="border-l border-black/20 py-3 text-center text-muted-foreground">
                                                 <AssignStudents group={group} students={students} />
+                                            </td>
+                                            <td className="py-3 text-center text-muted-foreground">
+                                                <AssignModules group={group} modules={modules} />
                                             </td>
                                         </tr>
                                     ))}

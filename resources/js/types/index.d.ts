@@ -103,12 +103,24 @@ export type OrganizationStats = {
     pending_invites: number;
 }
 export type OrganizationGroup = {
+    school_id: number;
     group_id: number;
     name: string;
     students_count: number;
     teachers_count: number;
     modules_count: number;
     created_at: string | null;
+}
+export type OrganizationModule = {
+    id: number;
+    name: string;
+    created_at: string | null;
+    updated_at: string | null;
+    organization_id: number;
+    description: string | null;
+    start_date: string | null;
+    end_date: string | null;
+    creator_id: number;
 }
 export type OnboardingRequest = {
     id: number;

@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\AccountInvites;
+use App\Models\GroupModuleTeacher;
+use App\Models\Module;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -131,6 +135,7 @@ class OrganizationOwnerController extends Controller
             ->get()
             ->map(function (SchoolGroup $group) use ($studentCounts, $teacherCounts, $moduleCounts) {
                 return [
+                    'school_id' => $group->school_id,
                     'group_id' => $group->group_id,
                     'name' => $group->name,
                     'students_count' => (int) ($studentCounts[$group->group_id] ?? 0),
@@ -173,6 +178,61 @@ class OrganizationOwnerController extends Controller
 
         return redirect()->route('groups')->with('success', 'Student assigned to group successfully');
     }
+    public function assignModules(Request $request)
+    {
+        $groupId = (int) $request->input('group_id');
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = Organization::query()->where('id', $organizationId)->first();
+
+        if (! $organization) {
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->first();
+
+        if (! $group) {
+            return redirect()->back()->with('error', 'Group not found');
+        }
+        $moduleIds = $request->input('module_ids', []);
+
+        $modules = Module::query()
+            ->with('creator.teacher')
+            ->where('organization_id', $organization->id)
+            ->whereIn('id', $moduleIds)
+            ->get()
+            ->keyBy('id');
+
+
+        DB::transaction(function () use ($organization, $groupId, $moduleIds, $modules) {
+            $semester = date("m") > 8 && date("m") <= 12 ? "1" : "2";
+            $schoolYear = $semester == 1 ? date("Y") ."/".(int) date("Y")+1 : (int) date("Y")-1 ."/".(int) date("Y");
+            foreach ($modules as $module) {
+                GroupModuleTeacher::query()
+                    ->where('school_id', $organization->id)
+                    ->where('group_id', $groupId)
+                    ->where('module_id', $module->id)
+                    ->where('teacher_id', '!=', $module->creator_id)
+                    ->delete();
+
+                GroupModuleTeacher::query()->firstOrCreate(
+                    [
+                        'school_id' => $organization->id,
+                        'group_id' => $groupId,
+                        'module_id' => $module->id,
+                        'teacher_id' => $module->creator_id,
+                    ],
+                    [
+                        'semester' => $semester,
+                        'school_year' => $schoolYear,
+                    ],
+                );
+            }
+        });
+
+        return redirect()->route('groups')->with('success', 'Modules assigned to group successfully');
+    }
     private function organizationStudents(Organization $organization): array
     {
         return $organization->users()
@@ -181,6 +241,30 @@ class OrganizationOwnerController extends Controller
             ->get()
             ->toArray();
 
+    }
+    public function availableModules(int $organizationId, int $groupId): JsonResponse
+    {
+        // TODO: finish this
+        $schoolGroup = SchoolGroup::query()->where('group_id', $groupId)->where('school_id', $organizationId)->first();
+
+        $workingModuleIds = DB::table('group_module_teacher')
+            ->join('school_groups', function ($join) {
+                $join->on('group_module_teacher.school_id', '=', 'school_groups.school_id')
+                    ->on('group_module_teacher.group_id', '=', 'school_groups.group_id');
+            })->where('school_groups.group_id', $groupId)->distinct()->pluck('group_module_teacher.module_id');
+        $modules = Module::query()
+            ->whereNotIn('id', $workingModuleIds)
+            ->where('organization_id', $organizationId)
+            ->with('creator')
+            ->get();
+        $moduleSummary = $modules->map(function (Module $module){
+            return [
+                ...$module->toArray(),
+                'teacher_name' => $module->creator?->name ?? ''
+            ];
+        });
+
+        return response()->json($moduleSummary);
     }
     private function ownedOrganization(Request $request): Organization
     {

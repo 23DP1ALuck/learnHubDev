@@ -11,6 +11,7 @@ use App\Http\Controllers\OrganizationOwnerController;
 use App\Http\Controllers\OrganizationsPageController;
 use App\Http\Controllers\SchoolGroupController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\StudentContentController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeacherContentController;
 use App\Http\Controllers\TopicController;
@@ -18,6 +19,7 @@ use App\Http\Middleware\CheckCanManageLearningContent;
 use App\Http\Middleware\CheckIsAdmin;
 use App\Http\Middleware\CheckIsOrganizationOwner;
 use App\Http\Middleware\CheckIsSchoolOwner;
+use App\Http\Middleware\CheckIsStudent;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -56,8 +58,10 @@ Route::middleware(['auth', 'verified', CheckIsOrganizationOwner::class])
     });
 Route::middleware([CheckIsSchoolOwner::class])->group(function () {
     Route::get('organization/groups', [OrganizationOwnerController::class, 'groups'])->name('groups');
+    Route::get('organization/{organization_id}/groups/{group_id}/available-modules', [OrganizationOwnerController::class, 'availableModules'])->name('groups.available-modules');
     Route::post('organization/groups', [SchoolGroupController::class, 'store'])->name('groups.store');
     Route::patch('organization/groups/assign-students', [OrganizationOwnerController::class, 'assignStudents'])->name('groups.assign-students');
+    Route::patch('organization/groups/assign-modules', [OrganizationOwnerController::class, 'assignModules'])->name('groups.assign-modules');
 });
 Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->group(function () {
     Route::get('/teacher/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
@@ -77,6 +81,13 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
 
     Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
 });
+//Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function () {
+//    Route::get('/student/dashboard', [StudentContentController::class, 'dashboard'])->name('student.dashboard');
+//    Route::get('/student/modules', [StudentContentController::class, 'modules'])->name('student.modules');
+//    Route::get('/student/assignments', [StudentContentController::class, 'assignments'])->name('student.assignments');
+//    Route::get('/student/assignments/{assignment}/tasks/{task}', [StudentContentController::class, 'task'])->name('student.tasks.show');
+//    Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
+//});
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);
 
