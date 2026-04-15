@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::get('/teacher/modules/{module}/topics/{topic}/materials/{material}', [TeacherContentController::class, 'material'])->name('teacher.materials.show');
     Route::get('/teacher/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
     Route::get('/preview/{assignment_id}/task/{task_id}', [TeacherContentController::class, 'task'])->name('teacher.tasks.preview');
+    Route::get('/teacher/assignments/{assignment}/tasks/{task}/edit', [TeacherContentController::class, 'editTask'])->name('teacher.tasks.editTask');
 
     Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
     Route::post('topics', [TopicController::class, 'store'])->name('topics.store');
@@ -73,6 +74,8 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::post('material-files', [MaterialFilesController::class, 'store'])->name('material-files.store');
     Route::post('assignments', [AssignmentsController::class, 'store'])->name('assignments.store');
     Route::post('tasks', [TasksController::class, 'store'])->name('tasks.store');
+
+    Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);

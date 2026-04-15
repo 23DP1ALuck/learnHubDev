@@ -128,7 +128,13 @@ export interface PaginatedData {
     next_page_url?: string,
     prev_page_url?: string,
     links: [
-        {active: boolean,url?: string,label: string,page?: number}
+        { active: boolean, url?: string, label: string, page?: number }
     ]
 }
-
+export type TaskType = 'CHECKBOX' | 'TEXT' | 'FILE' | 'TRUE_FALSE' | 'NUMBER' | 'CUSTOM_SELECT';
+export type TaskOption = {
+    assignment_id: number;
+    task_id: number;
+    option_id: number;
+    option_text: string;
+}

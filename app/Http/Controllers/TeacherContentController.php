@@ -302,4 +302,31 @@ class TeacherContentController extends Controller
             'taskNavigation' => $taskNavigation
         ];
     }
+    public function editTask(int $assignmentId, int $taskId){
+        $assignment = Assignment::query()
+            ->where('id', $assignmentId)
+            ->first();
+
+        $task = Task::query()
+            ->where('task_id', $taskId)
+            ->where('assignment_id', $assignment->id)
+            ->first();
+
+
+        $assignmentData = [
+            ...$assignment->toArray(),
+            'topics' => $assignment->topics()->get(),
+        ];
+        $taskData = [
+            ...$task->toArray(),
+            'options' => $task->options()->select(['option_id','option_text'])->get(),
+            'correct_answers' => $task->correctAnswers()->select(['answer_id','answer'])->get(),
+        ];
+
+        return Inertia::render('teacher/edit-task', [
+            'assignment' => $assignmentData,
+            'task' => $taskData,
+        ]);
+
+    }
 }

@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { store as storeTasks } from '@/routes/tasks';
 import { Form } from '@inertiajs/react';
 import { useRef, useState } from 'react';
-
+import {TaskType} from '@/types';
 const textareaClassName =
     'min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50';
 
@@ -18,16 +18,16 @@ type AssignmentTaskCreateProps = {
     assignmentId: number;
 };
 
-type TaskType = 'CHECKBOX' | 'TEXT' | 'FILE' | 'TRUE_FALSE' | 'NUMBER' | 'CUSTOM_SELECT';
+
 
 type ChoiceOption = {
-    id: number;
+    option_id: number;
     value: string;
 };
 
 const createDefaultOptions = (): ChoiceOption[] => [
-    { id: 1, value: '' },
-    { id: 2, value: '' },
+    { option_id: 1, value: '' },
+    { option_id: 2, value: '' },
 ];
 
 export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCreateProps) {
@@ -50,7 +50,7 @@ export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCre
     const updateOptionValue = (optionId: number, nextValue: string) => {
         setOptions((currentOptions) =>
             currentOptions.map((option) =>
-                option.id === optionId
+                option.option_id === optionId
                     ? {
                           ...option,
                           value: nextValue, // change selected option value to nextValue
@@ -66,7 +66,7 @@ export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCre
         setOptions((currentOptions) => [
             ...currentOptions,
             {
-                id: nextId,
+                option_id: nextId,
                 value: '',
             },
         ]);
@@ -75,7 +75,7 @@ export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCre
     };
 
     const removeOption = (optionId: number) => {
-        setOptions((currentOptions) => currentOptions.filter((option) => option.id !== optionId));
+        setOptions((currentOptions) => currentOptions.filter((option) => option.option_id !== optionId));
         setCorrectCheckboxOptionIds((currentIds) => currentIds.filter((id) => id !== optionId));
 
         if (correctSingleOptionId === optionId) {
@@ -108,8 +108,8 @@ export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCre
     };
 
     const shouldShowChoiceOptions = taskType === 'CHECKBOX' || taskType === 'CUSTOM_SELECT';
-    const derivedCheckboxAnswers = options.filter((option) => correctCheckboxOptionIds.includes(option.id)).map((option) => option.value);
-    const derivedSingleAnswer = options.find((option) => option.id === correctSingleOptionId)?.value ?? '';
+    const derivedCheckboxAnswers = options.filter((option) => correctCheckboxOptionIds.includes(option.option_id)).map((option) => option.value);
+    const derivedSingleAnswer = options.find((option) => option.option_id === correctSingleOptionId)?.value ?? '';
 
     return (
         <Card className="border-sidebar-border/70">
@@ -185,38 +185,38 @@ export default function AssignmentTaskCreate({ assignmentId }: AssignmentTaskCre
                                         {options.map((option, index) => {
                                             const isCheckboxType = taskType === 'CHECKBOX';
                                             const isChecked = isCheckboxType
-                                                ? correctCheckboxOptionIds.includes(option.id)
-                                                : correctSingleOptionId === option.id;
+                                                ? correctCheckboxOptionIds.includes(option.option_id)
+                                                : correctSingleOptionId === option.option_id;
 
                                             return (
-                                                <div key={option.id} className="grid gap-2 rounded-md border p-3">
+                                                <div key={option.option_id} className="grid gap-2 rounded-md border p-3">
                                                     <div className="flex items-center justify-between gap-4">
-                                                        <Label htmlFor={`option-${option.id}`}>Option {index + 1}</Label>
+                                                        <Label htmlFor={`option-${option.option_id}`}>Option {index + 1}</Label>
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
                                                             disabled={options.length <= 2}
-                                                            onClick={() => removeOption(option.id)}
+                                                            onClick={() => removeOption(option.option_id)}
                                                         >
                                                             Remove
                                                         </Button>
                                                     </div>
                                                     <Input
-                                                        id={`option-${option.id}`}
+                                                        id={`option-${option.option_id}`}
                                                         name="options[]"
-                                                        onChange={(event) => updateOptionValue(option.id, event.target.value)}
+                                                        onChange={(event) => updateOptionValue(option.option_id, event.target.value)}
                                                         placeholder={`Option ${index + 1}`}
                                                         value={option.value}
                                                     />
                                                     <label className="flex items-center gap-3 text-sm">
                                                         {isCheckboxType ? (
-                                                            <Checkbox checked={isChecked} onCheckedChange={(checked) => toggleCheckboxAnswer(option.id, checked === true)} />
+                                                            <Checkbox checked={isChecked} onCheckedChange={(checked) => toggleCheckboxAnswer(option.option_id, checked === true)} />
                                                         ) : (
                                                             <input
                                                                 checked={isChecked}
                                                                 className="size-4"
                                                                 name="correct_custom_select"
-                                                                onChange={() => setCorrectSingleOptionId(option.id)}
+                                                                onChange={() => setCorrectSingleOptionId(option.option_id)}
                                                                 type="radio"
                                                             />
                                                         )}

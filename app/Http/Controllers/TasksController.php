@@ -99,4 +99,51 @@ class TasksController extends Controller
             fn (string $option) => $option !== '',
         ));
     }
+
+    public function update(StoreTaskRequest $request, int $assignmentId, int $taskId): RedirectResponse
+    {
+        $validated = $request->validated();
+        DB::transaction(function () use ($validated, $assignmentId, $taskId) {
+            Assignment::query()
+                ->whereKey($assignmentId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $task = Task::query()
+                ->where('assignment_id', $assignmentId)
+                ->where('task_id', $taskId)
+                ->lockForUpdate()
+                ->firstOrFail();
+            Task::query()
+                ->where('assignment_id', $assignmentId)
+                ->where('task_id', $taskId)
+                ->update([
+                    'question_text' => $validated['question_text'],
+                    'task_type' => $validated['task_type'],
+                    'max_points' => $validated['max_points'],
+                ]);
+
+            $task->correctAnswers()->delete();
+            foreach ($this->normalizedAnswers($validated['correct_answers'] ?? []) as $index => $answer) {
+                TaskCorrectAnswer::create([
+                    'assignment_id' => $assignmentId,
+                    'task_id' => $taskId,
+                    'answer_id' => $index + 1,
+                    'answer' => $answer,
+                ]);
+            }
+
+            $task->options()->delete();
+            foreach ($this->normalizedOptions($validated['options'] ?? []) as $index => $option) {
+                TaskOption::create([
+                    'assignment_id' => $assignmentId,
+                    'task_id' => $taskId,
+                    'option_id' => $index + 1,
+                    'option_text' => $option,
+                ]);
+            }
+        });
+
+        return redirect()->back()->with('success', 'Task updated.');
+    }
 }

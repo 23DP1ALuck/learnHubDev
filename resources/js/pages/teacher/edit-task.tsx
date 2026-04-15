@@ -1,0 +1,58 @@
+import EditTaskForm from '@/components/teacher/edit-task-form';
+import type { AssignmentSummary, TaskSummary } from '@/components/teacher/edit-task-types';
+import AppLayout from '@/layouts/app-layout';
+import { modules } from '@/routes/teacher';
+import { editTask } from '@/routes/teacher/tasks';
+import type { BreadcrumbItem, Flash } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+
+function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: TaskSummary }) {
+    const primaryTopic = assignment.topics[0];
+    console.log(primaryTopic)
+    const { flash } = usePage<Flash>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Modules',
+            href: modules().url,
+        },
+        ...(primaryTopic
+            ? [
+                  {
+                      title: primaryTopic.module_name || `Module ${primaryTopic.module_id}`,
+                      href: `/teacher/modules/${primaryTopic.module_id}`,
+                  },
+                  {
+                      title: primaryTopic.name || `Topic ${primaryTopic.topic_id}`,
+                      href: `/teacher/modules/${primaryTopic.module_id}/topics/${primaryTopic.topic_id}`,
+                  },
+              ]
+            : []),
+        {
+            title: assignment.title,
+            href: `/teacher/assignments/${assignment.id}`,
+        },
+        {
+            title: 'Edit task',
+            href: editTask([assignment.id, task.task_id]).url,
+        },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Edit task" />
+
+            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
+                {flash?.success && (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {flash.success}
+                    </div>
+                )}
+
+                <EditTaskForm assignment={assignment} task={task} />
+            </div>
+        </AppLayout>
+    );
+}
+
+export default EditTask;
