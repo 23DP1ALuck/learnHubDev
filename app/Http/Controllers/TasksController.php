@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Models\Assignment;
 use App\Models\Task;
 use App\Models\TaskCorrectAnswer;
+use App\Models\TaskOption;
 use Helper;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -47,6 +48,14 @@ class TasksController extends Controller
                             'answer' => $answer,
                         ]);
                     }
+                    foreach ($this->normalizedOptions($validated['options'] ?? []) as $index => $option){
+                        TaskOption::create([
+                            'assignment_id' => $assignmentId,
+                            'task_id' => $taskId,
+                            'option_id' => $index + 1,
+                            'option_text' => $option,
+                        ]);
+                    }
                 });
 
                 return redirect()->back()->with('success', 'Task created.');
@@ -82,6 +91,12 @@ class TasksController extends Controller
         return array_values(array_filter(
             array_map(static fn (mixed $answer) => trim((string) $answer), $answers), // parse to string and trim
             static fn (string $answer) => $answer !== '', // remove empty strings
+        ));
+    }
+    private function normalizedOptions(array $options): array{
+        return array_values(array_filter(
+            array_map(fn (mixed $option) => trim((string) $option), $options),
+            fn (string $option) => $option !== '',
         ));
     }
 }

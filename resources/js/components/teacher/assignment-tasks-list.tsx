@@ -29,12 +29,12 @@ export default function AssignmentTasksList({ tasks }: AssignmentTasksListProps)
                         No tasks yet. Add the first question or submission requirement for this assignment.
                     </div>
                 ) : (
-                    tasks.map((task) => (
+                    tasks.map((task, index) => (
                         <div key={task.task_id} className="rounded-xl border p-4">
                             <div className="space-y-3">
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
-                                        <p className="font-semibold">Task #{task.task_id}</p>
+                                        <p className="font-semibold">Task #{index + 1}</p>
                                         <p className="text-sm text-muted-foreground">{task.question_text}</p>
                                     </div>
                                     <Badge variant="secondary">{task.task_type}</Badge>

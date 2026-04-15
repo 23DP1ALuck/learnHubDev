@@ -65,6 +65,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::get('/teacher/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');
     Route::get('/teacher/modules/{module}/topics/{topic}/materials/{material}', [TeacherContentController::class, 'material'])->name('teacher.materials.show');
     Route::get('/teacher/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
+    Route::get('/preview/{assignment_id}/task/{task_id}', [TeacherContentController::class, 'task'])->name('teacher.tasks.preview');
 
     Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
     Route::post('topics', [TopicController::class, 'store'])->name('topics.store');

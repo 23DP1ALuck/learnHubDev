@@ -257,13 +257,49 @@ class TeacherContentController extends Controller
                 'task_type' => $task->task_type,
                 'max_points' => $task->max_points,
                 'correct_answers' => $task->correctAnswers()->pluck('answer')->values(),
-                'options' => $task->options()->pluck('value')->values(),
+                'options' => $task->options()->pluck('option_text')->values(),
                 'created_at' => $task->created_at,
             ];
         });
         return [
             'topics' => $topics,
             'tasks' => $tasksSummary,
+        ];
+    }
+
+    public function task(Request $request, int $assignmentId, int $taskId): Response|RedirectResponse{
+
+        $data = $this->getTaskPageInfo($assignmentId, $taskId);
+        return Inertia::render('teacher/task', [
+            'assignment' => $data['assignment'],
+            'task' => $data['task'],
+            'taskNavigation' => $data['taskNavigation'],
+        ]);
+    }
+    private function getTaskPageInfo(int $assignmentId, int $taskId): array{
+        $assignment = Assignment::query()
+            ->where('id', $assignmentId)
+            ->first();
+        $task = Task::query()
+            ->where('task_id', $taskId)
+            ->where('assignment_id', $assignment->id)
+            ->first();
+        $correctAnswers = $task->correctAnswers()->pluck('answer')->values();
+        $options = $task->options()->select(['option_id','option_text'])->get();
+        $taskNavigation = $assignment->tasks()->select(['task_id', 'task_type'])->get();
+        $taskSummary = [
+                ...$task->toArray(),
+                'correct_answers' => $correctAnswers,
+                'options' => $options,
+            ];
+        return [
+            'assignment' => [
+                'id' => $assignment->id,
+                'title' => $assignment->title,
+                'due_date' => $assignment->due_date
+            ],
+            'task' => $taskSummary,
+            'taskNavigation' => $taskNavigation
         ];
     }
 }

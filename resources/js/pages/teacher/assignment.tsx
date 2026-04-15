@@ -4,7 +4,9 @@ import AssignmentTopicsList from '@/components/teacher/assignment-topics-list';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import {Head, Link, usePage} from '@inertiajs/react';
+import {preview} from "@/routes/teacher/tasks";
+import {Button} from "@/components/ui/button";
 
 type AssignmentSummary = {
     id: number;
@@ -78,11 +80,19 @@ export default function TeacherAssignmentPage({
                 )}
 
                 <Card className="border-sidebar-border/70">
-                    <CardHeader>
-                        <CardTitle>{assignment.title}</CardTitle>
-                        <CardDescription>
-                            {assignment.description || 'Add tasks to define the questions or submission requirements for this assignment.'}
-                        </CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="flex flex-col gap-2">
+                            <CardTitle>{assignment.title}</CardTitle>
+                            <CardDescription>
+                                {assignment.description || 'Add tasks to define the questions or submission requirements for this assignment.'}
+                            </CardDescription>
+                        </div>
+                        <Link
+                            href={preview([assignment.id, 1])}
+                            className="flex items-center gap-2 self-center font-medium"
+                        >
+                            <Button variant="outline">Preview</Button>
+                        </Link>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">
