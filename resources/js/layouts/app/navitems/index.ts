@@ -7,7 +7,7 @@ import {
     organization as ownerOrganization,
     users as ownerUsers,
 } from '@/routes';
-import { BookOpen, Building, Calendar, LayoutGrid, Settings, Users } from 'lucide-react';
+import { BookOpen, Building, Calendar, FileText, LayoutGrid, Settings, Users } from 'lucide-react';
 import {
     modules as teacherModules,
 } from '@/routes/teacher';
@@ -136,4 +136,30 @@ export const individualOwnerNavItems: NavItem[] = [
     },
 ];
 
-export const studentNavItems: NavItem[] = userNavItems;
+export const studentNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Modules',
+        href: '/student/modules',
+        icon: BookOpen,
+    },
+    {
+        title: 'Assignments',
+        href: '/student/assignments',
+        icon: Calendar,
+    },
+    {
+        title: 'Marks',
+        href: '/student/marks',
+        icon: FileText,
+    },
+    {
+        title: 'Settings',
+        href: editProfile(),
+        icon: Settings,
+    },
+];

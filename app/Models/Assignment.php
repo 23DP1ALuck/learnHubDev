@@ -50,4 +50,7 @@ class Assignment extends Model
     {
         return $this->hasMany(Submission::class, 'assignment_id');
     }
+    public function totalPoints(): int{
+        return $this->tasks()->sum('points');
+    }
 }

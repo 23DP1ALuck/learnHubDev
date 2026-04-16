@@ -21,7 +21,7 @@ class DashboardController extends Controller
             return app(OrganizationOwnerController::class)->dashboard($request);
         }
 
-        return $this->userDashboard();
+        return $this->userDashboard($request);
     }
 
     private function adminDashboard(): Response
@@ -33,8 +33,8 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function userDashboard(): Response
+    private function userDashboard(Request $request): Response
     {
-        return Inertia::render('dashboard', []);
+        return app(StudentContentController::class)->dashboard($request);
     }
 }
