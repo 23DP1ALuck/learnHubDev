@@ -81,13 +81,14 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
 
     Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
 });
-//Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function () {
-//    Route::get('/student/dashboard', [StudentContentController::class, 'dashboard'])->name('student.dashboard');
-//    Route::get('/student/modules', [StudentContentController::class, 'modules'])->name('student.modules');
+Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function () {
+    Route::get('/student/modules', [StudentContentController::class, 'modules'])->name('student.modules');
+//    Route::get('/module/{module}', [StudentContentController::class, 'module'])->name('student.modules.show');
+//    Route::get('/module/{module}/topic/{topic}', [StudentContentController::class, 'topic'])->name('student.topics.show');
 //    Route::get('/student/assignments', [StudentContentController::class, 'assignments'])->name('student.assignments');
 //    Route::get('/student/assignments/{assignment}/tasks/{task}', [StudentContentController::class, 'task'])->name('student.tasks.show');
 //    Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
-//});
+});
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);
 

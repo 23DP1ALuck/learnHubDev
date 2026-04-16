@@ -1,0 +1,37 @@
+import StudentModulesList from '@/components/student/student-modules-list';
+import type { StudentModuleSummary } from '@/components/student/student-types';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, Flash } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Modules',
+        href: '/student/modules',
+    },
+];
+
+export default function StudentModulesPage({ modules }: { modules: StudentModuleSummary[] }) {
+    const { flash } = usePage<Flash>().props;
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Student modules" />
+
+            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
+                {flash?.success && (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {flash.success}
+                    </div>
+                )}
+
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-semibold tracking-tight">Modules</h1>
+                    <p className="text-sm text-muted-foreground">The learning modules available to the student in the active organization.</p>
+                </div>
+
+                <StudentModulesList modules={modules} />
+            </div>
+        </AppLayout>
+    );
+}

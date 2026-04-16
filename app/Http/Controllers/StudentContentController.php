@@ -131,4 +131,26 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
+
+    public function modules(Request $request){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+
+        $groupId = $organization->pivot->group_id;
+
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        $studentModuleSummary = $this->getStudentModuleSummary($group);
+        return Inertia::render('student/modules', [
+            "modules" => $studentModuleSummary,
+        ]);
+    }
 }
