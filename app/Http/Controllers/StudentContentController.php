@@ -189,10 +189,10 @@ class StudentContentController extends Controller
             return redirect()->back()->with('error', 'You have no access to this module');
         }
         $module = $groupsModules->module;
-        
 
-        $studentModuleSummary = $this->getStudentSpecificModuleSummary($group, $module);
-        $studentTopicSummary = $this->getStudentModuleSummary($group);
+
+        $studentModuleSummary = $this->getStudentSpecificModuleSummary($module);
+        $studentTopicSummary = $this->getStudentTopicSummary($group);
         return Inertia::render('student/module', [
             "module" => $studentModuleSummary,
             "topics" => $studentTopicSummary
@@ -211,7 +211,7 @@ class StudentContentController extends Controller
             return $module->topics()->withCount('materials', 'assignments')->get();
         })->toArray();
     }
-    private function getStudentSpecificModuleSummary(SchoolGroup $group, Module $module): array | RedirectResponse{
+    private function getStudentSpecificModuleSummary(Module $module): array | RedirectResponse{
 
         return [
             'id' => $module->id,
