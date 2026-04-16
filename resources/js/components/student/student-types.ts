@@ -17,6 +17,25 @@ export type StudentModuleSummary = {
     assignments_count: number;
 };
 
+export type StudentTopicSummary = {
+    topic_id: number;
+    module_id: number;
+    name: string;
+    description: string | null;
+    materials_count: number;
+    assignments_count: number;
+    created_at: string | null;
+};
+
+export type StudentMaterialSummary = {
+    material_id: number;
+    module_id: number;
+    topic_id: number;
+    title: string;
+    description: string | null;
+    created_at: string | null;
+};
+
 export type StudentAssignmentSummary = {
     id: number;
     title: string;

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Module;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -152,5 +154,75 @@ class StudentContentController extends Controller
         return Inertia::render('student/modules', [
             "modules" => $studentModuleSummary,
         ]);
+    }
+
+    public function module(Request $request, int $moduleId){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+
+        $groupId = $organization->pivot->group_id;
+
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+
+        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
+        ->where('group_id', $group->group_id)
+            ->where('school_id', $group->school_id)
+            ->where('module_id', $moduleId)
+            ->with('module')
+            ->first();
+
+        if(!$groupsModules){
+            return redirect()->back()->with('error', 'You have no access to this module');
+        }
+        $module = $groupsModules->module;
+        
+
+        $studentModuleSummary = $this->getStudentSpecificModuleSummary($group, $module);
+        $studentTopicSummary = $this->getStudentModuleSummary($group);
+        return Inertia::render('student/module', [
+            "module" => $studentModuleSummary,
+            "topics" => $studentTopicSummary
+        ]);
+    }
+    private function getStudentTopicSummary(SchoolGroup $group): array{
+        $groupsModules = $group->groupModulesTeachers()
+            ->with('module')
+            ->get();
+
+        $modules = $groupsModules->map(function ($groupModuleTeacher) {
+            return $groupModuleTeacher->module;
+        })->filter(); // clear null values
+
+        return $modules->flatMap(function ($module) {
+            return $module->topics()->withCount('materials', 'assignments')->get();
+        })->toArray();
+    }
+    private function getStudentSpecificModuleSummary(SchoolGroup $group, Module $module): array | RedirectResponse{
+
+        return [
+            'id' => $module->id,
+            'name' => $module->name,
+            'description' => $module->description,
+            'start_date' => $module->start_date,
+            'end_date' => $module->end_date,
+            'topics_count' => $module->topics()->count(),
+            'assignments_count' => $module->assignments()->count(),
+        ];
+
+
     }
 }

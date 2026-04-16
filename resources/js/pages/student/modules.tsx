@@ -3,6 +3,8 @@ import type { StudentModuleSummary } from '@/components/student/student-types';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import {toast} from "sonner";
+import { useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,7 +15,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function StudentModulesPage({ modules }: { modules: StudentModuleSummary[] }) {
     const { flash } = usePage<Flash>().props;
-
+    useEffect(() => {
+        if(flash?.error){
+            toast.error(flash.error);
+        }
+    }, [flash?.error]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Student modules" />
