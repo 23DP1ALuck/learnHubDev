@@ -283,7 +283,7 @@ class StudentContentController extends Controller
             'assignments_count' => $topic->assignments()->count(),
         ];
     }
-    public function assignment(Request $request, int $moduleId, int $assignmentId){
+    public function assignment(Request $request, int $assignmentId){
         $user = $request->user();
         $organizationId = $request->session()->get('activeOrganization');
         $organization = $user->organizations()
@@ -304,23 +304,26 @@ class StudentContentController extends Controller
             return redirect()->back()->with('error', 'Group not found');
         }
 
+        $assignment = Assignment::query()
+            ->where('id', $assignmentId)
+            ->first();
+
+        if(!$assignment){
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+        $module = $assignment
+            ->topics()
+            ->first()
+            ->module()
+            ->first();
         $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
         ->where('group_id', $group->group_id)
             ->where('school_id', $group->school_id)
-            ->where('module_id', $moduleId)
-            ->with('module')
+            ->where('module_id', $module->id)
             ->first();
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
-        }
-        $assignment = $groupsModules
-            ->module
-            ->assignments()
-            ->where('id', $assignmentId)
-            ->first();
-        if(!$assignment){
-            return redirect()->back()->with('error', 'Assignment not found');
         }
         $assignmentSummary = $this->getSpecificAssignmentSummary($assignment, $user);
         $assignmentTopicsSummary = $this->getSpecificAssignmentTopicsSummary($assignment, $user);
@@ -354,7 +357,7 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
-    public function task(Request $request, int $moduleId, int $assignmentId, int $taskId){
+    public function task(Request $request, int $assignmentId, int $taskId){
         $user = $request->user();
         $organizationId = $request->session()->get('activeOrganization');
         $organization = $user->organizations()
@@ -375,24 +378,29 @@ class StudentContentController extends Controller
             return redirect()->back()->with('error', 'Group not found');
         }
 
+
+        $assignment = Assignment::query()
+            ->where('id', $assignmentId)
+            ->first();
+
+        if(!$assignment){
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+        $module = $assignment
+            ->topics()
+            ->first()
+            ->module()
+            ->first();
         $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
         ->where('group_id', $group->group_id)
             ->where('school_id', $group->school_id)
-            ->where('module_id', $moduleId)
-            ->with('module')
+            ->where('module_id', $module->id)
             ->first();
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
         }
-        $assignment = $groupsModules
-            ->module
-            ->assignments()
-            ->where('id', $assignmentId)
-            ->first();
-        if(!$assignment){
-            return redirect()->back()->with('error', 'Assignment not found');
-        }
+
         $assignmentSummary = [
             "id" => $assignment->id,
             "title" => $assignment->title,
@@ -408,7 +416,7 @@ class StudentContentController extends Controller
         $taskSummary = $this->getSpecificTaskSummary($task);
         $taskNavigation = $this->getTaskNavigation($assignment);
         return Inertia::render('student/task', [
-            "moduleId" => $moduleId,
+            "moduleId" => $module->id,
             "assignment" => $assignmentSummary,
             "task" => $taskSummary,
             "taskNavigation" => $taskNavigation
