@@ -39,11 +39,11 @@ export default function StudentAssignmentsList({
                         No assignments are available yet.
                     </div>
                 ) : (
-                    assignments.map((assignment) => {
+                    assignments.map((assignment, index) => {
                         const href = `/student/assignments/${assignment.id}`;
 
                         return (
-                            <Link key={assignment.id} href={href} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">
+                            <Link key={index} href={href} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div className="space-y-1">
                                         <p className="font-semibold">{assignment.title}</p>
