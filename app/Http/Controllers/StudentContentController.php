@@ -124,16 +124,20 @@ class StudentContentController extends Controller
         });
 
         return $assignments->map(function ($assignment) use ($user) {
+            $submission = $assignment->submissions()->where('student_id', $user->id)->first();
+            $status = $submission?->status ?? 'Not started';
+
+            $totalPercent = $submission?->total_percent ?? 0;
             return [
                 ...$assignment->toArray(),
                 'tasks_count' => $assignment->tasks()->count(),
                 'first_task_id' => $assignment->tasks()->first()?->task_id,
                 'module_names' => $assignment->topics()->pluck('topics.name')->values(),
                 'total_points' => $assignment->totalPoints(),
-                'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+                'total_percent' => $totalPercent,
+                'status' => $status
             ];
         })->toArray();
-
 
     }
 
@@ -440,5 +444,27 @@ class StudentContentController extends Controller
                 'max_points' => $task->max_points,
             ];
         })->toArray();
+    }
+    public function assignments(Request $request){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+
+        $groupId = $organization->pivot->group_id;
+
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
+        
+        return Inertia::render('student/assignments', [
+            "assignments" => $studentAssignmentSummary,
+        ]);
     }
 }
