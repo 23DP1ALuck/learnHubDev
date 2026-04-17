@@ -40,7 +40,7 @@ export default function StudentAssignmentsList({
                     </div>
                 ) : (
                     assignments.map((assignment) => {
-                        const href = assignment.first_task_id ? `/student/assignments/${assignment.id}/tasks/${assignment.first_task_id}` : '/student/assignments';
+                        const href = `/student/assignments/${assignment.id}`;
 
                         return (
                             <Link key={assignment.id} href={href} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">

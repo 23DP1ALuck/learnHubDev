@@ -50,6 +50,34 @@ export type StudentAssignmentSummary = {
     submitted_on: string | null;
 };
 
+export type StudentAssignmentDetail = {
+    id: number;
+    title: string;
+    description: string | null;
+    grading_policy: string | null;
+    due_date: string | null;
+    status: string;
+    tasks_count: number;
+    topics_count: number;
+    total_max_points: string | number | null;
+    first_task_id: number | null;
+    created_at: string | null;
+};
+
+export type StudentAssignmentTopic = {
+    module_id: number;
+    module_name: string | null;
+    topic_id: number;
+    topic_name: string | null;
+};
+
+export type StudentAssignmentTaskSummary = {
+    task_id: number;
+    task_type: TaskType;
+    max_points: string | number;
+    question_text: string;
+};
+
 export type StudentTaskOption = {
     option_id: number;
     option_text: string;

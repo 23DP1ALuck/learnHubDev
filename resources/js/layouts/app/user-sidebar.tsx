@@ -69,7 +69,7 @@ export function Sidebar() {
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton
                                         asChild
-                                        isActive={urlIsActive(item.href, undefined, true)}
+                                        isActive={urlIsActive(item.href, undefined, false)}
                                         tooltip={item.title}
                                     >
                                         <Link href={item.href} prefetch>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assignment;
 use App\Models\Material;
 use App\Models\Module;
 use App\Models\Organization;
@@ -34,7 +35,6 @@ class StudentContentController extends Controller
         $dashboardSummary = $this->getDashboardSummary($user, $group);
         $studentModuleSummary = $this->getStudentModuleSummary($group);
         $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
-        dd($studentAssignmentSummary);
 
         return Inertia::render('student/dashboard', [
             "stats" => $dashboardSummary,
@@ -281,6 +281,77 @@ class StudentContentController extends Controller
             'materials_count' => $topic->materials()->count(),
             'assignments_count' => $topic->assignments()->count(),
         ];
+    }
+    public function assignment(Request $request, int $moduleId, int $assignmentId){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+        $groupId = $organization->pivot->group_id;
+
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+
+        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
+        ->where('group_id', $group->group_id)
+            ->where('school_id', $group->school_id)
+            ->where('module_id', $moduleId)
+            ->with('module')
+            ->first();
+
+        if(!$groupsModules){
+            return redirect()->back()->with('error', 'You have no access to this module');
+        }
+        $assignment = $groupsModules
+            ->module
+            ->assignments()
+            ->where('id', $assignmentId)
+            ->first();
+        if(!$assignment){
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+        $assignmentSummary = $this->getSpecificAssignmentSummary($assignment, $user);
+        $assignmentTopicsSummary = $this->getSpecificAssignmentTopicsSummary($assignment, $user);
+        return Inertia::render('student/assignment', [
+            "assignment" => $assignmentSummary,
+            "topics" => $assignmentTopicsSummary,
+        ]);
+
+    }
+    private function getSpecificAssignmentSummary(Assignment $assignment, User $user): array{
+        $tasks = $assignment->tasks()->get();
+        $points = $tasks->sum('max_points');
+//        dd($points);
+        return [
+            ...$assignment->toArray(),
+            'tasks_count' => $assignment->tasks()->count(),
+            'first_task_id' => $assignment->tasks()->first()?->task_id,
+            'module_names' => $assignment->topics()->pluck('topics.name')->values(),
+            'total_max_points' => $assignment->totalPoints(),
+            'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+        ];
+    }
+    private function getSpecificAssignmentTopicsSummary(Assignment $assignment, User $user): array{
+        $topics = $assignment->topics()->get();
+        return $topics->map(function ($topic){
+            return [
+                'module_id' => $topic->module_id,
+                'module_name' => $topic->module->name,
+                'topic_id' => $topic->topic_id,
+                'topic_name' => $topic->name,
+            ];
+        })->toArray();
     }
 
 }

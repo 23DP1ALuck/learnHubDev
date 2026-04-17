@@ -1,0 +1,45 @@
+import StudentAssignmentSummaryCard from '@/components/student/student-assignment-summary';
+import StudentAssignmentTopicsList from '@/components/student/student-assignment-topics-list';
+import type { StudentAssignmentDetail, StudentAssignmentTopic } from '@/components/student/student-types';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, Flash } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
+
+export default function StudentAssignmentPage({
+    assignment,
+    topics,
+}: {
+    assignment: StudentAssignmentDetail;
+    topics: StudentAssignmentTopic[];
+}) {
+    const { flash } = usePage<Flash>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Assignments',
+            href: '/student/assignments',
+        },
+        {
+            title: assignment.title,
+            href: `/student/assignments/${assignment.id}`,
+        },
+    ];
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={assignment.title} />
+
+            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
+                {flash?.success && (
+                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {flash.success}
+                    </div>
+                )}
+
+                <StudentAssignmentSummaryCard assignment={assignment} />
+
+                <StudentAssignmentTopicsList topics={topics} />
+            </div>
+        </AppLayout>
+    );
+}
