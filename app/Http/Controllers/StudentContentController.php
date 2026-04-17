@@ -7,6 +7,7 @@ use App\Models\Material;
 use App\Models\Module;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
+use App\Models\Task;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -353,5 +354,83 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
+    public function task(Request $request, int $moduleId, int $assignmentId, int $taskId){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+        $groupId = $organization->pivot->group_id;
 
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+
+        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
+        ->where('group_id', $group->group_id)
+            ->where('school_id', $group->school_id)
+            ->where('module_id', $moduleId)
+            ->with('module')
+            ->first();
+
+        if(!$groupsModules){
+            return redirect()->back()->with('error', 'You have no access to this module');
+        }
+        $assignment = $groupsModules
+            ->module
+            ->assignments()
+            ->where('id', $assignmentId)
+            ->first();
+        if(!$assignment){
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+        $assignmentSummary = [
+            "id" => $assignment->id,
+            "title" => $assignment->title,
+            "description" => $assignment->description,
+            "due_date" => $assignment->due_date,
+            "status" => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+            "tasks_count" => $assignment->tasks()->count(),
+        ];
+        $task = $assignment->tasks()->where('task_id', $taskId)->first();
+        if(!$task){
+            return redirect()->back()->with('error', 'Task not found');
+        }
+        $taskSummary = $this->getSpecificTaskSummary($task);
+        $taskNavigation = $this->getTaskNavigation($assignment);
+        return Inertia::render('student/task', [
+            "moduleId" => $moduleId,
+            "assignment" => $assignmentSummary,
+            "task" => $taskSummary,
+            "taskNavigation" => $taskNavigation
+        ]);
+    }
+    private function getSpecificTaskSummary(Task $task): array{
+        return [
+            'task_id' => $task->task_id,
+            'question_text' => $task->question_text,
+            'task_type' => $task->task_type,
+            'max_points' => $task->max_points,
+            'options' => $task->options()->get()->toArray(),
+        ];
+    }
+    private function getTaskNavigation(Assignment $assignment): array{
+        $tasks = $assignment->tasks()->get();
+        return $tasks->map(function ($task){
+            return [
+                'task_type' => $task->task_type,
+                'task_id' => $task->task_id,
+                'max_points' => $task->max_points,
+            ];
+        })->toArray();
+    }
 }

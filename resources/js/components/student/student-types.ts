@@ -89,10 +89,6 @@ export type StudentTaskSummary = {
     task_type: TaskType;
     max_points: string | number;
     options: StudentTaskOption[];
-    answer_text: string | null;
-    points: string | null;
-    teacher_comment: string | null;
-    created_at: string | null;
 };
 
 export type StudentTaskNavigationItem = {
