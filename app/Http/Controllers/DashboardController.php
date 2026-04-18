@@ -17,9 +17,23 @@ class DashboardController extends Controller
             return $this->adminDashboard();
         }
 
-        if ($request->user()?->ownedOrganizations()->exists()) {
-            return app(OrganizationOwnerController::class)->dashboard($request);
+        $currentOrg = $request->session()->get('activeOrganization', '');
+        if(!$currentOrg){
+            return redirect()->route('login');
         }
+        $organization = $request->user()?->organizations()->where('id', $currentOrg)->first();
+        if($organization){
+            switch ($organization->pivot->role_in_org) {
+                case 'ORGANIZATION_OWNER':
+                    return app(OrganizationOwnerController::class)->dashboard($request);
+                case 'STUDENT':
+                    return app(StudentContentController::class)->dashboard($request);
+                case 'TEACHER':
+                    return app(TeacherContentController::class)->dashboard($request);
+            }
+        }
+
+
 
         return $this->userDashboard($request);
     }
