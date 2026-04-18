@@ -16,6 +16,12 @@ use Inertia\Response;
 
 class TeacherContentController extends Controller
 {
+    public function dashboard(Request $request): Response|RedirectResponse
+    {
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        return Inertia::render('teacher/dashboard', []);
+    }
     public function modules(Request $request): Response|RedirectResponse
     {
         $user = $request->user();

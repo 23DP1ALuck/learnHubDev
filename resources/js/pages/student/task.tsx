@@ -51,7 +51,7 @@ export default function StudentTaskPage({
                 </div>
 
                 <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,22rem)]">
-                    <StudentTaskContent task={task} />
+                    <StudentTaskContent assignmentId={assignment.id} task={task} />
                     <StudentTaskSidebar assignment={assignment} task={task} taskNavigation={taskNavigation} moduleId={moduleId}/>
                 </div>
             </div>

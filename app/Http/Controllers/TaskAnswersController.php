@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreTaskAnswerRequest;
+use App\Models\Assignment;
+use App\Models\TaskAnswer;
+use Illuminate\Http\Request;
+
+class TaskAnswersController extends Controller
+{
+    public function store(StoreTaskAnswerRequest $request, int $assignmentId, int $taskId){
+        $user = $request->user();
+        $validated = $request->validated();
+        if(!$user){
+            return redirect()->route('login');
+        }
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()->where('organizations.id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard');
+        }
+        $groupId = $organization->pivot->group_id;
+        $assignment = Assignment::query()->where('id', $assignmentId)->first();
+        if(!$assignment){
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+
+        $module = $assignment->topics()->first()->module()->first();
+        $enrolled = $module
+            ->groupModuleTeachers()
+            ->where('group_id', $groupId)
+            ->exists();
+
+        if(!$enrolled){
+            return redirect()->back()->with('error', 'You are not enrolled in this module');
+        }
+
+        $task = $assignment->tasks()
+            ->where('task_id', $taskId)
+            ->first();
+
+        if(!$task){
+            return redirect()->back()->with('error', 'Task not found');
+        }
+
+
+        if($task->correctAnswers()->exists()){
+            $result = 0; // initial value for calculating the score
+            $maxPoints = $task->max_points;
+
+            if($task->task_type == 'CHECKBOX'){
+
+                $taskCorrectAnswer = $task->correctAnswers()->get();
+                $correctAnswersLength = $taskCorrectAnswer->count();
+                $step = $maxPoints / $correctAnswersLength; // calculate the step for 1 correct answer
+
+                foreach($taskCorrectAnswer as $correctAnswer){
+                    // add the step to the result if the answer is correct
+                    if(in_array($correctAnswer->answer, $validated['answer_text'])){
+                        $result += $step;
+                    }
+                }
+        }else{
+                $taskCorrectAnswer = $task->correctAnswers()->first();
+                $result = $taskCorrectAnswer->answer == $validated['answer_text'] ? $maxPoints : 0; // max points for correct answer
+            }
+        }
+
+
+        $taskAnswer = TaskAnswer::create([
+            'student_id' => $user->id,
+            'assignment_id' => $assignmentId,
+            'task_id' => $taskId,
+            'answer_text' => json_encode($validated['answer_text']),
+            'points' => round($result,2),
+        ]);
+
+        return redirect()->back()->with('success', 'Answer submitted successfully');
+    }
+}

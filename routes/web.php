@@ -13,6 +13,7 @@ use App\Http\Controllers\SchoolGroupController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StudentContentController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\TaskAnswersController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeacherContentController;
 use App\Http\Controllers\TopicController;
@@ -89,7 +90,9 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
     Route::get('/student/assignments', [StudentContentController::class, 'assignments'])->name('student.assignments');
     Route::get('/student/assignments/{assignment_id}', [StudentContentController::class, 'assignment'])->name('student.assignments.show');
     Route::get('/student/assignments/{assignment}/tasks/{task}', [StudentContentController::class, 'task'])->name('student.tasks.show');
+
     Route::post('/student/assignments/{assignment}/start', [SubmissionController::class, 'store'])->name('student.submission.store');
+    Route::post('/student/assignments/{assignment}/task/{task}', [TaskAnswersController::class, 'store'])->name('student.answers.store');
 //    Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);

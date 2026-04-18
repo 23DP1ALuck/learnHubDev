@@ -1,13 +1,17 @@
 import type { StudentTaskSummary } from '@/components/student/student-types';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Form } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentTaskContentProps = {
+    assignmentId: number;
     task: StudentTaskSummary;
 };
 
-export default function StudentTaskContent({ task }: StudentTaskContentProps) {
+export default function StudentTaskContent({ assignmentId, task }: StudentTaskContentProps) {
     return (
         <Card className="border-sidebar-border/70 min-h-[28rem]">
             <CardHeader className="space-y-4">
@@ -26,26 +30,27 @@ export default function StudentTaskContent({ task }: StudentTaskContentProps) {
                     </p>
                 </div>
 
-                <div className="space-y-3">
-                    <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Answer preview</h2>
+                <Form action={route('student.answers.store', [assignmentId, task.task_id])} method="post" className="space-y-4">
+                    <input type="hidden" name="task_type" value={task.task_type} />
+                    <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Your answer</h2>
 
                     {task.task_type === 'TEXT' && (
                         <textarea
+                            name="answer_text"
                             className="min-h-40 w-full resize-none rounded-xl border bg-background px-4 py-3 text-sm outline-none"
-                            disabled
                             placeholder="Students type their answer here."
                         />
                     )}
 
                     {task.task_type === 'NUMBER' && (
-                        <Input disabled placeholder="Students enter a numeric answer here." type="number" />
+                        <Input name="answer_text" placeholder="Students enter a numeric answer here." type="number" />
                     )}
 
                     {task.task_type === 'TRUE_FALSE' && (
                         <div className="grid gap-3 sm:grid-cols-2">
                             {['TRUE', 'FALSE'].map((value) => (
-                                <label key={value} className="flex items-center gap-3 rounded-2xl border p-4 opacity-80">
-                                    <input disabled name="student-true-false" readOnly type="radio" />
+                                <label key={value} className="flex items-center gap-3 rounded-2xl border p-4">
+                                    <input name="answer_text" value={value} type="radio" />
                                     <span className="font-medium">{value}</span>
                                 </label>
                             ))}
@@ -58,11 +63,10 @@ export default function StudentTaskContent({ task }: StudentTaskContentProps) {
                                 <div className="rounded-2xl border border-dashed p-5 text-sm text-muted-foreground">No options configured yet.</div>
                             ) : (
                                 task.options.map((option) => (
-                                    <label key={option.option_id} className="flex items-center gap-3 rounded-2xl border p-4 opacity-80">
+                                    <label key={option.option_id} className="flex items-center gap-3 rounded-2xl border p-4">
                                         <input
-                                            disabled
-                                            name={`student-option-${task.task_type}`}
-                                            readOnly
+                                            name={task.task_type === 'CHECKBOX' ? 'answer_text[]' : 'answer_text'}
+                                            value={option.option_text}
                                             type={task.task_type === 'CHECKBOX' ? 'checkbox' : 'radio'}
                                         />
                                         <span>{option.option_text}</span>
@@ -73,11 +77,14 @@ export default function StudentTaskContent({ task }: StudentTaskContentProps) {
                     )}
 
                     {task.task_type === 'FILE' && (
-                        <div className="rounded-2xl border border-dashed p-6 text-center text-sm text-muted-foreground">
-                            File upload tasks are reviewed manually. The student upload area will be shown here later.
-                        </div>
+                        <Input name="answer_file" type="file" />
                     )}
-                </div>
+
+                    <div className="flex justify-end">
+                        <Button type="submit">Submit answer</Button>
+                    </div>
+                    <input type="hidden" name="task_type" value={task.task_type} />
+                </Form>
             </CardContent>
         </Card>
     );
