@@ -1,7 +1,8 @@
 import type { StudentAssignmentDetail } from '@/components/student/student-types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from '@inertiajs/react';
+import { Link, Form } from '@inertiajs/react';
+import { FC } from "react";
 import { route } from 'ziggy-js';
 
 type StudentAssignmentSummaryProps = {
@@ -20,6 +21,38 @@ function statusLabel(status: string): string {
             return 'Not started';
     }
 }
+function AssignmentStartButton({assignment}: { assignment : StudentAssignmentDetail }) {
+    if(assignment.first_task_id && assignment.status === 'NOT STARTED'){
+        return  (
+            <Form
+            action={route('student.submission.store', [assignment.id])}
+            method="POST"
+            className="flex-shrink-0"
+            >
+            <Button type="submit">
+                Start Assignment
+            </Button>
+            </Form>
+        )
+    } else if(assignment.first_task_id && assignment.status === 'DRAFT'){
+        // TODO: reiceve correct task id
+        return (
+            <Link href={route('student.tasks.show', [assignment.id, 1])} className="flex-shrink-0">
+                <Button>
+                    Continue
+                </Button>
+            </Link>
+        )
+    } else if(assignment.first_task_id && assignment.status === 'SUBMITTED'){
+        return (
+            <div className="flex p-4 rounded bg-muted-foreground text-white">Submission completed</div>
+        )
+    } else {
+        return (
+            <div className="flex p-4 rounded bg-muted-foreground text-white">No tasks yet</div>
+        )
+    }
+}
 
 export default function StudentAssignmentSummaryCard({ assignment }: StudentAssignmentSummaryProps) {
     return (
@@ -31,14 +64,7 @@ export default function StudentAssignmentSummaryCard({ assignment }: StudentAssi
                         {assignment.description || 'This assignment contains the tasks the student needs to complete.'}
                     </CardDescription>
                 </div>
-
-                {assignment.first_task_id ? (
-                    <Link href={route('student.tasks.show', [assignment.id, assignment.first_task_id])}>
-                        <Button>Start assignment</Button>
-                    </Link>
-                ) : (
-                    <Button disabled>No tasks yet</Button>
-                )}
+                <AssignmentStartButton assignment={assignment} />
             </CardHeader>
 
             <CardContent className="grid gap-3 md:grid-cols-5">
