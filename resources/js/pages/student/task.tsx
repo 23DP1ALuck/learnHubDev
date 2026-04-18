@@ -19,6 +19,7 @@ export default function StudentTaskPage({
     task: StudentTaskSummary;
     taskNavigation: StudentTaskNavigationItem[];
 }) {
+    console.log(task);
     const { flash } = usePage<Flash>().props;
     const breadcrumbs: BreadcrumbItem[] = [
         {

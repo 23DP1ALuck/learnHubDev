@@ -424,7 +424,7 @@ class StudentContentController extends Controller
         if(!$task){
             return redirect()->back()->with('error', 'Task not found');
         }
-        $taskSummary = $this->getSpecificTaskSummary($task);
+        $taskSummary = $this->getSpecificTaskSummary($task, $user);
         $taskNavigation = $this->getTaskNavigation($assignment);
         return Inertia::render('student/task', [
             "moduleId" => $module->id,
@@ -433,13 +433,15 @@ class StudentContentController extends Controller
             "taskNavigation" => $taskNavigation
         ]);
     }
-    private function getSpecificTaskSummary(Task $task): array{
+    private function getSpecificTaskSummary(Task $task, User $user): array{
+        $answer = $task->answers()->where('student_id', $user->id)->first();
         return [
             'task_id' => $task->task_id,
             'question_text' => $task->question_text,
             'task_type' => $task->task_type,
             'max_points' => $task->max_points,
             'options' => $task->options()->get()->toArray(),
+            'answer' => json_decode($answer?->answer_text) ?? null,
         ];
     }
     private function getTaskNavigation(Assignment $assignment): array{

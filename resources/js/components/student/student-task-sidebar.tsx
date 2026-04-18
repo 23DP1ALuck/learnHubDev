@@ -78,7 +78,6 @@ export default function StudentTaskSidebar({ assignment, task, taskNavigation, m
                     <div className="grid grid-cols-4 gap-3">
                         {taskNavigation.map((item) => {
                             const isCurrent = item.task_id === task.task_id;
-
                             return (
                                 <Link
                                     key={item.task_id}

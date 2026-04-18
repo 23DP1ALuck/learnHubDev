@@ -90,6 +90,7 @@ export type StudentTaskSummary = {
     task_type: TaskType;
     max_points: string | number;
     options: StudentTaskOption[];
+    answer: string[];
 };
 
 export type StudentTaskNavigationItem = {

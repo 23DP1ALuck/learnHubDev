@@ -12,8 +12,15 @@ type StudentTaskContentProps = {
 };
 
 export default function StudentTaskContent({ assignmentId, task }: StudentTaskContentProps) {
+    const isAnswered = task.answer !== null && task.answer !== undefined;
+
+    const selectedAnswers = Array.isArray(task.answer) // for next comparing logic
+        ? task.answer
+        : [task.answer]
+
+
     return (
-        <Card className="border-sidebar-border/70 min-h-[28rem]">
+        <Card className="min-h-[28rem] border-sidebar-border/70">
             <CardHeader className="space-y-4">
                 <div className="flex items-center justify-between gap-3">
                     <div>
@@ -23,6 +30,7 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                     <Badge variant="secondary">{task.max_points} pts</Badge>
                 </div>
             </CardHeader>
+
             <CardContent className="grid gap-6">
                 <div className="rounded-3xl border bg-card p-6">
                     <p className="whitespace-pre-wrap text-base leading-7 text-foreground/90">
@@ -32,25 +40,42 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
 
                 <Form action={route('student.answers.store', [assignmentId, task.task_id])} method="post" className="space-y-4">
                     <input type="hidden" name="task_type" value={task.task_type} />
-                    <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Your answer</h2>
+
+                    <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        Your answer
+                    </h2>
 
                     {task.task_type === 'TEXT' && (
                         <textarea
-                            name="answer_text"
+                            name="answer_text[]"
                             className="min-h-40 w-full resize-none rounded-xl border bg-background px-4 py-3 text-sm outline-none"
                             placeholder="Students type their answer here."
+                            defaultValue={selectedAnswers[0] ?? ''}
+                            disabled={isAnswered}
                         />
                     )}
 
                     {task.task_type === 'NUMBER' && (
-                        <Input name="answer_text" placeholder="Students enter a numeric answer here." type="number" />
+                        <Input
+                            name="answer_text[]"
+                            placeholder="Students enter a numeric answer here."
+                            type="number"
+                            defaultValue={selectedAnswers[0] ?? ''}
+                            disabled={isAnswered}
+                        />
                     )}
 
                     {task.task_type === 'TRUE_FALSE' && (
                         <div className="grid gap-3 sm:grid-cols-2">
                             {['TRUE', 'FALSE'].map((value) => (
                                 <label key={value} className="flex items-center gap-3 rounded-2xl border p-4">
-                                    <input name="answer_text" value={value} type="radio" />
+                                    <input
+                                        name="answer_text[]"
+                                        value={value}
+                                        type="radio"
+                                        defaultChecked={selectedAnswers[0] === value}
+                                        disabled={isAnswered}
+                                    />
                                     <span className="font-medium">{value}</span>
                                 </label>
                             ))}
@@ -60,7 +85,9 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                     {(task.task_type === 'CHECKBOX' || task.task_type === 'CUSTOM_SELECT') && (
                         <div className="space-y-3">
                             {task.options.length === 0 ? (
-                                <div className="rounded-2xl border border-dashed p-5 text-sm text-muted-foreground">No options configured yet.</div>
+                                <div className="rounded-2xl border border-dashed p-5 text-sm text-muted-foreground">
+                                    No options configured yet.
+                                </div>
                             ) : (
                                 task.options.map((option) => (
                                     <label key={option.option_id} className="flex items-center gap-3 rounded-2xl border p-4">
@@ -68,6 +95,8 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                                             name={task.task_type === 'CHECKBOX' ? 'answer_text[]' : 'answer_text'}
                                             value={option.option_text}
                                             type={task.task_type === 'CHECKBOX' ? 'checkbox' : 'radio'}
+                                            defaultChecked={selectedAnswers.includes(option.option_text)}
+                                            disabled={isAnswered}
                                         />
                                         <span>{option.option_text}</span>
                                     </label>
@@ -77,13 +106,18 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                     )}
 
                     {task.task_type === 'FILE' && (
-                        <Input name="answer_file" type="file" />
+                        <Input
+                            name="answer_file"
+                            type="file"
+                            disabled={isAnswered}
+                        />
                     )}
 
-                    <div className="flex justify-end">
-                        <Button type="submit">Submit answer</Button>
-                    </div>
-                    <input type="hidden" name="task_type" value={task.task_type} />
+                    {!task.answer && (
+                        <div className="flex justify-end">
+                            <Button type="submit">Submit answer</Button>
+                        </div>
+                    )}
                 </Form>
             </CardContent>
         </Card>
