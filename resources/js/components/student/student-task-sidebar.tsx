@@ -83,8 +83,8 @@ export default function StudentTaskSidebar({ assignment, task, taskNavigation, m
                                     key={item.task_id}
                                     className={`flex aspect-square items-center justify-center rounded-2xl border text-base font-semibold transition ${
                                         isCurrent
-                                            ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                                            : 'bg-background hover:border-primary/40 hover:bg-muted/40'
+                                            ? 'border-primary bg-primary text-primary-foreground shadow-sm' :
+                                            (item.is_completed ? 'bg-muted-foreground/20 hover:border-primary/40' : 'bg-background hover:border-primary/40 hover:bg-muted/40')
                                     }`}
                                     href={route('student.tasks.show', [assignment.id, item.task_id])}
                                 >

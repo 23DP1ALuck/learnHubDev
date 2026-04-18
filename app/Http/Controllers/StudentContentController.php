@@ -425,7 +425,7 @@ class StudentContentController extends Controller
             return redirect()->back()->with('error', 'Task not found');
         }
         $taskSummary = $this->getSpecificTaskSummary($task, $user);
-        $taskNavigation = $this->getTaskNavigation($assignment);
+        $taskNavigation = $this->getTaskNavigation($assignment, $user);
         return Inertia::render('student/task', [
             "moduleId" => $module->id,
             "assignment" => $assignmentSummary,
@@ -444,13 +444,20 @@ class StudentContentController extends Controller
             'answer' => json_decode($answer?->answer_text) ?? null,
         ];
     }
-    private function getTaskNavigation(Assignment $assignment): array{
+    private function getTaskNavigation(Assignment $assignment, User $user): array{
+//        TODO: send isCompleted flag
+        $isCompleted = $assignment
+                ->submissions()
+                ->where('student_id', auth()->id())->first()?->status === 'COMPLETED';
         $tasks = $assignment->tasks()->get();
-        return $tasks->map(function ($task){
+        return $tasks->map(function ($task) use ($user) {
             return [
                 'task_type' => $task->task_type,
                 'task_id' => $task->task_id,
                 'max_points' => $task->max_points,
+                'is_completed' => $task
+                        ->answers()
+                        ->where('student_id', $user->id)->exists()
             ];
         })->toArray();
     }

@@ -97,6 +97,7 @@ export type StudentTaskNavigationItem = {
     task_id: number;
     task_type: TaskType;
     max_points: string | number;
+    is_completed: boolean;
 };
 
 export type StudentTaskAssignment = {
