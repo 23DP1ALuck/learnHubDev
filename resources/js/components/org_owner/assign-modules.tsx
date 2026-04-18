@@ -36,7 +36,7 @@ export const AssignModules = ({group, modules}: {group: OrganizationGroup, modul
         })
     }
     const getGroupModules = async () => {
-        const response = await fetch(`/organization/${group.school_id}/groups/${group.group_id}/available-modules`);
+        const response = await fetch(route('groups.available-modules', [group.school_id, group.group_id]));
         return await response.json();
     }
     const [availableModules, setAvailableModules] = useState<OrganizationSummary[]>([]);

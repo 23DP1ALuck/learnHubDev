@@ -2,6 +2,7 @@ import type { StudentTaskAssignment, StudentTaskNavigationItem, StudentTaskSumma
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
 import { Clock3, Hash } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 type StudentTaskSidebarProps = {
     assignment: StudentTaskAssignment;
@@ -86,7 +87,7 @@ export default function StudentTaskSidebar({ assignment, task, taskNavigation, m
                                             ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                                             : 'bg-background hover:border-primary/40 hover:bg-muted/40'
                                     }`}
-                                    href={`/student/module/${moduleId}/assignments/${assignment.id}/tasks/${item.task_id}`}
+                                    href={route('student.tasks.show', [assignment.id, item.task_id])}
                                 >
                                     {item.task_id}
                                 </Link>

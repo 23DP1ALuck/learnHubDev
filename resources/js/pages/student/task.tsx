@@ -4,6 +4,7 @@ import type { StudentTaskAssignment, StudentTaskNavigationItem, StudentTaskSumma
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 export default function StudentTaskPage({
     moduleId,
@@ -20,15 +21,15 @@ export default function StudentTaskPage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Assignments',
-            href: '/student/assignments',
+            href: route('student.assignments'),
         },
         {
             title: assignment.title,
-            href: `/student/assignments/${assignment.id}/tasks/${task.task_id}`,
+            href: route('student.assignments.show', assignment.id),
         },
         {
             title: `Task #${task.task_id}`,
-            href: `/student/assignments/${assignment.id}/tasks/${task.task_id}`,
+            href: route('student.tasks.show', [assignment.id, task.task_id]),
         },
     ];
 

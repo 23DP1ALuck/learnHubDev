@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
 import {Badge} from "@/components/ui/badge";
+import { route } from 'ziggy-js';
 
 type ModuleSummary = {
     id: number;
@@ -29,7 +30,7 @@ export default function MaterialContext({ module, topic }: MaterialContextProps)
             </CardHeader>
             <CardContent className="space-y-3">
                 <Link
-                    href={`/teacher/modules/${module.id}`}
+                    href={route('teacher.modules.show', module.id)}
                     className="block rounded-lg border p-4 transition-colors hover:bg-muted/40"
                     prefetch
                 >
@@ -42,7 +43,7 @@ export default function MaterialContext({ module, topic }: MaterialContextProps)
                     </p>
                 </Link>
                 <Link
-                    href={`/teacher/modules/${module.id}/topics/${topic.topic_id}`}
+                    href={route('teacher.topics.show', [module.id, topic.topic_id])}
                     className="block rounded-lg border p-4 transition-colors hover:bg-muted/40"
                     prefetch
                 >

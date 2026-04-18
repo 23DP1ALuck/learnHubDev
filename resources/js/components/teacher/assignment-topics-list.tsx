@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type AssignmentTopic = {
     module_id: number;
@@ -28,7 +29,7 @@ export default function AssignmentTopicsList({ topics }: AssignmentTopicsListPro
                     topics.map((topic) => (
                         <Link
                             key={`${topic.module_id}-${topic.topic_id}`}
-                            href={`/teacher/modules/${topic.module_id}/topics/${topic.topic_id}`}
+                            href={route('teacher.topics.show', [topic.module_id, topic.topic_id])}
                             className="block rounded-lg border p-3 text-sm transition-colors hover:bg-muted/40"
                             prefetch
                         >

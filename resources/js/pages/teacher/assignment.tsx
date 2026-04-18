@@ -7,6 +7,7 @@ import type { BreadcrumbItem, Flash } from '@/types';
 import {Head, Link, usePage} from '@inertiajs/react';
 import {preview} from "@/routes/teacher/tasks";
 import {Button} from "@/components/ui/button";
+import { route } from 'ziggy-js';
 
 type AssignmentSummary = {
     id: number;
@@ -48,23 +49,23 @@ export default function TeacherAssignmentPage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
-            href: '/teacher/modules',
+            href: route('teacher.modules'),
         },
         ...(primaryTopic
             ? [
                   {
                       title: primaryTopic.module_name || `Module ${primaryTopic.module_id}`,
-                      href: `/teacher/modules/${primaryTopic.module_id}`,
+                      href: route('teacher.modules.show', primaryTopic.module_id),
                   },
                   {
                       title: primaryTopic.topic_name || `Topic ${primaryTopic.topic_id}`,
-                      href: `/teacher/modules/${primaryTopic.module_id}/topics/${primaryTopic.topic_id}`,
+                      href: route('teacher.topics.show', [primaryTopic.module_id, primaryTopic.topic_id]),
                   },
               ]
             : []),
         {
             title: assignment.title,
-            href: `/teacher/assignments/${assignment.id}`,
+            href: route('teacher.assignments.show', assignment.id),
         },
     ];
 

@@ -10,6 +10,7 @@ import type {
     User
 } from '@/types';
 import { Head } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 import {CreateGroups} from "@/components/org_owner/create-groups";
 import {AssignStudents} from "@/components/org_owner/assign-students";
 import {AssignModules} from "@/components/org_owner/assign-modules";
@@ -17,11 +18,11 @@ import {AssignModules} from "@/components/org_owner/assign-modules";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organization',
-        href: '/organization',
+        href: route('organization'),
     },
     {
         title: 'Groups',
-        href: '/organization/groups',
+        href: route('groups'),
     },
 ];
 type OrganizationSummary = OrganizationModule & {teacher_name: string};

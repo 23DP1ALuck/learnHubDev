@@ -4,6 +4,7 @@ import type { AssignmentPreview, TaskNavigationItem, TaskPreview } from '@/compo
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import {Head, usePage} from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 export default function TeacherTaskPreviewPage({
     assignment,
@@ -19,15 +20,15 @@ export default function TeacherTaskPreviewPage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
-            href: '/teacher/modules',
+            href: route('teacher.modules'),
         },
         {
             title: assignment.title,
-            href: `/teacher/assignments/${assignment.id}`,
+            href: route('teacher.assignments.show', assignment.id),
         },
         {
             title: `Preview task #${task.task_id}`,
-            href: `/preview/${assignment.id}/task/${task.task_id}`,
+            href: route('teacher.tasks.preview', [assignment.id, task.task_id]),
         },
     ];
 

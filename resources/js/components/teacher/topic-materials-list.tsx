@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type MaterialSummary = {
     material_id: number;
@@ -29,7 +30,7 @@ export default function TopicMaterialsList({ moduleId, topicId, materials }: Top
                     materials.map((material) => (
                         <Link
                             key={material.material_id}
-                            href={`/teacher/modules/${moduleId}/topics/${topicId}/materials/${material.material_id}`}
+                            href={route('teacher.materials.show', [moduleId, topicId, material.material_id])}
                             className="block rounded-xl border p-4 transition-colors hover:bg-muted/40"
                             prefetch
                         >

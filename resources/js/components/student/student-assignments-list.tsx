@@ -2,6 +2,7 @@ import type { StudentAssignmentSummary } from '@/components/student/student-type
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentAssignmentsListProps = {
     assignments: StudentAssignmentSummary[];
@@ -40,7 +41,7 @@ export default function StudentAssignmentsList({
                     </div>
                 ) : (
                     assignments.map((assignment, index) => {
-                        const href = `/student/assignments/${assignment.id}`;
+                        const href = route('student.assignments.show', assignment.id);
 
                         return (
                             <Link key={index} href={href} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">

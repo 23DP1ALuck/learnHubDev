@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type AssignmentSummary = {
     id: number;
@@ -32,7 +33,7 @@ export default function TopicAssignmentsList({ assignments }: TopicAssignmentsLi
                     assignments.map((assignment) => (
                         <Link
                             key={assignment.id}
-                            href={`/teacher/assignments/${assignment.id}`}
+                            href={route('teacher.assignments.show', assignment.id)}
                             className="block rounded-xl border p-4 transition-colors hover:bg-muted/40"
                             prefetch
                         >

@@ -3,11 +3,12 @@ import type { StudentAssignmentSummary } from '@/components/student/student-type
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Assignments',
-        href: '/student/assignments',
+        href: route('student.assignments'),
     },
 ];
 

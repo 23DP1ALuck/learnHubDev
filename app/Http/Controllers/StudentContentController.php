@@ -462,7 +462,7 @@ class StudentContentController extends Controller
             ->firstOrFail();
 
         $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
-        
+
         return Inertia::render('student/assignments', [
             "assignments" => $studentAssignmentSummary,
         ]);

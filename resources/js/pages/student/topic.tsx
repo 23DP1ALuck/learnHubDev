@@ -5,6 +5,7 @@ import type { StudentAssignmentSummary, StudentMaterialSummary, StudentModuleSum
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 export default function StudentTopicPage({
     module,
@@ -22,15 +23,15 @@ export default function StudentTopicPage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
-            href: '/student/modules',
+            href: route('student.modules'),
         },
         {
             title: module.name,
-            href: `/module/${module.id}`,
+            href: route('student.modules.show', module.id),
         },
         {
             title: topic.name,
-            href: `/module/${module.id}/topic/${topic.topic_id}`,
+            href: route('student.topics.show', [module.id, topic.topic_id]),
         },
     ];
 

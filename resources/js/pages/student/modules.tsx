@@ -5,11 +5,12 @@ import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import {toast} from "sonner";
 import { useEffect } from 'react';
+import { route } from 'ziggy-js';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Modules',
-        href: '/student/modules',
+        href: route('student.modules'),
     },
 ];
 

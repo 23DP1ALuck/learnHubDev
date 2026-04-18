@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type TeacherModule = {
     id: number;
@@ -26,7 +27,7 @@ type ContentStats = {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Modules',
-        href: '/teacher/modules',
+        href: route('teacher.modules'),
     },
 ];
 

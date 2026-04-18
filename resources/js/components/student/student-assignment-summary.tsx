@@ -2,6 +2,7 @@ import type { StudentAssignmentDetail } from '@/components/student/student-types
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentAssignmentSummaryProps = {
     assignment: StudentAssignmentDetail;
@@ -32,7 +33,7 @@ export default function StudentAssignmentSummaryCard({ assignment }: StudentAssi
                 </div>
 
                 {assignment.first_task_id ? (
-                    <Link href={`/student/assignments/${assignment.id}/tasks/${assignment.first_task_id}`}>
+                    <Link href={route('student.tasks.show', [assignment.id, assignment.first_task_id])}>
                         <Button>Start assignment</Button>
                     </Link>
                 ) : (

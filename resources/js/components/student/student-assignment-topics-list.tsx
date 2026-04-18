@@ -1,6 +1,7 @@
 import type { StudentAssignmentTopic } from '@/components/student/student-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentAssignmentTopicsListProps = {
     topics: StudentAssignmentTopic[];
@@ -22,7 +23,7 @@ export default function StudentAssignmentTopicsList({ topics }: StudentAssignmen
                     topics.map((topic) => (
                         <Link
                             key={`${topic.module_id}-${topic.topic_id}`}
-                            href={`/module/${topic.module_id}/topic/${topic.topic_id}`}
+                            href={route('student.topics.show', [topic.module_id, topic.topic_id])}
                             className="block rounded-xl border p-4 transition-colors hover:bg-muted/40"
                         >
                             <p className="font-semibold">{topic.topic_name || `Topic ${topic.topic_id}`}</p>

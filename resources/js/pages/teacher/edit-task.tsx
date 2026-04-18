@@ -5,6 +5,7 @@ import { modules } from '@/routes/teacher';
 import { editTask } from '@/routes/teacher/tasks';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: TaskSummary }) {
     const primaryTopic = assignment.topics[0];
@@ -20,17 +21,17 @@ function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: T
             ? [
                   {
                       title: primaryTopic.module_name || `Module ${primaryTopic.module_id}`,
-                      href: `/teacher/modules/${primaryTopic.module_id}`,
+                      href: route('teacher.modules.show', primaryTopic.module_id),
                   },
                   {
                       title: primaryTopic.name || `Topic ${primaryTopic.topic_id}`,
-                      href: `/teacher/modules/${primaryTopic.module_id}/topics/${primaryTopic.topic_id}`,
+                      href: route('teacher.topics.show', [primaryTopic.module_id, primaryTopic.topic_id]),
                   },
               ]
             : []),
         {
             title: assignment.title,
-            href: `/teacher/assignments/${assignment.id}`,
+            href: route('teacher.assignments.show', assignment.id),
         },
         {
             title: 'Edit task',

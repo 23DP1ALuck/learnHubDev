@@ -4,6 +4,7 @@ import type { StudentAssignmentDetail, StudentAssignmentTopic } from '@/componen
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 export default function StudentAssignmentPage({
     assignment,
@@ -17,11 +18,11 @@ export default function StudentAssignmentPage({
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Assignments',
-            href: '/student/assignments',
+            href: route('student.assignments'),
         },
         {
             title: assignment.title,
-            href: `/student/assignments/${assignment.id}`,
+            href: route('student.assignments.show', assignment.id),
         },
     ];
 

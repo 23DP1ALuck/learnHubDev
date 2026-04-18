@@ -2,6 +2,7 @@ import type { StudentModuleSummary } from '@/components/student/student-types';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentModulesListProps = {
     modules: StudentModuleSummary[];
@@ -21,7 +22,7 @@ export default function StudentModulesList({ modules }: StudentModulesListProps)
                     </div>
                 ) : (
                     modules.map((module) => (
-                        <Link key={module.id} href={`/module/${module.id}`} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">
+                        <Link key={module.id} href={route('student.modules.show', module.id)} className="block rounded-xl border p-4 transition-colors hover:bg-muted/40">
                             <div className="flex items-start justify-between gap-3">
                                 <div className="space-y-1">
                                     <p className="font-semibold">{module.name}</p>
