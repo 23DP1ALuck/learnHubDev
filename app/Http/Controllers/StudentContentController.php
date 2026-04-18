@@ -119,9 +119,12 @@ class StudentContentController extends Controller
         })->filter();
 
 
-        $assignments = $modules->flatMap(function ($module) {
-            return $module->assignments()->with('topics')->get();
+        $topics = $modules->flatMap(function (Module $module) {
+            return $module->topics()->get();
         });
+        $assignments = $topics->flatMap(function (Topic $topic) {
+            return $topic->assignments()->get();
+        })->unique('id')->values();
 
         return $assignments->map(function ($assignment) use ($user) {
             $submission = $assignment->submissions()->where('student_id', $user->id)->first();

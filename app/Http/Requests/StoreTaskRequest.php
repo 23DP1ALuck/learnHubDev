@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Concerns\AuthorizesLearningContent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Contracts\Validation\Validator;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -17,7 +18,7 @@ class StoreTaskRequest extends FormRequest
 
     public function rules(): array
     {
-        $autoGradableTypes = ['CHECKBOX', 'TEXT', 'TRUE_FALSE', 'NUMBER', 'CUSTOM_SELECT'];
+        $autoGradableTypes = ['CHECKBOX', 'TRUE_FALSE', 'NUMBER', 'CUSTOM_SELECT'];
         $selectableTypes = ['CHECKBOX', 'CUSTOM_SELECT'];
 
         return [
@@ -26,12 +27,11 @@ class StoreTaskRequest extends FormRequest
             'task_type' => ['required', Rule::in(['CHECKBOX', 'TEXT', 'FILE', 'TRUE_FALSE', 'NUMBER', 'CUSTOM_SELECT'])],
             'max_points' => ['required', 'numeric', 'min:0'],
             'correct_answers' => [
-                Rule::requiredIf(fn () => in_array($this->input('task_type'), $autoGradableTypes, true)),
                 'nullable',
                 'array',
                 'min:1',
             ],
-            'correct_answers.*' => ['required', 'string', 'max:255'],
+            'correct_answers.*' => ['nullable','string', 'max:255'],
             'options' => [
                 Rule::requiredIf(fn () => in_array($this->input('task_type'), $selectableTypes, true)),
                 'nullable',
