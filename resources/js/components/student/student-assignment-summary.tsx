@@ -22,7 +22,7 @@ function statusLabel(status: string): string {
     }
 }
 function AssignmentStartButton({assignment}: { assignment : StudentAssignmentDetail }) {
-    if(assignment.first_task_id && assignment.status === 'NOT STARTED'){
+    if(assignment.first_task_id && (assignment.status === 'NOT STARTED' || !assignment.status)){
         return  (
             <Form
             action={route('student.submission.store', [assignment.id])}

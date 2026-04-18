@@ -38,7 +38,7 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                     </p>
                 </div>
 
-                <Form action={route('student.answers.store', [assignmentId, task.task_id])} method="post" className="space-y-4">
+                <Form key={task.task_id} action={route('student.answers.store', [assignmentId, task.task_id])} method="post" className="space-y-4">
                     <input type="hidden" name="task_type" value={task.task_type} />
 
                     <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -92,7 +92,7 @@ export default function StudentTaskContent({ assignmentId, task }: StudentTaskCo
                                 task.options.map((option) => (
                                     <label key={option.option_id} className="flex items-center gap-3 rounded-2xl border p-4">
                                         <input
-                                            name={task.task_type === 'CHECKBOX' ? 'answer_text[]' : 'answer_text'}
+                                            name={'answer_text[]'}
                                             value={option.option_text}
                                             type={task.task_type === 'CHECKBOX' ? 'checkbox' : 'radio'}
                                             defaultChecked={selectedAnswers.includes(option.option_text)}
