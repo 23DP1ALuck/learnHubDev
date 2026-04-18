@@ -67,7 +67,6 @@ class TaskAnswersController extends Controller
             }
         }
 
-
         $taskAnswer = TaskAnswer::create([
             'student_id' => $user->id,
             'assignment_id' => $assignmentId,
@@ -76,6 +75,21 @@ class TaskAnswersController extends Controller
             'points' => round($result,2),
         ]);
 
-        return redirect()->back()->with('success', 'Answer submitted successfully');
+        $completedTasks = TaskAnswer::query()
+            ->where('assignment_id', $assignmentId)
+            ->where('student_id', $user->id)
+            ->pluck('task_id');
+
+        $nextTaskId = $assignment // take the smallest task_id from incompleted tasks
+            ->tasks()
+            ->whereNotIn('task_id', $completedTasks)
+            ->orderBy('task_id')
+            ->value('task_id');
+
+
+        return redirect()->route('student.tasks.show',
+            ['assignment' => $assignmentId, 'task' => $nextTaskId]
+            )
+            ->with('success', 'Answer submitted successfully');
     }
 }
