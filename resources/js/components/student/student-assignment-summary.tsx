@@ -35,9 +35,8 @@ function AssignmentStartButton({assignment}: { assignment : StudentAssignmentDet
             </Form>
         )
     } else if(assignment.first_task_id && assignment.status === 'DRAFT'){
-        // TODO: reiceve correct task id
         return (
-            <Link href={route('student.tasks.show', [assignment.id, 1])} className="flex-shrink-0">
+            <Link href={route('student.tasks.show', [assignment.id, assignment.last_incompleted_task])} className="flex-shrink-0">
                 <Button>
                     Continue
                 </Button>

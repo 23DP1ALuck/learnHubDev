@@ -62,6 +62,7 @@ export type StudentAssignmentDetail = {
     total_max_points: string | number | null;
     first_task_id: number | null;
     created_at: string | null;
+    last_incompleted_task: number | null;
 };
 
 export type StudentAssignmentTopic = {

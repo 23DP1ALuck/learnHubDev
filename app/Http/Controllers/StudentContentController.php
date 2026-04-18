@@ -340,7 +340,13 @@ class StudentContentController extends Controller
     private function getSpecificAssignmentSummary(Assignment $assignment, User $user): array{
         $tasks = $assignment->tasks()->get();
         $points = $tasks->sum('max_points');
-//        dd($points);
+        $answers = $tasks->map(function ($task) use ($user){
+            return $task
+                ->answers()
+                ->where('student_id', $user->id)
+                ->value('task_id');
+        });
+        $lastIncompletedTask = $tasks->whereNotIn('task_id', $answers)->sortBy('task_id')->first();
         return [
             ...$assignment->toArray(),
             'tasks_count' => $assignment->tasks()->count(),
@@ -348,6 +354,7 @@ class StudentContentController extends Controller
             'module_names' => $assignment->topics()->pluck('topics.name')->values(),
             'total_max_points' => $assignment->totalPoints(),
             'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+            'last_incompleted_task' => $lastIncompletedTask->task_id ?? null,
         ];
     }
     private function getSpecificAssignmentTopicsSummary(Assignment $assignment, User $user): array{
