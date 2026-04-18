@@ -278,7 +278,7 @@ class StudentContentController extends Controller
     }
     private function getSpecificTopicSummary(Topic $topic): array{
         return [
-            'id' => $topic->id,
+            'topic_id' => $topic->topic_id,
             'name' => $topic->name,
             'description' => $topic->description,
             'start_date' => $topic->start_date,

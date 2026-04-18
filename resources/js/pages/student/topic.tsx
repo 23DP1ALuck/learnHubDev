@@ -19,8 +19,6 @@ export default function StudentTopicPage({
     assignments: StudentAssignmentSummary[];
 }) {
     const { flash } = usePage<Flash>().props;
-    //TODO: fix
-    console.log(topic)
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
