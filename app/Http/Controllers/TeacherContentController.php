@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\Material;
 use App\Models\Module;
+use App\Models\Organization;
+use App\Models\Submission;
 use App\Models\Task;
 use App\Models\Topic;
 use App\Models\User;
@@ -48,6 +50,160 @@ class TeacherContentController extends Controller
             'recentModules' => $modules,
             'upcomingAssignments' => $assignments,
         ]);
+    }
+
+    public function marks(Request $request): Response|RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+        $organizationId = $request->session()->get('activeOrganization');
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+        $organization = Organization::query()
+            ->where('id', $organizationId)
+            ->first();
+        $studentList = $organization->users()->wherePivot('role_in_org', 'STUDENT')->get();
+        $moduleList = $organization // get teacher's modules
+            ->modules()
+            ->where('modules.creator_id', $user->id)
+            ->get();
+        $assignments = $moduleList->map(function ($module) use ($studentList) { // get all assignments for all modules
+            $topics = $module->topics()->get();
+            return $topics->map(function ($topic) use ($studentList) {
+                return $topic->assignments()->get();
+            });
+        })->flatten(2)->unique('id');
+        $assignmentIds = $assignments->pluck('id')->toArray();
+        $studentId = $request->query('student_id');
+        $moduleId = $request->query('module_id');
+        $assignmentId = $request->query('assignment_id');
+        if(!$studentId && !$moduleId && !$assignmentId){ // default state on page load
+            $submissions = Submission::query()
+                ->whereIn('assignment_id', $assignmentIds)->whereIn('status', ['SUBMITTED','GRADED'])->get();
+            $submissions = $submissions->map(function (Submission $submission) {
+                $assignment = $submission->assignment()->first();
+                $module = $assignment->topics()->first()->module()->first();
+                return [
+                    ...$submission->toArray(),
+                    'assignment_title' => $assignment->title,
+                    'student_name' => $submission->student()->first()->user()->first()->name,
+                    'module_name' => $module->name,
+                    ];
+            })->toArray();
+        } else {
+            $student = User::query()->where('id', $studentId)->first();
+            $module = Module::query()->where('id', $moduleId)->first();
+            $assignment = Assignment::query()->where('id', $assignmentId)->first();
+            $filters = [
+                'student' => $student,
+                'module' => $module,
+                'assignment' => $assignment,
+            ];
+            $submissionIds = null;
+            if($filters['student']){
+                $submissions = $this->filterByStudent($filters['student'], $assignmentIds);
+                // if first filter just add found submissions, otherwise intersect with previous filters
+                $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
+            }
+            if($filters['module']){
+                $submissions = $this->filterMarksByModule($filters['module'], $assignmentIds);
+                // if first filter just add found submissions, otherwise intersect with previous filters
+                $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
+            }
+            if($filters['assignment']){
+                $submissions = $this->filterMarksByAssignment($filters['assignment']);
+                // if first filter just add found submissions, otherwise intersect with previous filters
+                $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
+            }
+            $submissionIds = $submissionIds?->values() ?? collect(); // reindex array, create an empty collection if null
+            $submissions = $this->applyFilters($submissionIds, $assignmentIds);
+            return Inertia::render('teacher/marks', [
+                'filters' => [
+                    'student_id' => (string) $request->query('student_id', ''),
+                    'module_id' => (string) $request->query('module_id', ''),
+                    'assignment_id' => (string) $request->query('assignment_id', ''),
+                ],
+                'students' => $studentList,
+                'modules' => $moduleList,
+                'assignments' => $assignments,
+                'marks' => $submissions,
+            ]);
+        }
+
+
+
+//        if($student && $module && $assignment){
+//            $submission = Submission::query()
+//                ->where('')
+//        }
+
+        return Inertia::render('teacher/marks', [
+            'filters' => [
+                'student_id' => (string) $request->query('student_id', ''),
+                'module_id' => (string) $request->query('module_id', ''),
+                'assignment_id' => (string) $request->query('assignment_id', ''),
+            ],
+            'students' => $studentList,
+            'modules' => $moduleList,
+            'assignments' => $assignments,
+            'marks' => $submissions,
+        ]);
+    }
+    private function filterByStudent(User $student, $assignmentIds){
+        $submissions =  Submission::query()
+            ->whereIn('assignment_id', $assignmentIds)
+            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->where('student_id', $student->id)
+            ->get();
+        return $submissions->map(function (Submission $submission) {
+            return $submission->student_id . ':' . $submission->assignment_id;
+        });
+    }
+    private function filterMarksByModule(Module $module, $assignmentIds){
+        $assignments = $module->topics()->get()->map(function (Topic $topic) use ($assignmentIds){
+            return $topic->assignments()->whereIn('id', $assignmentIds)->get();
+        })->flatten(2)->unique('id')->pluck('id')->toArray();
+       $submissions = Submission::query()
+           ->whereIn('assignment_id', $assignments)
+            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->get();
+
+        return $submissions->map(function (Submission $submission) {
+            return $submission->student_id . ':' . $submission->assignment_id;
+        });
+    }
+    private function filterMarksByAssignment(Assignment $assignment){
+        $submissions = Submission::query()
+            ->where('assignment_id', $assignment->id)
+            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->get();
+        return $submissions->map(function (Submission $submission) {
+            return $submission->student_id . ':' . $submission->assignment_id;
+        });
+    }
+    private function applyFilters($submissionIds, array $assignmentIds){
+        $submissionIds = $submissionIds->unique()->values();
+        $submissions = Submission::query()
+            ->whereIn('assignment_id', $assignmentIds)
+            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->get()
+            ->filter(function (Submission $submission) use ($submissionIds) {
+                $key = $submission->student_id . ":" . $submission->assignment_id;
+                return $submissionIds->contains($key);
+            })->values();
+        return $submissions->map(function (Submission $submission) {
+            $assignment = $submission->assignment()->first();
+            $module = $assignment->topics()->first()->module()->first();
+            return [
+                ...$submission->toArray(),
+                'assignment_title' => $assignment->title,
+                'student_name' => $submission->student()->first()->user()->first()->name,
+                'module_name' => $module->name,
+            ];
+        })->toArray();
     }
     public function modules(Request $request): Response|RedirectResponse
     {

@@ -66,6 +66,7 @@ Route::middleware([CheckIsSchoolOwner::class])->group(function () {
     Route::patch('organization/groups/assign-modules', [OrganizationOwnerController::class, 'assignModules'])->name('groups.assign-modules');
 });
 Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->group(function () {
+    Route::get('/teacher/marks', [TeacherContentController::class, 'marks'])->name('teacher.marks');
     Route::get('/teacher/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
     Route::get('/teacher/modules/{module}', [TeacherContentController::class, 'module'])->name('teacher.modules.show');
     Route::get('/teacher/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');

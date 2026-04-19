@@ -10,7 +10,9 @@ import {
 import { BookOpen, Building, Calendar, FileText, LayoutGrid, Settings, Users } from 'lucide-react';
 import {
     modules as teacherModules,
+    marks as teacherMarks,
 } from '@/routes/teacher';
+import { route } from 'ziggy-js';
 
 export const userNavItems: NavItem[] = [
     {
@@ -58,6 +60,11 @@ export const teacherNavItems: NavItem[] = [
         title: 'Modules',
         href: teacherModules(),
         icon: BookOpen,
+    },
+    {
+        title: 'Marks',
+        href: teacherMarks(),
+        icon: FileText,
     },
     {
         title: 'Settings',
@@ -111,6 +118,11 @@ export const individualOwnerNavItems: NavItem[] = [
         title: 'Modules',
         href: teacherModules(),
         icon: BookOpen,
+    },
+    {
+        title: 'Marks',
+        href: route('teacher.marks'),
+        icon: FileText,
     },
     {
         title: 'Organization',
