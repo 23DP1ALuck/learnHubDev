@@ -4,6 +4,8 @@ import type { StudentAssignmentDetail, StudentAssignmentTopic } from '@/componen
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { useEffect } from "react";
+import { toast } from "sonner";
 import { route } from 'ziggy-js';
 
 export default function StudentAssignmentPage({
@@ -25,20 +27,17 @@ export default function StudentAssignmentPage({
             href: route('student.assignments.show', assignment.id),
         },
     ];
-
+    useEffect(() => {
+        if(flash?.success){
+            toast.success(flash?.success);
+        }
+    }, [flash?.success]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={assignment.title} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
-                {flash?.success && (
-                    <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                        {flash.success}
-                    </div>
-                )}
-
                 <StudentAssignmentSummaryCard assignment={assignment} />
-
                 <StudentAssignmentTopicsList topics={topics} />
             </div>
         </AppLayout>

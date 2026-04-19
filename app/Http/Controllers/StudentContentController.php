@@ -19,6 +19,7 @@ class StudentContentController extends Controller
     public function dashboard(Request $request){
 
         $user = $request->user();
+
         $organizationId = $request->session()->get('activeOrganization');
 
         $organization = $user->organizations()
@@ -27,16 +28,17 @@ class StudentContentController extends Controller
             ->firstOrFail();
 
         $groupId = $organization->pivot->group_id;
+        if($groupId){
+            $group = $organization->schoolGroups()
+                ->where('group_id', $groupId)
+                ->where('school_id', $organization->id)
+                ->firstOrFail();
 
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
-
-        $dashboardSummary = $this->getDashboardSummary($user, $group);
-        $studentModuleSummary = $this->getStudentModuleSummary($group);
-        $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
-
+            $dashboardSummary = $this->getDashboardSummary($user, $group);
+            $studentModuleSummary = $this->getStudentModuleSummary($group);
+            $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
+        }
+//        TODO: send isAssignedToGroup
         return Inertia::render('student/dashboard', [
             "stats" => $dashboardSummary,
             "modules" => $studentModuleSummary,
@@ -356,7 +358,7 @@ class StudentContentController extends Controller
             'first_task_id' => $assignment->tasks()->first()?->task_id,
             'module_names' => $assignment->topics()->pluck('topics.name')->values(),
             'total_max_points' => $assignment->totalPoints(),
-            'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+            'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'NOT STARTED',
             'last_incompleted_task' => $lastIncompletedTask->task_id ?? null,
         ];
     }

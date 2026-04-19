@@ -22,6 +22,7 @@ function statusLabel(status: string): string {
     }
 }
 function AssignmentStartButton({assignment}: { assignment : StudentAssignmentDetail }) {
+    console.log(assignment.status);
     if(assignment.first_task_id && (assignment.status === 'NOT STARTED' || !assignment.status)){
         return  (
             <Form
@@ -44,7 +45,7 @@ function AssignmentStartButton({assignment}: { assignment : StudentAssignmentDet
         )
     } else if(assignment.first_task_id && assignment.status === 'SUBMITTED'){
         return (
-            <div className="flex p-4 rounded bg-muted-foreground text-white">Submission completed</div>
+            <div className="flex p-2 rounded-xl text-center bg-muted-foreground text-white">Assignment completed</div>
         )
     } else {
         return (

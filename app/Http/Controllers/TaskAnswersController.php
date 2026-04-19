@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskAnswerRequest;
 use App\Models\Assignment;
+use App\Models\Submission;
 use App\Models\TaskAnswer;
 use Illuminate\Http\Request;
 
@@ -63,7 +64,7 @@ class TaskAnswersController extends Controller
                 }
         }else{
                 $taskCorrectAnswer = $task->correctAnswers()->first();
-                $result = $taskCorrectAnswer->answer == $validated['answer_text'] ? $maxPoints : 0; // max points for correct answer
+                $result = $taskCorrectAnswer->answer == $validated['answer_text'][0] ? $maxPoints : 0; // max points for correct answer
             }
         }
 
@@ -72,7 +73,7 @@ class TaskAnswersController extends Controller
             'assignment_id' => $assignmentId,
             'task_id' => $taskId,
             'answer_text' => json_encode($validated['answer_text']),
-            'points' => round($result,2),
+            'points' => round($result ?? 0,2) ,
         ]);
 
         $completedTasks = TaskAnswer::query()
@@ -85,6 +86,29 @@ class TaskAnswersController extends Controller
             ->whereNotIn('task_id', $completedTasks)
             ->orderBy('task_id')
             ->value('task_id');
+
+        if(!$nextTaskId){
+            $submission = $assignment
+                ->submissions()
+                ->where('student_id', $user->id)
+                ->where('status', 'DRAFT')
+                ->first();
+            $totalPoints = $submission?->taskAnswers()->sum('points');
+            $totalPercent = $totalPoints / $assignment->totalPoints() * 100;
+            Submission::query()
+                ->where('student_id', $user->id)
+                ->where('assignment_id', $assignmentId)
+                ->update([
+                    'status' => 'SUBMITTED',
+                    'total_points' => $totalPoints,
+                    'total_percent' => round($totalPercent,2),
+                    'submitted_on' => now()
+                ]);
+
+            return redirect()->route('student.assignments.show', $assignmentId)
+                ->with('success', 'You have completed the assignment');
+
+        }
 
 
         return redirect()->route('student.tasks.show',
