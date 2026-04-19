@@ -36,6 +36,17 @@ export type StudentMaterialSummary = {
     created_at: string | null;
 };
 
+export type StudentMaterialFileSummary = {
+    module_id: number;
+    topic_id: number;
+    material_id: number;
+    file_id: number;
+    file: {
+        file_name: string;
+        file_path: string | null;
+    };
+};
+
 export type StudentAssignmentSummary = {
     id: number;
     title: string;

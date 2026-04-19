@@ -1,5 +1,7 @@
 import type { StudentMaterialSummary } from '@/components/student/student-types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentTopicMaterialsListProps = {
     materials: StudentMaterialSummary[];
@@ -19,10 +21,15 @@ export default function StudentTopicMaterialsList({ materials }: StudentTopicMat
                     </div>
                 ) : (
                     materials.map((material) => (
-                        <div key={material.material_id} className="rounded-xl border p-4">
+                        <Link
+                            key={material.material_id}
+                            href={route('student.materials.show', [material.module_id, material.topic_id, material.material_id])}
+                            className="block rounded-xl border p-4 transition-colors hover:bg-muted/40"
+                            prefetch
+                        >
                             <p className="font-semibold">{material.title}</p>
                             <p className="mt-1 text-sm text-muted-foreground">{material.description || 'No material description yet.'}</p>
-                        </div>
+                        </Link>
                     ))
                 )}
             </CardContent>

@@ -87,6 +87,7 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
     Route::get('/student/modules', [StudentContentController::class, 'modules'])->name('student.modules');
     Route::get('/module/{module_id}', [StudentContentController::class, 'module'])->name('student.modules.show');
     Route::get('/module/{module}/topic/{topic}', [StudentContentController::class, 'topic'])->name('student.topics.show');
+    Route::get('/module/{module}/topic/{topic}/materials/{material}', [StudentContentController::class, 'material'])->name('student.materials.show');
     Route::get('/student/assignments', [StudentContentController::class, 'assignments'])->name('student.assignments');
     Route::get('/student/assignments/{assignment_id}', [StudentContentController::class, 'assignment'])->name('student.assignments.show');
     Route::get('/student/assignments/{assignment}/tasks/{task}', [StudentContentController::class, 'task'])->name('student.tasks.show');

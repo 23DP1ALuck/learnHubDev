@@ -488,4 +488,67 @@ class StudentContentController extends Controller
             "assignments" => $studentAssignmentSummary,
         ]);
     }
+    public function material(Request $request, int $moduleId, int $topicId, int $materialId){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+        $groupId = $organization->pivot->group_id;
+        $group = $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
+        ->where('group_id', $group->group_id)
+            ->where('school_id', $group->school_id)
+            ->where('module_id', $moduleId)
+            ->with('module')
+            ->first();
+
+        if(!$groupsModules){
+            return redirect()->back()->with('error', 'You have no access to this module');
+        }
+        $module = $groupsModules->module;
+
+        $topic = $module->topics()->where('topics.topic_id', $topicId)->first();
+        if(!$topic){
+            return redirect()->back()->with('error', 'Topic not found');
+        }
+        $studentModuleSummary = $this->getStudentSpecificModuleSummary($module);
+        $studentTopicSummary = $this->getSpecificTopicSummary($topic);
+        $studentMaterialSummary = $topic->materials()->where('materials.material_id', $materialId)->first();
+        $files = $this->getMaterialFiles($studentMaterialSummary);
+
+        return Inertia::render('student/material', [
+            "module" => $studentModuleSummary,
+            "topic" => $studentTopicSummary,
+            "material" => $studentMaterialSummary,
+            "files" => $files,
+        ]);
+
+    }
+    public function getMaterialFiles(Material $material){
+        $files = $material->fileLinks()->with('file')->get();
+        return $files->map(function ($file){
+            return [
+                'module_id' => $file->module_id,
+                'topic_id' => $file->topic_id,
+                'material_id' => $file->material_id,
+                'file_id' => $file->file_id,
+                'file' => [
+                    'file_name' => $file->file->file_name,
+                    'file_path' => $file->file->file_path,
+                ]
+            ];
+        })->toArray();
+    }
 }
