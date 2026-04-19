@@ -26,6 +26,7 @@ type AssignmentTopic = {
 };
 
 type TaskSummary = {
+    assignment_id: number;
     task_id: number;
     question_text: string;
     task_type: string;

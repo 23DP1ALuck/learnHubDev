@@ -1,7 +1,11 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from "@inertiajs/react";
+import { route } from "ziggy-js";
+import {Button} from "@/components/ui/button";
 
 type TaskSummary = {
+    assignment_id: number;
     task_id: number;
     question_text: string;
     task_type: string;
@@ -39,19 +43,39 @@ export default function AssignmentTasksList({ tasks }: AssignmentTasksListProps)
                                     </div>
                                     <Badge variant="secondary">{task.task_type}</Badge>
                                 </div>
-                                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                                    <span>Max points: {task.max_points}</span>
-                                    <span>Grading: {task.correct_answers.length > 0 ? 'Auto-check ready' : 'Manual review'}</span>
-                                </div>
                                 {task.correct_answers.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {task.correct_answers.map((answer, index) => (
-                                            <Badge key={index} variant="outline">
-                                                {answer}
-                                            </Badge>
-                                        ))}
+                                    <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                                        <span>Max points: {task.max_points}</span>
+                                        <span>Grading: {task.correct_answers.length > 0 ? 'Auto-check ready' : 'Manual review'}</span>
                                     </div>
                                 )}
+
+                                {task.correct_answers.length > 0 ? (
+                                <div className="flex justify-between items-end">
+
+                                        <div className="flex flex-wrap gap-2">
+                                            {task.correct_answers.map((answer, index) => (
+                                                <Badge key={index} variant="outline" className="h-6">
+                                                    {answer}
+                                                </Badge>
+                                            ))}
+                                        </div>
+
+                                    <Link href={route('teacher.tasks.editTask', [task.assignment_id,task.task_id])}>
+                                        <Button variant={"outline"}>Edit</Button>
+                                    </Link>
+                                </div>
+                                ) :
+                                    <div className="flex justify-between items-end">
+                                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                                            <span>Max points: {task.max_points}</span>
+                                            <span>Grading: {task.correct_answers.length > 0 ? 'Auto-check ready' : 'Manual review'}</span>
+                                        </div>
+                                        <Link href={route('teacher.tasks.editTask', [task.assignment_id,task.task_id])}>
+                                            <Button variant={"outline"}>Edit</Button>
+                                        </Link>
+                                    </div>
+                                }
                             </div>
                         </div>
                     ))

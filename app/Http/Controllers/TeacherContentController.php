@@ -256,8 +256,9 @@ class TeacherContentController extends Controller
     private function getAssignmentPageInfo(Assignment $assignment): array{
         $topics = $assignment->topics()->get();
         $tasks = $assignment->tasks()->get();
-        $tasksSummary = $tasks->map(function (Task $task){
+        $tasksSummary = $tasks->map(function (Task $task) use ($assignment){
             return [
+                'assignment_id' => $assignment->id,
                 'task_id' => $task->task_id,
                 'question_text' => $task->question_text,
                 'task_type' => $task->task_type,
