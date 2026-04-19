@@ -7,11 +7,12 @@ use App\Models\Material;
 use App\Models\Module;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
+use App\Models\Submission;
 use App\Models\Task;
 use App\Models\Topic;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 
 class StudentContentController extends Controller
@@ -444,7 +445,7 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
-    private function getActiveOrganization(User $user, Request $request): Organization
+    private function getActiveOrganization(User $user, Request $request): ?Organization
     {
         $organizationId = $request->session()->get('activeOrganization');
 
@@ -454,7 +455,7 @@ class StudentContentController extends Controller
             ->firstOrFail();
     }
 
-    private function getOrganizationGroup(Organization $organization): SchoolGroup
+    private function getOrganizationGroup(Organization $organization): ?SchoolGroup
     {
         $groupId = $organization->pivot->group_id;
 
@@ -482,5 +483,60 @@ class StudentContentController extends Controller
             ->module()
             ->first();
     }
+    public function marks(Request $request){
+        $user = $request->user();
+        $organization = $this->getActiveOrganization($user, $request);
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+        $group = $this->getOrganizationGroup($organization);
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+        $groupsModules = $group->groupModulesTeachers()->with('module')->get();
+        $assignments = $groupsModules->map(function ($groupModuleTeacher) {
+            return $groupModuleTeacher->module->assignments()->get();
+        })->flatten();
+        $marks = $this->getStudentMarksInfo($user);
+        $stats = $this->getStudentMarksStats($user);
 
+        return Inertia::render('student/marks', [
+            "marks" => $marks,
+            "stats" => $stats,
+        ]);
+    }
+    private function getStudentMarksInfo(User $user): array{
+        $submissions = Submission::query() // get completed assignment submissions ids
+            ->where('student_id', $user->id)
+            ->where('status', ['SUBMITTED', 'GRADED'])
+            ->pluck('assignment_id');
+        $assignments = Assignment::query()
+            ->whereIn('id', $submissions)
+            ->get();
+        return $assignments->map(function ($assignment) use ($user) {
+            $submission = $assignment->submissions()->where('student_id', $user->id)->first();
+            return [
+                'id' => $assignment->id,
+                'title' => $assignment->title,
+                'status' => $submission->status,
+                'total_points' => $submission->total_points,
+                'total_percent' => $submission->total_percent,
+                'submitted_on' => $submission->submitted_on,
+            ];
+        })->toArray();
+
+    }
+    private function getStudentMarksStats(User $user){
+        $submissions = Submission::query()
+            ->where('student_id', $user->id)
+            ->get();
+        $graded = $submissions->where('status', 'GRADED')->count();
+        $submitted = $submissions->where('status', 'SUBMITTED')->count();
+        $averagePercent = $submissions->avg('total_percent');
+        return [
+            'graded' => $graded,
+            'submitted' => $submitted,
+            'averagePercent' => $averagePercent,
+        ];
+    }
 }

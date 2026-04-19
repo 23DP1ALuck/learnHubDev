@@ -28,7 +28,7 @@ class Submission extends Model
         return [
             'student_id' => 'integer',
             'assignment_id' => 'integer',
-            'submitted_on' => 'date',
+            'submitted_on' => 'datetime',
             'total_points' => 'decimal:2',
             'total_percent' => 'decimal:2',
             'created_at' => 'datetime',
