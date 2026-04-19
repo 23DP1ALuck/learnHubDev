@@ -19,8 +19,35 @@ class TeacherContentController extends Controller
     public function dashboard(Request $request): Response|RedirectResponse
     {
         $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
         $organizationId = $request->session()->get('activeOrganization');
-        return Inertia::render('teacher/dashboard', []);
+
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+
+        $stats = $this->getStats($user, $organizationId);
+        $modules = Module::query()
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->withCount('topics')
+            ->withCount('assignments')
+            ->latest()
+            ->take(5)
+            ->get();
+        $assignments = Assignment::query()
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->orderBy('due_date', 'desc')
+            ->take(5)
+            ->get();
+        return Inertia::render('teacher/dashboard', [
+            'stats' => $stats,
+            'recentModules' => $modules,
+            'upcomingAssignments' => $assignments,
+        ]);
     }
     public function modules(Request $request): Response|RedirectResponse
     {
