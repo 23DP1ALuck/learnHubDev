@@ -19,20 +19,10 @@ class StudentContentController extends Controller
     public function dashboard(Request $request){
 
         $user = $request->user();
-
-        $organizationId = $request->session()->get('activeOrganization');
-
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
-
+        $organization = $this->getActiveOrganization($user, $request);
         $groupId = $organization->pivot->group_id;
         if($groupId){
-            $group = $organization->schoolGroups()
-                ->where('group_id', $groupId)
-                ->where('school_id', $organization->id)
-                ->firstOrFail();
+            $group = $this->getOrganizationGroup($organization);
 
             $dashboardSummary = $this->getDashboardSummary($user, $group);
             $studentModuleSummary = $this->getStudentModuleSummary($group);
@@ -148,19 +138,8 @@ class StudentContentController extends Controller
 
     public function modules(Request $request){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
-
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
+        $group = $this->getOrganizationGroup($organization);
 
         $studentModuleSummary = $this->getStudentModuleSummary($group);
         return Inertia::render('student/modules', [
@@ -170,32 +149,18 @@ class StudentContentController extends Controller
 
     public function module(Request $request, int $moduleId){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
         if(!$organization){
             return redirect()->back()->with('error', 'Organization not found');
         }
 
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $group = $this->getOrganizationGroup($organization);
 
         if(!$group){
             return redirect()->back()->with('error', 'Group not found');
         }
 
-        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
-        ->where('group_id', $group->group_id)
-            ->where('school_id', $group->school_id)
-            ->where('module_id', $moduleId)
-            ->with('module')
-            ->first();
+        $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
@@ -236,32 +201,18 @@ class StudentContentController extends Controller
     }
     public function topic(Request $request, int $moduleId, int $topicId){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
         if(!$organization){
             return redirect()->back()->with('error', 'Organization not found');
         }
 
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $group = $this->getOrganizationGroup($organization);
 
         if(!$group){
             return redirect()->back()->with('error', 'Group not found');
         }
 
-        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
-        ->where('group_id', $group->group_id)
-            ->where('school_id', $group->school_id)
-            ->where('module_id', $moduleId)
-            ->with('module')
-            ->first();
+        $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
@@ -294,20 +245,11 @@ class StudentContentController extends Controller
     }
     public function assignment(Request $request, int $assignmentId){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
         if(!$organization){
             return redirect()->back()->with('error', 'Organization not found');
         }
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $group = $this->getOrganizationGroup($organization);
 
         if(!$group){
             return redirect()->back()->with('error', 'Group not found');
@@ -320,16 +262,8 @@ class StudentContentController extends Controller
         if(!$assignment){
             return redirect()->back()->with('error', 'Assignment not found');
         }
-        $module = $assignment
-            ->topics()
-            ->first()
-            ->module()
-            ->first();
-        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
-        ->where('group_id', $group->group_id)
-            ->where('school_id', $group->school_id)
-            ->where('module_id', $module->id)
-            ->first();
+        $module = $this->getAssignmentModule($assignment);
+        $groupsModules = $this->getEnrolledGroupModule($group, $module->id);
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
@@ -375,20 +309,11 @@ class StudentContentController extends Controller
     }
     public function task(Request $request, int $assignmentId, int $taskId){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
         if(!$organization){
             return redirect()->back()->with('error', 'Organization not found');
         }
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $group = $this->getOrganizationGroup($organization);
 
         if(!$group){
             return redirect()->back()->with('error', 'Group not found');
@@ -402,16 +327,8 @@ class StudentContentController extends Controller
         if(!$assignment){
             return redirect()->back()->with('error', 'Assignment not found');
         }
-        $module = $assignment
-            ->topics()
-            ->first()
-            ->module()
-            ->first();
-        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
-        ->where('group_id', $group->group_id)
-            ->where('school_id', $group->school_id)
-            ->where('module_id', $module->id)
-            ->first();
+        $module = $this->getAssignmentModule($assignment);
+        $groupsModules = $this->getEnrolledGroupModule($group, $module->id);
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
@@ -468,19 +385,8 @@ class StudentContentController extends Controller
     }
     public function assignments(Request $request){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
-
-        $groupId = $organization->pivot->group_id;
-
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
+        $group = $this->getOrganizationGroup($organization);
 
         $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
 
@@ -490,29 +396,16 @@ class StudentContentController extends Controller
     }
     public function material(Request $request, int $moduleId, int $topicId, int $materialId){
         $user = $request->user();
-        $organizationId = $request->session()->get('activeOrganization');
-        $organization = $user->organizations()
-            ->where('organizations.id', $organizationId)
-            ->withPivot('group_id')
-            ->firstOrFail();
+        $organization = $this->getActiveOrganization($user, $request);
         if(!$organization){
             return redirect()->back()->with('error', 'Organization not found');
         }
-        $groupId = $organization->pivot->group_id;
-        $group = $organization->schoolGroups()
-            ->where('group_id', $groupId)
-            ->where('school_id', $organization->id)
-            ->firstOrFail();
+        $group = $this->getOrganizationGroup($organization);
 
         if(!$group){
             return redirect()->back()->with('error', 'Group not found');
         }
-        $groupsModules = $group->groupModulesTeachers() // check if the user's group enroll in this module
-        ->where('group_id', $group->group_id)
-            ->where('school_id', $group->school_id)
-            ->where('module_id', $moduleId)
-            ->with('module')
-            ->first();
+        $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
         if(!$groupsModules){
             return redirect()->back()->with('error', 'You have no access to this module');
@@ -551,4 +444,43 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
+    private function getActiveOrganization(User $user, Request $request): Organization
+    {
+        $organizationId = $request->session()->get('activeOrganization');
+
+        return $user->organizations()
+            ->where('organizations.id', $organizationId)
+            ->withPivot('group_id')
+            ->firstOrFail();
+    }
+
+    private function getOrganizationGroup(Organization $organization): SchoolGroup
+    {
+        $groupId = $organization->pivot->group_id;
+
+        return $organization->schoolGroups()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->firstOrFail();
+    }
+
+    private function getEnrolledGroupModule(SchoolGroup $group, int $moduleId)
+    {
+        return $group->groupModulesTeachers()
+            ->where('group_id', $group->group_id)
+            ->where('school_id', $group->school_id)
+            ->where('module_id', $moduleId)
+            ->with('module')
+            ->first();
+    }
+
+    private function getAssignmentModule(Assignment $assignment): Module
+    {
+        return $assignment
+            ->topics()
+            ->first()
+            ->module()
+            ->first();
+    }
+
 }
