@@ -49,4 +49,9 @@ class Organization extends Model
     {
         return $this->hasMany(Module::class);
     }
+
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class, 'organization_id');
+    }
 }

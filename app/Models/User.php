@@ -95,4 +95,20 @@ class User extends Authenticatable
     {
         return $this->hasOne(Student::class, 'user_id');
     }
+
+    public function chats(): BelongsToMany
+    {
+        return $this->belongsToMany(Chat::class, 'chat_users', 'user_id', 'chat_id')
+            ->withPivot(['role', 'last_read_at']);
+    }
+
+    public function chatMemberships(): HasMany
+    {
+        return $this->hasMany(ChatUser::class, 'user_id');
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
 }

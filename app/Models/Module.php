@@ -60,4 +60,9 @@ class Module extends Model
         )->withPivot('topic_id');
     }
 
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class, 'module_id');
+    }
+
 }

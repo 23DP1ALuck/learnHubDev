@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\AssignmentsController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaterialFilesController;
@@ -36,6 +37,7 @@ Route::post('onboarding-requests', [OnboardingRequestController::class, 'store']
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
     Route::get('/download-material/{module}/{topic}/{material}/{file}', [MaterialFilesController::class, 'download'])->name('download-material');
 //    Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');

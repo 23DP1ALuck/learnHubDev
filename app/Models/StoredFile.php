@@ -34,4 +34,9 @@ class StoredFile extends Model
     {
         return $this->hasMany(AnswerFile::class, 'file_id');
     }
+
+    public function messageLinks(): HasMany
+    {
+        return $this->hasMany(MessageFile::class, 'file_id');
+    }
 }
