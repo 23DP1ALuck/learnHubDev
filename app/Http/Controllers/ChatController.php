@@ -36,28 +36,78 @@ class ChatController extends Controller
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
 
+
+
+        $groupId = $organization->pivot?->group_id;
+
+        $group = $this->getGroup($groupId, $organization);
+
+        $classPools = $this->getClassPools($group, $user, $organization);
+
+        $chats = $user->chats()->get();
+//        export type ChatSummary = {
+//        id: number;
+//        name: string;
+//        type: ChatType;
+//        unread_count: number;
+//        last_message_text: string | null;
+//        last_message_at: string | null;
+//        last_sender_name: string | null;
+//        participants_preview: string[];
+//    };
+        $chatsUsers = $chats->map(function ($chat) use($user){
+            $lastMessage = $chat->messages()->latest()->first();
+            $sender = $lastMessage?->sender;
+            if($chat->type === 'GROUP'){
+                return [
+                    'chat_id' => $chat->chat_id,
+                    'name' => $chat->name,
+                    'chat_type' => $chat->type,
+                    'unread_count' => 0,
+                    'last_message_text' => $lastMessage->text ?? null,
+                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
+                    'participants_preview' => ['qwe','qweqwe'],
+                ];
+            } else if($chat->type === 'PRIVATE'){
+                return [
+                    'chat_id' => $chat->chat_id,
+                    'name' => $chat->users()->where('user_id', '!=', $user->id)->first()->name,
+                    'chat_type' => $chat->type,
+                    'unread_count' => 0,
+                    'last_message_text' => $lastMessage->text ?? null,
+                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
+                    'participants_preview' => ['qwe','qweqwe'],
+                ];
+            }
+            return null;
+        });
+
+        return Inertia::render('chats/index', [
+            'stats' => [
+                'total' => 0,
+                'unread' => 0,
+                'private' => 0,
+                'groups' => 0,
+                'modules' => 0,
+            ],
+            'chats' => $chatsUsers,
+            'activeChat' => null,
+            'recipientPools' => [
+                'class' => $classPools,
+                'organization' => [],
+            ],
+        ]);
+    }
+    private function getClassPools(SchoolGroup $group, $user, $organization){
+        // get all modules/teachers for current group
+        $moduleTeachers = $group->groupModulesTeachers()->with(['teacher.user', 'module'])->get();
         $groupMembers = $organization
             ->users()
             ->wherePivot('group_id', $organization->pivot->group_id)
             ->where('id', '!=', $user->id)
             ->get();
-
-        $groupId = $organization->pivot?->group_id;
-        $group = null;
-
-        if ($groupId) {
-            $group = SchoolGroup::query()
-                ->where('group_id', $groupId)
-                ->where('school_id', $organization->id)
-                ->first();
-        }
-
-
-        // get all modules/teachers for current group
-        $moduleTeachers = $group
-            ? $group->groupModulesTeachers()->with(['teacher.user', 'module'])->get()
-            : collect();
-
         $teachers = $moduleTeachers->map(function ($groupModuleTeacher) use ($group) {
             $teacher = $groupModuleTeacher->teacher?->user;
             if (! $teacher) {
@@ -82,26 +132,17 @@ class ChatController extends Controller
                 'group_name' => $group->name ?? null,
             ];
         });
-
-//        dd($teachers);
-        $classPools = $classMates->merge($teachers)->toArray();
-        return Inertia::render('chats/index', [
-            'stats' => [
-                'total' => 0,
-                'unread' => 0,
-                'private' => 0,
-                'groups' => 0,
-                'modules' => 0,
-            ],
-            'chats' => [],
-            'activeChat' => null,
-            'recipientPools' => [
-                'class' => $classPools,
-                'organization' => [],
-            ],
-        ]);
+        return $classMates->merge($teachers)->toArray();
     }
+    private function getGroup($groupId, $organization): ?SchoolGroup
+    {
+        $group = null;
 
+        return SchoolGroup::query()
+            ->where('group_id', $groupId)
+            ->where('school_id', $organization->id)
+            ->first();
+    }
     public function createChat(StoreChatRequest $request): RedirectResponse
     {
         $user = $request->user();
