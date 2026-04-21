@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { echo } from '@laravel/echo-react';
 import { Paperclip, Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type ChatThreadProps = {
     activeChat: ActiveChat | null;

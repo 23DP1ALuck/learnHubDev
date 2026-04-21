@@ -43,6 +43,7 @@ function formatTimestamp(value: string | null): string {
 }
 
 export default function ChatList({ chats, activeChatId }: ChatListProps) {
+    console.log('chats', chats);
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader className="gap-3">
@@ -64,7 +65,7 @@ export default function ChatList({ chats, activeChatId }: ChatListProps) {
                     chats.map((chat) => (
                         <Link
                             key={chat.id}
-                            href={route('chats', { chat: chat.id })}
+                            href={route('chats.show', chat.id)}
                             className={cn(
                                 'block rounded-2xl border p-4 transition-colors hover:bg-muted/40',
                                 activeChatId === chat.id && 'border-primary bg-primary/5',

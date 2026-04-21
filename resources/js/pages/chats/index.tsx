@@ -40,7 +40,6 @@ export default function ChatsPage({
     recipientPools?: ChatRecipientPools;
 }) {
     const { flash } = usePage<Flash>().props;
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Chats" />

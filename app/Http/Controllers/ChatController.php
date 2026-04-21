@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreChatRequest;
 use App\Models\Chat;
+use App\Models\ChatMessage;
 use App\Models\ChatUser;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
@@ -19,7 +20,7 @@ use Inertia\Response;
 
 class ChatController extends Controller
 {
-    public function chats(Request $request): Response|RedirectResponse
+    public function chats(Request $request, ?int $chat = null): Response|RedirectResponse
     {
         $user = $request->user();
         if (!$user) {
@@ -37,52 +38,76 @@ class ChatController extends Controller
         }
 
 
-
         $groupId = $organization->pivot?->group_id;
 
         $group = $this->getGroup($groupId, $organization);
 
-        $classPools = $this->getClassPools($group, $user, $organization);
+        $classPools = $this->getClassPools($group, $user, $organization); // for user list
 
-        $chats = $user->chats()->get();
-//        export type ChatSummary = {
-//        id: number;
-//        name: string;
-//        type: ChatType;
-//        unread_count: number;
-//        last_message_text: string | null;
-//        last_message_at: string | null;
-//        last_sender_name: string | null;
-//        participants_preview: string[];
-//    };
-        $chatsUsers = $chats->map(function ($chat) use($user){
-            $lastMessage = $chat->messages()->latest()->first();
-            $sender = $lastMessage?->sender;
-            if($chat->type === 'GROUP'){
-                return [
-                    'chat_id' => $chat->chat_id,
-                    'name' => $chat->name,
-                    'chat_type' => $chat->type,
-                    'unread_count' => 0,
-                    'last_message_text' => $lastMessage->text ?? null,
-                    'last_message_at' => $lastMessage?->created_at ?? null,
-                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
-                    'participants_preview' => ['qwe','qweqwe'],
-                ];
-            } else if($chat->type === 'PRIVATE'){
-                return [
-                    'chat_id' => $chat->chat_id,
-                    'name' => $chat->users()->where('user_id', '!=', $user->id)->first()->name,
-                    'chat_type' => $chat->type,
-                    'unread_count' => 0,
-                    'last_message_text' => $lastMessage->text ?? null,
-                    'last_message_at' => $lastMessage?->created_at ?? null,
-                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
-                    'participants_preview' => ['qwe','qweqwe'],
-                ];
+        $chatsUsers = $this->getChats($user);
+
+
+        $activeChat = null;
+
+        if ($chat !== null) {
+            $activeChat = Chat::query()
+                ->where('chat_id', $chat)
+                ->with(['users', 'messages'])
+                ->first();
+            if(!$activeChat){
+                return redirect()->route('chats')->with('error', 'Chat not found');
             }
-            return null;
-        });
+            $belongsToChat =  $activeChat?->users()->where('user_id', $user->id)->exists();
+            if(!$belongsToChat){
+                return redirect()->route('chats')->with('error', 'You are not a member of this chat');
+            }
+
+            $messages = $activeChat->messages()->with('sender')->get();
+            $chatMessages = $messages->map(function (ChatMessage $message) use ($user){
+                $sender = $message->sender;
+                return [
+                    'id' => $message->message_id,
+                    'sender_id' => $message->sender_id,
+                    'sender_name' => $sender->name,
+                    'text' => $message->text,
+                    'sent_at' => $message->sent_at,
+                    'is_mine' =>  $sender->id === $user->id,
+                    'is_seen' => false,
+                    'files' => [],
+                ];
+            });
+            $chatUser = ChatUser::query()
+                ->where('chat_id', $chat)
+                ->where('user_id', $user->id)
+                ->first();
+            $unreadMessagesQuery = $activeChat
+                ->messages()
+                ->where('sender_id', '!=', $user->id);
+
+            if ($chatUser->last_read_at !== null) {
+                $unreadMessagesQuery->where('sent_at', '>', $chatUser->last_read_at);
+            }
+
+            $unreadMessages = $unreadMessagesQuery->count();
+            $participants = $activeChat->users()->get()->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role_in_org' => $user->pivot?->role,
+                ];
+            });
+            $activeChat = [
+                'id' => $activeChat->chat_id,
+                'name' => $activeChat->type === 'GROUP' ?
+                    $activeChat->name :
+                    $activeChat->users()->where('user_id', '!=', $user->id)->first()->name,
+                'type' => $activeChat->type,
+                'unread_count' => $unreadMessages,
+                'participants' => $participants,
+                'messages' => $chatMessages,
+            ];
+        }
 
         return Inertia::render('chats/index', [
             'stats' => [
@@ -93,12 +118,44 @@ class ChatController extends Controller
                 'modules' => 0,
             ],
             'chats' => $chatsUsers,
-            'activeChat' => null,
+            'activeChat' => $activeChat ?? null,
             'recipientPools' => [
                 'class' => $classPools,
                 'organization' => [],
             ],
         ]);
+    }
+    private function getChats(User $user){
+        $chats = $user->chats()->get();
+
+        return $chats->map(function ($chat) use($user){
+            $lastMessage = $chat->messages()->latest()->first();
+            // if group chat, set group name, if private - set recipient's name
+            if($chat->type === 'GROUP'){
+                return [
+                    'id' => $chat->chat_id,
+                    'name' => $chat->name,
+                    'type' => $chat->type,
+                    'unread_count' => 0,
+                    'last_message_text' => $lastMessage->text ?? null,
+                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
+                    'participants_preview' => ['qwe','qweqwe'],
+                ];
+            } else if($chat->type === 'PRIVATE'){
+                return [
+                    'id' => $chat->chat_id,
+                    'name' => $chat->users()->where('user_id', '!=', $user->id)->first()->name,
+                    'type' => $chat->type,
+                    'unread_count' => 0,
+                    'last_message_text' => $lastMessage->text ?? null,
+                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_sender_name' => $lastMessage?->sender?->name ?? null,
+                    'participants_preview' => ['qwe','qweqwe'],
+                ];
+            }
+            return null;
+        });
     }
     private function getClassPools(SchoolGroup $group, $user, $organization){
         // get all modules/teachers for current group
@@ -136,8 +193,6 @@ class ChatController extends Controller
     }
     private function getGroup($groupId, $organization): ?SchoolGroup
     {
-        $group = null;
-
         return SchoolGroup::query()
             ->where('group_id', $groupId)
             ->where('school_id', $organization->id)
@@ -193,7 +248,6 @@ class ChatController extends Controller
                 }
             });
         } catch (Exception $e){
-            dd($e);
             return redirect()->route('chats')->with('error', 'Failed to create chat');
         }
 

@@ -38,14 +38,10 @@ Route::post('onboarding-requests', [OnboardingRequestController::class, 'store']
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/chats', [ChatController::class, 'chats'])->name('chats');
+    Route::get('/chats/{chat}', [ChatController::class, 'chats'])->name('chats.show');
     Route::post('/chats', [ChatController::class, 'createChat'])->name('chats.store');
     Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
     Route::get('/download-material/{module}/{topic}/{material}/{file}', [MaterialFilesController::class, 'download'])->name('download-material');
-//    Route::post('modules', [ModulesController::class, 'store'])->name('modules.store');
-//    Route::post('topics', [TopicController::class, 'store'])->name('topics.store');
-//    Route::post('materials', [MaterialsController::class, 'store'])->name('materials.store');
-//    Route::post('assignments', [AssignmentsController::class, 'store'])->name('assignments.store');
-//    Route::post('tasks', [TasksController::class, 'store'])->name('tasks.store');
 });
 Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
