@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->bigIncrements('chat_id');
-            $table->string('name', 120);
+            $table->string('name', 120)->nullable();
             $table->enum('type', ['GROUP', 'MODULE', 'PRIVATE']);
             $table->foreignId('organization_id')
                 ->constrained('organizations')
