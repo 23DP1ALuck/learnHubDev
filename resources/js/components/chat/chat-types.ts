@@ -57,7 +57,8 @@ export type ChatRecipient = {
     name: string;
     email: string | null;
     role_in_org: 'STUDENT' | 'TEACHER' | 'ORGANIZATION_OWNER' | null;
-    group_name: string | null;
+    group_name?: string | null;
+    module_names?: string[] | null;
 };
 
 export type ChatRecipientPools = {
