@@ -25,6 +25,7 @@ export interface NavItem {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    badge?: number | string | null;
     embedItems?: NavItem[];
 }
 
@@ -34,6 +35,7 @@ export interface SharedData {
     session: Session;
     org: Organization | null;
     sidebarOpen: boolean;
+    chatUnreadCount?: number;
     [key: string]: unknown;
 }
 export interface Session {

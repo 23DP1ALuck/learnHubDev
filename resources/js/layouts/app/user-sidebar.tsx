@@ -4,6 +4,7 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
+    SidebarMenuBadge,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -16,20 +17,31 @@ import Logo from '@/components/icons/Logo';
 import { dashboard as ownerDashboard } from '@/routes';
 import { individualOwnerNavItems, schoolOwnerNavItems, studentNavItems, teacherNavItems, userNavItems } from '@/layouts/app/navitems';
 
-function setNavItems(auth: Auth) {
+function withChatBadge(items: NavItem[], unreadCount: number): NavItem[] {
+    return items.map((item) =>
+        item.title === 'Chats'
+            ? {
+                  ...item,
+                  badge: unreadCount > 99 ? '99+' : unreadCount > 0 ? unreadCount : null,
+              }
+            : item,
+    );
+}
+
+function setNavItems(auth: Auth, unreadCount: number) {
     if (auth.canManageOrganization) {
         if (auth.currentOrganization?.organization_type === 'individual') {
-            return individualOwnerNavItems;
+            return withChatBadge(individualOwnerNavItems, unreadCount);
         }
-        return schoolOwnerNavItems;
+        return withChatBadge(schoolOwnerNavItems, unreadCount);
     }
 
     if (auth.organizationRole === 'TEACHER') {
-        return teacherNavItems;
+        return withChatBadge(teacherNavItems, unreadCount);
     }
 
     if (auth.organizationRole === 'STUDENT') {
-        return studentNavItems;
+        return withChatBadge(studentNavItems, unreadCount);
     }
 
     return userNavItems;
@@ -37,8 +49,8 @@ function setNavItems(auth: Auth) {
 
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
-    const { auth } = usePage<SharedData>().props;
-    const navItems = setNavItems(auth);
+    const { auth, chatUnreadCount = 0 } = usePage<SharedData>().props;
+    const navItems = setNavItems(auth, chatUnreadCount);
     const homeHref = auth.canManageOrganization
         ? ownerDashboard()
         : auth.organizationRole === 'STUDENT'
@@ -77,6 +89,7 @@ export function Sidebar() {
                                             <span>{item.title}</span>
                                         </Link>
                                     </SidebarMenuButton>
+                                    {item.badge ? <SidebarMenuBadge>{item.badge}</SidebarMenuBadge> : null}
                                 </SidebarMenuItem>
                             );
                         }

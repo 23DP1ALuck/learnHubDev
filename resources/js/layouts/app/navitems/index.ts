@@ -7,12 +7,13 @@ import {
     organization as ownerOrganization,
     users as ownerUsers,
 } from '@/routes';
-import { BookOpen, Building, Calendar, FileText, LayoutGrid, Settings, Users } from 'lucide-react';
+import { BookOpen, Building, Calendar, FileText, LayoutGrid, MessageSquare, Settings, Users } from 'lucide-react';
 import {
     modules as teacherModules,
     marks as teacherMarks,
 } from '@/routes/teacher';
 import { route } from 'ziggy-js';
+import {chats} from '@/routes/';
 
 export const userNavItems: NavItem[] = [
     {
@@ -62,6 +63,11 @@ export const teacherNavItems: NavItem[] = [
         icon: BookOpen,
     },
     {
+        title: 'Chats',
+        href: chats(),
+        icon: MessageSquare,
+    },
+    {
         title: 'Marks',
         href: teacherMarks(),
         icon: FileText,
@@ -78,6 +84,11 @@ export const schoolOwnerNavItems: NavItem[] = [
         title: 'Dashboard',
         href: ownerDashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Chats',
+        href: chats(),
+        icon: MessageSquare,
     },
     {
         title: 'Organization',
@@ -118,6 +129,11 @@ export const individualOwnerNavItems: NavItem[] = [
         title: 'Modules',
         href: teacherModules(),
         icon: BookOpen,
+    },
+    {
+        title: 'Chats',
+        href: chats(),
+        icon: MessageSquare,
     },
     {
         title: 'Marks',
@@ -163,6 +179,11 @@ export const studentNavItems: NavItem[] = [
         title: 'Assignments',
         href: '/student/assignments',
         icon: Calendar,
+    },
+    {
+        title: 'Chats',
+        href: chats(),
+        icon: MessageSquare,
     },
     {
         title: 'Marks',
