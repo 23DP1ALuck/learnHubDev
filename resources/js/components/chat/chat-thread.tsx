@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { Paperclip, Send } from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { route } from 'ziggy-js';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
+import {useIsMobile} from "@/hooks/use-mobile";
 
 type ChatThreadProps = {
     activeChat: ActiveChat | null;
@@ -25,10 +26,6 @@ type IncomingChatMessageEvent = {
         id: number;
         file_name: string;
     }>;
-};
-
-type StoreMessageResponse = {
-    message: ChatMessage;
 };
 
 function formatTimestamp(value: string | null): string {
@@ -49,7 +46,15 @@ function formatTimestamp(value: string | null): string {
         minute: '2-digit',
     });
 }
-
+function sendViaShiftEnter(
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
+    ref: React.RefObject<HTMLButtonElement | null>)
+{
+    if(event.code === 'Enter' && event.shiftKey){
+        event.preventDefault();
+        ref.current?.click();
+    }
+}
 function MessageBubble({ message }: { message: ChatMessage }) {
     return (
         <div className={`flex ${message.is_mine ? 'justify-end' : 'justify-start'}`}>
@@ -91,6 +96,9 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
     const [isSending, setIsSending] = useState(false);
     const [sendError, setSendError] = useState<string | null>(null);
 
+    const isMobile = useIsMobile();
+    const messagesListRef = useRef<HTMLDivElement | null>(null);
+    const sendButtonRef = useRef<HTMLButtonElement | null>(null);
     useEffect(() => {
         setMessages(activeChat?.messages ?? []);
     }, [activeChat?.messages]);
@@ -128,7 +136,6 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
             },
         ]);
     });
-
     const submitMessage = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -163,7 +170,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
             setSendError(`Failed to send message. Please try again. ${error}`);
         }
     };
-    const messagesListRef = useRef<HTMLDivElement | null>(null);
+
     if (!activeChat) {
         return (
             <Card className="border-sidebar-border/70">
@@ -220,6 +227,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                         name="text"
                         value={draft}
                         onChange={(event) => setDraft(event.target.value)}
+                        onKeyDown={(event) => sendViaShiftEnter(event, sendButtonRef)}
                         className="min-h-28 w-full resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none"
                         placeholder="Write a message..."
                     />
@@ -229,10 +237,21 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                             <Paperclip />
                             Attach file
                         </Button>
-                        <Button type="submit" disabled={draft.trim() === '' || isSending}>
-                            <Send />
-                            {isSending ? 'Sending...' : 'Send'}
-                        </Button>
+                        {(!isMobile) ?(
+                            <div className="flex items-center gap-2">
+                                <p className="text-muted-foreground text-xs">Shift + Enter</p>
+                                <Button type="submit" disabled={draft.trim() === '' || isSending} ref={sendButtonRef}>
+                                    <Send />
+                                    {isSending ? 'Sending...' : 'Send'}
+                                </Button>
+                            </div>
+                        ):
+                            <Button type="submit" disabled={draft.trim() === '' || isSending} ref={sendButtonRef}>
+                                <Send />
+                                {isSending ? 'Sending...' : 'Send'}
+                            </Button>
+                        }
+
                     </div>
                 </form>
             </CardContent>
