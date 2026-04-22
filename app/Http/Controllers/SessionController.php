@@ -28,7 +28,7 @@ class SessionController extends Controller
             return redirect()->route('dashboard')
                 ->with('error', "You don't belong to this organization");
         }
-
+//        dd($organization->id);
         session()->put('activeOrganization', $organization->id);
 
         return redirect()->route('dashboard')->with('success', 'Organization set successfully.');

@@ -41,8 +41,7 @@ class ChatController extends Controller
         $groupId = $organization->pivot?->group_id;
 
         $group = $this->getGroup($groupId, $organization);
-
-        $classPools = $this->getClassPools($group, $user, $organization); // for user list
+        $classPools = $group ? $this->getClassPools($group, $user, $organization) : []; // for user list
 
         $chatsUsers = $this->getChats($user);
 

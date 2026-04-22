@@ -22,7 +22,6 @@ type JoinedOrgProps = {
     currentOrganization?: Organization | null | undefined;
 };
 export const JoinedOrg = ({organizations, showList, onOpenChange, currentOrganization} : JoinedOrgProps) => {
-    console.log("qweq", currentOrganization);
     return <Dialog open={showList} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>

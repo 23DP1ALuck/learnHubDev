@@ -84,7 +84,7 @@ export function Sidebar() {
                                         isActive={urlIsActive(item.href, undefined, false)}
                                         tooltip={item.title}
                                     >
-                                        <Link href={item.href} prefetch>
+                                        <Link href={item.href}>
                                             {item.icon && <item.icon />}
                                             <span>{item.title}</span>
                                         </Link>
@@ -100,7 +100,7 @@ export function Sidebar() {
                                     isActive={urlIsActive(item.href, undefined, true)}
                                     tooltip={item.title}
                                 >
-                                    <Link href={item.href} prefetch>
+                                    <Link href={item.href} >
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
                                     </Link>
@@ -114,7 +114,7 @@ export function Sidebar() {
                                         tooltip={innerItem.title}
                                         className="px-4"
                                     >
-                                        <Link href={innerItem.href} prefetch>
+                                        <Link href={innerItem.href}>
                                             {innerItem.icon && <innerItem.icon />}
                                             <span>{innerItem.title}</span>
                                         </Link>
