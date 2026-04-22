@@ -13,6 +13,7 @@ use App\Models\SchoolGroup;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -255,27 +256,56 @@ class ChatController extends Controller
 
         return redirect()->route('chats');
     }
-    public function storeMessage(StoreChatMessageRequest $request, int $chat): RedirectResponse{
+    public function storeMessage(StoreChatMessageRequest $request, int $chat): JsonResponse|RedirectResponse
+    {
+        // send here json response, because we do not want to redirect to chats page, so work with this approac
         $user = $request->user();
         if (!$user) {
-            return redirect()->route('login');
+            return $request->expectsJson()
+                ? response()->json(['message' => 'Unauthenticated.'], 401)
+                : redirect()->route('login');
         }
+
         $validated = $request->validated();
-        $chat = Chat::query()->where('chat_id', $chat)->with('users')->first();
-        if(!$chat){
-            return redirect()->route('chats')->with('error', 'Chat not found');
+        $organizationId = $request->session()->get('activeOrganization');
+        $chatModel = Chat::query()->where('chat_id', $chat)->with('users')->first();
+
+        if (!$chatModel || $chatModel->organization_id !== $organizationId) {
+            return $request->expectsJson()
+                ? response()->json(['message' => 'Chat not found.'], 404)
+                : redirect()->route('chats')->with('error', 'Chat not found');
         }
-        $isMember = $chat->users()->where('user_id', $user->id)->exists();
-        if(!$isMember){
-            return redirect()->route('chats')->with('error', 'You are not a member of this chat');
+
+        $isMember = $chatModel->users()->where('user_id', $user->id)->exists();
+        if (!$isMember) {
+            return $request->expectsJson()
+                ? response()->json(['message' => 'You are not a member of this chat.'], 403)
+                : redirect()->route('chats')->with('error', 'You are not a member of this chat');
         }
-        $chat = ChatMessage::create([
-           'chat_id' => $chat->chat_id,
+
+        $message = ChatMessage::create([
+           'chat_id' => $chatModel->chat_id,
            'sender_id' => $user->id,
            'text' => $validated['text'],
            'sent_at' => now(),
            'is_seen' => false,
         ]);
-        return redirect()->route('chats.show', ['chat' => $chat->chat_id]);
+
+        $message->load('sender');
+
+        NewMessage::dispatch($message->chat_id, $message->text, $message->sender);
+
+        return response()->json([
+            'message' => [
+                'id' => $message->message_id,
+                'sender_id' => $message->sender_id,
+                'sender_name' => $message->sender?->name,
+                'text' => $message->text,
+                'sent_at' => $message->sent_at?->toISOString(),
+                'is_mine' => true,
+                'is_seen' => $message->is_seen,
+                'files' => [],
+            ],
+        ], 201);
     }
 }

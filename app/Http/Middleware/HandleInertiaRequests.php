@@ -49,6 +49,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'chatUnreadCount' => 0,
             'auth' => [
                 'user' => $request->user(),
                 'currentOrganization' => $currentOrganization,

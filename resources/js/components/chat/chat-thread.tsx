@@ -3,11 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SharedData } from '@/types';
-import {Form, usePage} from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { Paperclip, Send } from 'lucide-react';
-import {useEffect, useState} from 'react';
-import {route} from "ziggy-js";
-import {reset} from "@/routes/password";
+import { useEffect, useState } from 'react';
+import { route } from 'ziggy-js';
+import { useEcho } from '@laravel/echo-react';
+import { toast } from 'sonner';
 
 type ChatThreadProps = {
     activeChat: ActiveChat | null;
@@ -24,6 +25,10 @@ type IncomingChatMessageEvent = {
         id: number;
         file_name: string;
     }>;
+};
+
+type StoreMessageResponse = {
+    message: ChatMessage;
 };
 
 function formatTimestamp(value: string | null): string {
@@ -71,13 +76,85 @@ function MessageBubble({ message }: { message: ChatMessage }) {
     );
 }
 
+function getXsrfToken(): string { // need for laravel POST request if make request via fetch
+    const cookies = document.cookie.split(';').map((cookie) => cookie.trim());
+    const xsrfCookie = cookies.find((cookie) => cookie.startsWith('XSRF-TOKEN='))?.slice(11);
+
+    // cookies are encoded, so decode it
+    return xsrfCookie ? decodeURIComponent(xsrfCookie) : '';
+}
+
 export default function ChatThread({ activeChat }: ChatThreadProps) {
     const { auth } = usePage<SharedData>().props;
     const [draft, setDraft] = useState('');
     const [messages, setMessages] = useState<ChatMessage[]>(activeChat?.messages ?? []);
+    const [isSending, setIsSending] = useState(false);
+    const [sendError, setSendError] = useState<string | null>(null);
+
     useEffect(() => {
         setMessages(activeChat?.messages ?? []);
     }, [activeChat?.messages]);
+
+    useEffect(() => {
+        if (sendError) {
+            toast.error(sendError);
+        }
+    }, [sendError]);
+
+    useEcho(`chat.${activeChat?.id}`, '.chat.message.created', (event: IncomingChatMessageEvent) => {
+        if (!activeChat || event.chat_id !== activeChat.id || event.sender_id === auth.user.id) {
+            return;
+        }
+
+        setMessages((currentMessages) => [
+            ...currentMessages,
+            {
+                id: Date.now(),
+                sender_id: event.sender_id,
+                sender_name: event.sender_name,
+                text: event.text,
+                sent_at: event.sent_at,
+                is_mine: false,
+                is_seen: event.is_seen,
+                files: event.files,
+            },
+        ]);
+    });
+
+    const submitMessage = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        if (!activeChat || draft.trim() === '' || isSending) {
+            return;
+        }
+
+        setSendError(null);
+
+        try {
+            const response = await fetch(route('chats.messages.store', activeChat.id, false), {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': getXsrfToken(),
+                },
+                body: JSON.stringify({ text: draft }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setSendError(data.message);
+                return;
+            }
+
+            setDraft('');
+            setMessages((currentMessages) => [...currentMessages, data.message]);
+        } catch (error) {
+            setSendError(`Failed to send message. Please try again. ${error}`);
+        }
+    };
 
     if (!activeChat) {
         return (
@@ -120,16 +197,9 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                     )}
                 </div>
 
-                <Form
-                    action={route('chats.messages.store', activeChat.id)}
-                    method={'post'}
+                <form
                     className="grid gap-3 rounded-3xl border bg-card p-4"
-                    onSuccess={() => {
-                        setDraft('');
-                    }}
-                    options={{
-                        preserveScroll: true
-                    }}
+                    onSubmit={submitMessage}
                 >
                     <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                         {activeChat.participants.map((participant) => (
@@ -145,17 +215,18 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                         className="min-h-28 w-full resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none"
                         placeholder="Write a message..."
                     />
+                    {sendError ? <p className="text-sm text-destructive">{sendError}</p> : null}
                     <div className="flex items-center justify-between gap-3">
                         <Button type="button" variant="outline">
                             <Paperclip />
                             Attach file
                         </Button>
-                        <Button type="submit" disabled={draft.trim() === ''}>
+                        <Button type="submit" disabled={draft.trim() === '' || isSending}>
                             <Send />
-                            Send
+                            {isSending ? 'Sending...' : 'Send'}
                         </Button>
                     </div>
-                </Form>
+                </form>
             </CardContent>
         </Card>
     );
