@@ -3,9 +3,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import {Form, usePage} from '@inertiajs/react';
 import { Paperclip, Send } from 'lucide-react';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
+import {route} from "ziggy-js";
+import {reset} from "@/routes/password";
 
 type ChatThreadProps = {
     activeChat: ActiveChat | null;
@@ -73,7 +75,9 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
     const { auth } = usePage<SharedData>().props;
     const [draft, setDraft] = useState('');
     const [messages, setMessages] = useState<ChatMessage[]>(activeChat?.messages ?? []);
-
+    useEffect(() => {
+        setMessages(activeChat?.messages ?? []);
+    }, [activeChat?.messages]);
 
     if (!activeChat) {
         return (
@@ -116,11 +120,16 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                     )}
                 </div>
 
-                <form
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                    }}
+                <Form
+                    action={route('chats.messages.store', activeChat.id)}
+                    method={'post'}
                     className="grid gap-3 rounded-3xl border bg-card p-4"
+                    onSuccess={() => {
+                        setDraft('');
+                    }}
+                    options={{
+                        preserveScroll: true
+                    }}
                 >
                     <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                         {activeChat.participants.map((participant) => (
@@ -130,6 +139,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                         ))}
                     </div>
                     <textarea
+                        name="text"
                         value={draft}
                         onChange={(event) => setDraft(event.target.value)}
                         className="min-h-28 w-full resize-none rounded-2xl border bg-background px-4 py-3 text-sm outline-none"
@@ -145,7 +155,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                             Send
                         </Button>
                     </div>
-                </form>
+                </Form>
             </CardContent>
         </Card>
     );

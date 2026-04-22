@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewMessage;
 use App\Http\Requests\StoreChatMessageRequest;
 use App\Http\Requests\StoreChatRequest;
 use App\Models\Chat;
@@ -254,7 +255,7 @@ class ChatController extends Controller
 
         return redirect()->route('chats');
     }
-    public function sendMessage(StoreChatMessageRequest $request, int $chat): RedirectResponse{
+    public function storeMessage(StoreChatMessageRequest $request, int $chat): RedirectResponse{
         $user = $request->user();
         if (!$user) {
             return redirect()->route('login');
@@ -268,13 +269,13 @@ class ChatController extends Controller
         if(!$isMember){
             return redirect()->route('chats')->with('error', 'You are not a member of this chat');
         }
-        ChatMessage::create([
-           'chat_id' => $validated['chat_id'],
+        $chat = ChatMessage::create([
+           'chat_id' => $chat->chat_id,
            'sender_id' => $user->id,
            'text' => $validated['text'],
            'sent_at' => now(),
            'is_seen' => false,
         ]);
-        return redirect()->route('chats', [$chat->id]);
+        return redirect()->route('chats.show', ['chat' => $chat->chat_id]);
     }
 }
