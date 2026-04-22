@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import type { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { Paperclip, Send } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { route } from 'ziggy-js';
 import { useEcho } from '@laravel/echo-react';
 import { toast } from 'sonner';
@@ -101,6 +101,14 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
         }
     }, [sendError]);
 
+    useEffect(() => { // scroll to bottom of messages list if new message received
+        const element = messagesListRef.current;
+        if (!element) {
+            return;
+        }
+        element.scrollTop = element.scrollHeight;
+    }, [messages]);
+
     useEcho(`chat.${activeChat?.id}`, '.chat.message.created', (event: IncomingChatMessageEvent) => {
         if (!activeChat || event.chat_id !== activeChat.id || event.sender_id === auth.user.id) {
             return;
@@ -155,7 +163,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
             setSendError(`Failed to send message. Please try again. ${error}`);
         }
     };
-
+    const messagesListRef = useRef<HTMLDivElement | null>(null);
     if (!activeChat) {
         return (
             <Card className="border-sidebar-border/70">
@@ -187,7 +195,7 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
                 </div>
             </CardHeader>
             <CardContent className="grid h-[68dvh] grid-rows-[minmax(0,1fr)_auto] gap-4 p-4">
-                <div className="space-y-3 overflow-y-auto rounded-3xl bg-muted/20 p-3">
+                <div className="space-y-3 overflow-y-auto rounded-3xl bg-muted/20 p-3" ref={messagesListRef}>
                     {messages.length === 0 ? (
                         <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-muted-foreground">
                             No messages yet. The first message in this chat will appear here.
