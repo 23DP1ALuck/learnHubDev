@@ -382,7 +382,7 @@ class TeacherContentController extends Controller
         if(!$topic){
             return redirect()->route('dashboard')->with('error', 'Topic not found.');
         }
-        
+
         $moduleSummary = [
             'id' => $module->id,
             'name' => $module->name,
@@ -404,11 +404,27 @@ class TeacherContentController extends Controller
             'files' => $files,
         ];
     }
-    public function material(Request $request, Module $module, Topic $topic, Material $material): Response|RedirectResponse{
+    public function material(Request $request, int $module, int $topic, int $material): Response|RedirectResponse{
         $user = $request->user();
 
         if (! $user) {
             return redirect()->route('login');
+        }
+        $module = Module::query()->where('id', $module)->first();
+        if(!$module->creator()->first()->id === $user->id){
+            return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
+        }
+        $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();
+        if(!$topic){
+            return redirect()->route('dashboard')->with('error', 'Topic not found.');
+        }
+        $material = Material::query()
+            ->where('module_id', $topic->module_id)
+            ->where('topic_id', $topic->topic_id)
+            ->where('material_id', $material)
+            ->first();
+        if(!$material){
+            return redirect()->route('dashboard')->with('error', 'Material not found.');
         }
         $moduleSummary = [
             'id' => $module->id,
