@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreChatMessageRequest;
 use App\Http\Requests\StoreChatRequest;
 use App\Models\Chat;
 use App\Models\ChatMessage;
@@ -43,7 +44,7 @@ class ChatController extends Controller
         $group = $this->getGroup($groupId, $organization);
         $classPools = $group ? $this->getClassPools($group, $user, $organization) : []; // for user list
 
-        $chatsUsers = $this->getChats($user);
+        $chatsUsers = $this->getChats($user, $organizationId);
 
 
         $activeChat = null;
@@ -124,8 +125,8 @@ class ChatController extends Controller
             ],
         ]);
     }
-    private function getChats(User $user){
-        $chats = $user->chats()->get();
+    private function getChats(User $user, int $activeOrganization){
+        $chats = $user->chats()->where('organization_id', $activeOrganization)->get();
 
         return $chats->map(function ($chat) use($user){
             $lastMessage = $chat->messages()->latest()->first();
@@ -252,5 +253,28 @@ class ChatController extends Controller
 
 
         return redirect()->route('chats');
+    }
+    public function sendMessage(StoreChatMessageRequest $request, int $chat): RedirectResponse{
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+        $validated = $request->validated();
+        $chat = Chat::query()->where('chat_id', $chat)->with('users')->first();
+        if(!$chat){
+            return redirect()->route('chats')->with('error', 'Chat not found');
+        }
+        $isMember = $chat->users()->where('user_id', $user->id)->exists();
+        if(!$isMember){
+            return redirect()->route('chats')->with('error', 'You are not a member of this chat');
+        }
+        ChatMessage::create([
+           'chat_id' => $validated['chat_id'],
+           'sender_id' => $user->id,
+           'text' => $validated['text'],
+           'sent_at' => now(),
+           'is_seen' => false,
+        ]);
+        return redirect()->route('chats', [$chat->id]);
     }
 }
