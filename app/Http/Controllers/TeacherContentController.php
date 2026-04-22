@@ -367,14 +367,22 @@ class TeacherContentController extends Controller
             'moduleTopics' => $moduleTopics,
         ];
     }
-    public function topic(Request $request, Module $module, Topic $topic): Response|RedirectResponse
+    public function topic(Request $request, int $module, int $topic): Response|RedirectResponse
     {
         $user = $request->user();
 
         if (! $user) {
             return redirect()->route('login');
         }
-
+        $module = Module::query()->where('id', $module)->first();
+        if(!$module->creator()->first()->id === $user->id){
+            return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
+        }
+        $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();
+        if(!$topic){
+            return redirect()->route('dashboard')->with('error', 'Topic not found.');
+        }
+        
         $moduleSummary = [
             'id' => $module->id,
             'name' => $module->name,
