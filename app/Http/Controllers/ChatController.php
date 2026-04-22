@@ -54,12 +54,13 @@ class ChatController extends Controller
         if ($chat !== null) {
             $activeChat = Chat::query()
                 ->where('chat_id', $chat)
+                ->where('organization_id', $organizationId)
                 ->with(['users', 'messages'])
                 ->first();
             if(!$activeChat){
                 return redirect()->route('chats')->with('error', 'Chat not found');
             }
-            $belongsToChat =  $activeChat?->users()->where('user_id', $user->id)->exists();
+            $belongsToChat =  $activeChat->users()->where('user_id', $user->id)->exists();
             if(!$belongsToChat){
                 return redirect()->route('chats')->with('error', 'You are not a member of this chat');
             }
@@ -78,19 +79,11 @@ class ChatController extends Controller
                     'files' => [],
                 ];
             });
-            $chatUser = ChatUser::query()
+            // set last read at to now, because we automatically read messages once we open chat
+            ChatUser::query()
                 ->where('chat_id', $chat)
                 ->where('user_id', $user->id)
-                ->first();
-            $unreadMessagesQuery = $activeChat
-                ->messages()
-                ->where('sender_id', '!=', $user->id);
-
-            if ($chatUser->last_read_at !== null) {
-                $unreadMessagesQuery->where('sent_at', '>', $chatUser->last_read_at);
-            }
-
-            $unreadMessages = $unreadMessagesQuery->count();
+                ->update(['last_read_at' => now()]);
             $participants = $activeChat->users()->get()->map(function ($user) {
                 return [
                     'id' => $user->id,
@@ -105,10 +98,11 @@ class ChatController extends Controller
                     $activeChat->name :
                     $activeChat->users()->where('user_id', '!=', $user->id)->first()->name,
                 'type' => $activeChat->type,
-                'unread_count' => $unreadMessages,
+                'unread_count' => 0,
                 'participants' => $participants,
                 'messages' => $chatMessages,
             ];
+            $chatsUsers = $this->getChats($user, $organizationId); // refresh the chats list to reset the unread count
         }
 
         return Inertia::render('chats/index', [
@@ -130,17 +124,30 @@ class ChatController extends Controller
     private function getChats(User $user, int $activeOrganization){
         $chats = $user->chats()->where('organization_id', $activeOrganization)->get();
 
-        return $chats->map(function ($chat) use($user){
-            $lastMessage = $chat->messages()->latest()->first();
+        return $chats->map(function (Chat $chat) use($user){
+            $lastMessage = $chat->messages()->latest('sent_at')->first();
+
+            $chatUser = ChatUser::query()
+                ->where('chat_id', $chat->chat_id)
+                ->where('user_id', $user->id)->first();
+            $unreadMessagesQuery = $chat
+                ->messages()
+                ->where('sender_id', '!=', $user->id);
+
+            if ($chatUser->last_read_at !== null) {
+                $unreadMessagesQuery->where('sent_at', '>', $chatUser->last_read_at);
+            }
+
+            $unreadMessages = $unreadMessagesQuery->count();
             // if group chat, set group name, if private - set recipient's name
             if($chat->type === 'GROUP'){
                 return [
                     'id' => $chat->chat_id,
                     'name' => $chat->name,
                     'type' => $chat->type,
-                    'unread_count' => 0,
+                    'unread_count' => $unreadMessages,
                     'last_message_text' => $lastMessage->text ?? null,
-                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_message_at' => $lastMessage?->sent_at ?? null,
                     'last_sender_name' => $lastMessage?->sender?->name ?? null,
                     'participants_preview' => ['qwe','qweqwe'],
                 ];
@@ -149,9 +156,9 @@ class ChatController extends Controller
                     'id' => $chat->chat_id,
                     'name' => $chat->users()->where('user_id', '!=', $user->id)->first()->name,
                     'type' => $chat->type,
-                    'unread_count' => 0,
+                    'unread_count' => $unreadMessages,
                     'last_message_text' => $lastMessage->text ?? null,
-                    'last_message_at' => $lastMessage?->created_at ?? null,
+                    'last_message_at' => $lastMessage?->sent_at ?? null,
                     'last_sender_name' => $lastMessage?->sender?->name ?? null,
                     'participants_preview' => ['qwe','qweqwe'],
                 ];
