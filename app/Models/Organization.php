@@ -45,6 +45,12 @@ class Organization extends Model
             ->withPivot(['joined_on', 'role_in_org', 'admin_privileges', 'group_id'])
             ->wherePivot('role_in_org', 'STUDENT');
     }
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'users_organizations')
+            ->withPivot(['joined_on', 'role_in_org', 'admin_privileges', 'group_id'])
+            ->wherePivot('role_in_org', 'TEACHER');
+    }
     public function modules(): HasMany
     {
         return $this->hasMany(Module::class);

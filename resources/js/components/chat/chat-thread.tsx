@@ -188,9 +188,9 @@ export default function ChatThread({ activeChat }: ChatThreadProps) {
     }
 
     return (
-        <Card className="border-sidebar-border/70">
+        <Card className="border-sidebar-border/70 py-2">
             <CardHeader className="border-b">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center justify-between gap-4">
                     <div className="space-y-1">
                         <CardTitle>{activeChat.name}</CardTitle>
                         <CardDescription>{activeChat.participants.length} participants</CardDescription>

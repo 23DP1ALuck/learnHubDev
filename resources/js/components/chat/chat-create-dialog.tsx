@@ -26,6 +26,7 @@ type ChatCreateDialogProps = {
 };
 
 export default function ChatCreateDialog({ recipientPools }: ChatCreateDialogProps) {
+    console.log(recipientPools);
     const { auth } = usePage<SharedData>().props;
     const initialScope: ChatRecipientScope = recipientPools.class.length > 0 ? 'CLASS' : 'ORGANIZATION';
     const [open, setOpen] = useState(false);
@@ -51,6 +52,18 @@ export default function ChatCreateDialog({ recipientPools }: ChatCreateDialogPro
         setGroupName('');
         setSelectedRecipientIds([]);
     };
+    const formatRole = (role: string) => {
+        switch (role) {
+            case 'TEACHER':
+                return 'Teacher';
+            case 'STUDENT':
+                return 'Student';
+            case 'ORGANIZATION_OWNER':
+                return 'Administration';
+            default:
+                return role;
+        }
+    }
 
     const toggleRecipient = (recipientId: number, checked: boolean) => {
         if (chatType === 'PRIVATE') { // if private chat select new one, remove from old one
@@ -231,7 +244,13 @@ export default function ChatCreateDialog({ recipientPools }: ChatCreateDialogPro
                                                             <div className="flex items-center gap-2">
                                                                 <p className="font-medium">{recipient.name}</p>
                                                                 {recipient.group_name ? <Badge variant="outline">{recipient.group_name}</Badge> : null}
-                                                                {recipient.role_in_org === 'TEACHER' && <Badge variant="outline">Teacher</Badge>}
+                                                                {
+                                                                    (recipient.role_in_org === 'TEACHER' ||
+                                                                        recipient.role_in_org === 'ORGANIZATION_OWNER')
+                                                                    &&
+                                                                    <Badge variant="outline">
+                                                                        {formatRole(recipient.role_in_org)}
+                                                                    </Badge>}
                                                             </div>
                                                             <p className="text-sm text-muted-foreground">{recipient.email || 'No email provided'}</p>
                                                             <div className="flex">

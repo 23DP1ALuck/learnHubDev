@@ -36,16 +36,17 @@ class ChatController extends Controller
         }
 
         $organization = $user->organizations()->where('organizations.id', $organizationId)->first();
+
         if (!$organization) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
-
+        $this->getOrganizationPools($organization, $user);
 
         $groupId = $organization->pivot?->group_id;
 
         $group = $this->getGroup($groupId, $organization);
-        $classPools = $group ? $this->getClassPools($group, $user, $organization) : []; // for user list
-
+        $classPools = $group ? $this->getClassPools($group, $user, $organization) : []; // for user list inside group
+        $organizationPools = $this->getOrganizationPools($organization, $user) ?? []; // for user list inside org
         $chatsUsers = $this->getChats($user, $organizationId);
 
 
@@ -117,13 +118,12 @@ class ChatController extends Controller
             'activeChat' => $activeChat ?? null,
             'recipientPools' => [
                 'class' => $classPools,
-                'organization' => [],
+                'organization' => $organizationPools,
             ],
         ]);
     }
     private function getChats(User $user, int $activeOrganization){
         $chats = $user->chats()->where('organization_id', $activeOrganization)->get();
-
         return $chats->map(function (Chat $chat) use($user){
             $lastMessage = $chat->messages()->latest('sent_at')->first();
 
@@ -185,7 +185,7 @@ class ChatController extends Controller
                 'name' => $teacher->name,
                 'email' => $teacher->email,
                 'role_in_org' => 'TEACHER',
-                'group_name' => $group?->name,
+                'group_name' => $group?->name ?? null,
             ];
         })->filter()->unique('id')->values();
 
@@ -199,6 +199,31 @@ class ChatController extends Controller
             ];
         });
         return $classMates->merge($teachers)->toArray();
+    }
+    private function getOrganizationPools(Organization $organization, User $user)
+    {
+        // get all modules/teachers for current group
+        $users = $organization->users()
+            ->where('users.id', '!=', $user->id)
+            ->orderByPivot('role_in_org')
+            ->get();
+
+        return $users->map(function (User $user) use($organization){
+            $group = null;
+            if($user->pivot?->role_in_org === 'STUDENT' && $user->pivot?->group_id !== null){
+                $group = SchoolGroup::query()
+                    ->where('group_id', $user->pivot?->group_id)
+                    ->where('school_id', $organization->id)
+                    ->first();
+            }
+           return [
+               'id' => $user->id,
+               'name' => $user->name,
+               'email' => $user->email,
+               'role_in_org' => $user->pivot?->role_in_org,
+               'group_name' => $group->name ?? null,
+           ];
+        });
     }
     private function getGroup($groupId, $organization): ?SchoolGroup
     {
