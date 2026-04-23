@@ -249,20 +249,34 @@ class ChatController extends Controller
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
         try{
-            DB::transaction(function () use ($validated, $organization, $user){
+            $chats = $user->chatMemberships()->pluck('chat_id')->toArray();
+            $recipients = collect($validated['recipient_ids'])
+                ->map(fn ($recipientId) => (int) $recipientId)
+                ->unique()
+                ->values();
+            $allowedRecipientIds = $organization->users()
+                ->whereIn('users.id', $recipients)
+                ->pluck('users.id');
+            $chatExists = null;
+            if($allowedRecipientIds->count() == 1){
+                $chatExists = $this->existingChat($user, $allowedRecipientIds->first());
+            }
+            if($chatExists){
+                return redirect()
+                    ->route('chats.show', $chatExists->chat_id)
+                    ->with('error', 'You are already a member of this chat');
+            }
+            DB::transaction(function () use ($validated,
+                $recipients,
+                $allowedRecipientIds,
+                $organization,
+                $user)
+            {
                 $sender = $user->id;
-                $recipients = collect($validated['recipient_ids'])
-                    ->map(fn ($recipientId) => (int) $recipientId)
-                    ->unique()
-                    ->values();
-                $allowedRecipientIds = $organization->users()
-                    ->whereIn('users.id', $recipients)
-                    ->pluck('users.id');
 
                 if ($allowedRecipientIds->count() !== $recipients->count()) {
                     throw new Exception('One or more recipients do not belong to the active organization.');
                 }
-
                 $chat =Chat::create([
                     'name' => $validated['name'] ?? null,
                     'type' => $validated['type'],
@@ -287,6 +301,17 @@ class ChatController extends Controller
 
 
         return redirect()->route('chats');
+    }
+    private function existingChat(User $user, $recipient): ChatUser|null
+    {
+        $senderChats = $user->chats()->where('type', '!=', 'GROUP')->get();
+        $senderChats = $senderChats->map(function (Chat $chat) use ($user, $recipient){
+            return $chat->memberships()->where('user_id', $recipient)->first();
+        })->filter()->first();
+        if(!$senderChats){
+            return null;
+        }
+        return $senderChats;
     }
     public function storeMessage(StoreChatMessageRequest $request, int $chat): JsonResponse|RedirectResponse
     {
