@@ -1,9 +1,10 @@
 import ModuleTopicsCreate from '@/components/teacher/module-topics-create';
 import ModuleTopicsList from '@/components/teacher/module-topics-list';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import {DeleteModule} from "@/components/teacher/delete-module";
 import {useEffect} from "react";
@@ -81,7 +82,12 @@ export default function TeacherModulePage({
                             <CardDescription>
                                 {module.description || 'Add topics to break this module into concrete learning units.'}
                             </CardDescription>
-                            <DeleteModule module={deleteModuleInfo}/>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" asChild>
+                                    <Link href={route('teacher.modules.edit', module.id)}>Edit</Link>
+                                </Button>
+                                <DeleteModule module={deleteModuleInfo}/>
+                            </div>
                         </div>
 
                     </CardHeader>

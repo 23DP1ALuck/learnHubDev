@@ -26,6 +26,34 @@ class ModulesController extends Controller
 
         return redirect()->back()->with('success', 'Module created.');
     }
+    public function update(StoreModuleRequest $request, int $moduleId): RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+
+        $module = Module::query()->where('id', $moduleId)->first();
+
+        if (! $module) {
+            return redirect()->route('teacher.modules')->with('error', 'Module not found.');
+        }
+
+        if ($module->organization_id !== (int) $organizationId || $module->creator_id !== $user->id) {
+            return redirect()->route('teacher.modules')->with('error', 'You do not have permission to edit this module.');
+        }
+
+        $module->update($request->validated());
+
+        return redirect()->route('teacher.modules.edit', $module->id)->with('success', 'Module updated.');
+    }
     public function destroy(Request $request, int $moduleId){
         $user = $request->user();
         if(!$user){

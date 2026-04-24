@@ -8,12 +8,13 @@ type DeleteModuleProps = {
     module: {
         id: number,
         name: string,
-    }
+    },
+    onFullWidth?: boolean
 }
-export const DeleteModule = ({module}: DeleteModuleProps) => {
+export const DeleteModule = ({module, onFullWidth}: DeleteModuleProps) => {
     const [open, setOpen] = useState(false)
     return<Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger>
+        <DialogTrigger className={onFullWidth ? 'w-full' : ''} asChild>
             <Button variant="destructive">Delete</Button>
         </DialogTrigger>
         <DialogContent>

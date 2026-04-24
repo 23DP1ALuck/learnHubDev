@@ -299,6 +299,32 @@ class TeacherContentController extends Controller
 
     }
 
+    public function editModule(Request $request, Module $module): Response|RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+
+        if ($module->organization_id !== (int) $organizationId || $module->creator_id !== $user->id) {
+            return redirect()->route('teacher.modules')->with('error', 'You do not have permission to edit this module.');
+        }
+
+        $data = $this->getModulePageInfo($request, $module);
+
+        return Inertia::render('teacher/edit-module', [
+            'module' => $data['moduleSummary'],
+            'stats' => $data['moduleStats'],
+        ]);
+    }
+
     private function getModulePageInfo(Request $request, Module $module): array
     {
         $topics = Topic::query()
