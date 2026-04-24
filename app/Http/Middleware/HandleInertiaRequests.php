@@ -41,10 +41,14 @@ class HandleInertiaRequests extends Middleware
         $currentOrganizationId = $this->resolveCurrentOrganization($request);
 
         $currentUser = $request->user();
-        $currentOrganization = $currentUser instanceof User ? $currentUser
-            ->organizations()
-            ->where('id', $currentOrganizationId)
-            ->first(): null;
+        $currentOrganization = null;
+        if($currentUser->role !== 'admin'){
+            $currentOrganization = $currentUser instanceof User ? $currentUser
+                ->organizations()
+                ->where('id', $currentOrganizationId)
+                ->first(): null;
+        }
+
 
         return [
             ...parent::share($request),
