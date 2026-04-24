@@ -40,21 +40,6 @@ return new class extends Migration
                 'CUSTOM_SELECT',
             ])->change();
         });
-
-        if (! Schema::hasTable('task_options')) {
-            Schema::create('task_options', function (Blueprint $table) {
-                $table->unsignedBigInteger('assignment_id');
-                $table->unsignedBigInteger('task_id');
-                $table->unsignedBigInteger('option_id');
-                $table->string('option_text');
-
-                $table->primary(['assignment_id', 'task_id', 'option_id']);
-                $table->foreign(['assignment_id', 'task_id'])
-                    ->references(['assignment_id', 'task_id'])
-                    ->on('tasks')
-                    ->cascadeOnDelete();
-            });
-        }
     }
 
     public function down(): void
