@@ -44,6 +44,8 @@ export default function OwnerInvitationsPage({
     roleOptions: Array<{ value: Extract<OrganizationRole, 'TEACHER' | 'STUDENT'>; label: string }>;
 }) {
     const { flash } = usePage<Flash & SharedData>().props;
+    const {auth} = usePage<SharedData>().props;
+    const orgType = auth.currentOrganization?.organization_type;
     const [, copy] = useClipboard();
     const [roleInOrg, setRoleInOrg] = useState<Extract<OrganizationRole, 'TEACHER' | 'STUDENT'> | ''>('');
     const lastInviteUrlRef = useRef<string | undefined>(undefined);
@@ -82,8 +84,10 @@ export default function OwnerInvitationsPage({
                 <Card className="border-sidebar-border/70">
                     <CardHeader>
                         <CardTitle>Invite members to {organization.organization_name}</CardTitle>
+
                         <CardDescription>
-                            Send a secure invite link to a teacher or student. The recipient can join with the email you specify here.
+                            {orgType !== 'individual' ?  'Send a secure invite link to a teacher or student. The recipient can join with the email you specify here. Name fields will be ignored if user already has a profile.' :
+                            'Send a secure invite link to a student. The recipient can join with the email you specify here. Name fields will be ignored if user already has a profile.'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -106,21 +110,25 @@ export default function OwnerInvitationsPage({
                                         <InputError message={errors.email} />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="role_in_org">Role</Label>
-                                        <input type="hidden" name="role_in_org" value={roleInOrg} />
-                                        <Select value={roleInOrg} onValueChange={(value) => setRoleInOrg(value as Extract<OrganizationRole, 'TEACHER' | 'STUDENT'>)}>
-                                            <SelectTrigger id="role_in_org">
-                                                <SelectValue placeholder="Select role" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {roleOptions.map((option) => (
-                                                    <SelectItem key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.role_in_org} />
+                                        {orgType !== 'individual' ? <>
+                                            <Label htmlFor="role_in_org">Role</Label>
+
+                                            <input type="hidden" name="role_in_org" value={roleInOrg} />
+                                            <Select value={roleInOrg} onValueChange={(value) => setRoleInOrg(value as Extract<OrganizationRole, 'TEACHER' | 'STUDENT'>)}>
+                                                <SelectTrigger id="role_in_org">
+                                                    <SelectValue placeholder="Select role" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {roleOptions.map((option) => (
+                                                        <SelectItem key={option.value} value={option.value}>
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.role_in_org} />
+                                        </> :  <input type="hidden" name="role_in_org" value={'STUDENT'}/>}
+
                                     </div>
                                     <div className="md:col-span-2 flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                                         <div>

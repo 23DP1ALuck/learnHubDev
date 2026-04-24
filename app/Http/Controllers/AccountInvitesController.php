@@ -368,6 +368,7 @@ class AccountInvitesController extends Controller
      */
     private function acceptOnboardingInvite(Request $request, AccountInvites $invite): void
     {
+//        TODO: add db transaction
         $onboardingRequest = $this->verifyOnboardingRequest($invite);
         $password = $this->validatedPassword($request);
 

@@ -42,11 +42,13 @@ class HandleInertiaRequests extends Middleware
 
         $currentUser = $request->user();
         $currentOrganization = null;
-        if($currentUser->role !== 'admin'){
-            $currentOrganization = $currentUser instanceof User ? $currentUser
-                ->organizations()
-                ->where('id', $currentOrganizationId)
-                ->first(): null;
+        if($currentUser instanceof User){
+            if($currentUser->role !== 'admin'){
+                $currentOrganization = $currentUser
+                    ->organizations()
+                    ->where('id', $currentOrganizationId)
+                    ->first();
+            }
         }
 
 
