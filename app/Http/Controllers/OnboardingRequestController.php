@@ -25,14 +25,21 @@ class OnboardingRequestController extends Controller
             ->latest()
             ->paginate(5)
             ->withQueryString();
-        $countsByStatus = OnboardingRequest::query()    // get status metrics
-            ->selectRaw('SUM(status="approved") as approved,
-             SUM(status="rejected") as rejected,
-             SUM(status="pending") as pending')
+        $countsByStatus = OnboardingRequest::query() // get status metrics
+            ->selectRaw("
+            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+            SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+            SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
+            ")
             ->first();
+        $metrics = [
+            "approved" => $countsByStatus->approved ?? 0,
+            "pending" => $countsByStatus->rejected ?? 0,
+            "rejected" => $countsByStatus->penidng ?? 0,
+        ];
         return Inertia::render('admin/onboarding-requests', [
             'onboardingRequests' => $requests,
-            'metrics' => $countsByStatus
+            'metrics' => $metrics
         ]);
     }
 
