@@ -8,6 +8,7 @@ use App\Models\Topic;
 use Helper;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -59,5 +60,38 @@ class TopicController extends Controller
             ->value('topic_id');
 
         return ((int) ($lastTopicId ?? 0)) + 1;
+    }
+    public function destroy(Request $request, int $moduleId, int $topicId): RedirectResponse
+    {
+        $user = $request->user();
+        if(!$user){
+            return redirect()->route('login');
+        }
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = $user->organizations()->where('organizations.id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+        $module = Module::query()
+            ->where('id', $moduleId)
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organization->id)
+            ->first();
+        if(!$module){
+            return redirect()->route('dashboard')->with('error', 'You do not have permission to delete this topic.');
+        }
+        $topic = Topic::query()
+            ->where('topic_id', $topicId)
+            ->where('module_id', $moduleId)
+            ->first();
+        if(!$topic){
+            return redirect()->route('dashboard')->with('error', 'Topic not found.');
+        }
+        Topic::query()
+            ->where('topic_id', $topicId)
+            ->where('module_id', $moduleId)
+            ->first()
+            ->delete();
+        return redirect()->route('teacher.modules.show', $moduleId)->with('success', 'Topic deleted.');
     }
 }

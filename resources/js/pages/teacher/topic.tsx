@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import {DeleteTopic} from "@/components/teacher/delete-topic";
 
 type ModuleSummary = {
     id: number;
@@ -89,9 +90,12 @@ export default function TeacherTopicPage({
                 <Card className="border-sidebar-border/70">
                     <CardHeader>
                         <CardTitle>{topic.name}</CardTitle>
-                        <CardDescription>
-                            {topic.description || 'This topic contains the learning materials and assignments students work through.'}
-                        </CardDescription>
+                        <div className="flex justify-between">
+                            <CardDescription>
+                                {topic.description || 'This topic contains the learning materials and assignments students work through.'}
+                            </CardDescription>
+                            <DeleteTopic topic={{topic_id: topic.topic_id, module_id: module.id, name: topic.name}}/>
+                        </div>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-3">
                         <div className="rounded-lg border p-4">
