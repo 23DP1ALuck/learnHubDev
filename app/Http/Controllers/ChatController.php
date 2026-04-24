@@ -185,7 +185,7 @@ class ChatController extends Controller
                 'name' => $teacher->name,
                 'email' => $teacher->email,
                 'role_in_org' => 'TEACHER',
-                'group_name' => $group?->name ?? null,
+                'group_name' => null,
             ];
         })->filter()->unique('id')->values();
 
