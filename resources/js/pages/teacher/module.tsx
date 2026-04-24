@@ -5,6 +5,9 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import {DeleteModule} from "@/components/teacher/delete-module";
+import {useEffect} from "react";
+import {toast} from "sonner";
 
 type ModuleSummary = {
     id: number;
@@ -52,7 +55,14 @@ export default function TeacherModulePage({
             href: route('teacher.modules.show', module.id),
         },
     ];
-
+    const deleteModuleInfo = {
+        id: module.id,
+        name: module.name,
+    }
+    useEffect(() => {
+        if(flash?.success)
+            toast.success(flash.success);
+    }, [flash?.success])
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={module.name} />
@@ -67,9 +77,13 @@ export default function TeacherModulePage({
                 <Card className="border-sidebar-border/70 h-[30dvh]">
                     <CardHeader>
                         <CardTitle>{module.name}</CardTitle>
-                        <CardDescription>
-                            {module.description || 'Add topics to break this module into concrete learning units.'}
-                        </CardDescription>
+                        <div className="flex justify-between">
+                            <CardDescription>
+                                {module.description || 'Add topics to break this module into concrete learning units.'}
+                            </CardDescription>
+                            <DeleteModule module={deleteModuleInfo}/>
+                        </div>
+
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-5">
                         <div className="rounded-lg border p-4">

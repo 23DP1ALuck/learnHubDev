@@ -83,6 +83,8 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::post('tasks', [TasksController::class, 'store'])->name('tasks.store');
 
     Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
+
+    Route::delete('/modules/{module_id}', [ModulesController::class, 'destroy'])->name('modules.destroy');
 });
 Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function () {
     Route::get('/student/modules', [StudentContentController::class, 'modules'])->name('student.modules');
