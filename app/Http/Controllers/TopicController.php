@@ -61,6 +61,48 @@ class TopicController extends Controller
 
         return ((int) ($lastTopicId ?? 0)) + 1;
     }
+    public function update(StoreTopicRequest $request, int $moduleId, int $topicId): RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+        $validated = $request->validated();
+
+        $module = Module::query()
+            ->where('id', $moduleId)
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->first();
+        if (! $module) {
+            return redirect()->route('teacher.modules')->with('error', 'You do not have permission to edit this topic.');
+        }
+
+        $topic = Topic::query()
+            ->where('topic_id', $topicId)
+            ->where('module_id', $moduleId)
+            ->first();
+        if (! $topic) {
+            return redirect()->route('teacher.modules.show', $moduleId)->with('error', 'Topic not found.');
+        }
+
+        $topic->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+        ]);
+        Topic::query() // need to query again because of composite key
+            ->where('topic_id', $topicId)
+            ->where('module_id', $moduleId)
+            ->first()
+            ->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            ]);;
+
+        return redirect()->route('teacher.topics.edit', [$moduleId, $topicId])->with('success', 'Topic updated.');
+    }
     public function destroy(Request $request, int $moduleId, int $topicId): RedirectResponse
     {
         $user = $request->user();
@@ -87,7 +129,7 @@ class TopicController extends Controller
         if(!$topic){
             return redirect()->route('dashboard')->with('error', 'Topic not found.');
         }
-        Topic::query()
+        Topic::query() // need to query again because of composite key
             ->where('topic_id', $topicId)
             ->where('module_id', $moduleId)
             ->first()

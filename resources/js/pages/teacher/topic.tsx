@@ -2,10 +2,11 @@ import TopicAssignmentCreate from '@/components/teacher/topic-assignment-create'
 import TopicAssignmentsList from '@/components/teacher/topic-assignments-list';
 import TopicMaterialCreate from '@/components/teacher/topic-material-create';
 import TopicMaterialsList from '@/components/teacher/topic-materials-list';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import {DeleteTopic} from "@/components/teacher/delete-topic";
 
@@ -94,7 +95,12 @@ export default function TeacherTopicPage({
                             <CardDescription>
                                 {topic.description || 'This topic contains the learning materials and assignments students work through.'}
                             </CardDescription>
-                            <DeleteTopic topic={{topic_id: topic.topic_id, module_id: module.id, name: topic.name}}/>
+                            <div className="flex items-center gap-2">
+                                <Button variant="outline" asChild>
+                                    <Link href={route('teacher.topics.edit', [module.id, topic.topic_id])}>Edit</Link>
+                                </Button>
+                                <DeleteTopic topic={{topic_id: topic.topic_id, module_id: module.id, name: topic.name}}/>
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-3">

@@ -70,6 +70,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::get('/teacher/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
     Route::get('/teacher/modules/{module}', [TeacherContentController::class, 'module'])->name('teacher.modules.show');
     Route::get('/teacher/modules/{module}/edit', [TeacherContentController::class, 'editModule'])->name('teacher.modules.edit');
+    Route::get('/teacher/modules/{module}/topics/{topic}/edit', [TeacherContentController::class, 'editTopic'])->name('teacher.topics.edit');
     Route::get('/teacher/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');
     Route::get('/teacher/modules/{module}/topics/{topic}/materials/{material}', [TeacherContentController::class, 'material'])->name('teacher.materials.show');
     Route::get('/teacher/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
 
     Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
     Route::patch('/modules/{module_id}', [ModulesController::class, 'update'])->name('modules.update');
+    Route::patch('/modules/{module_id}/topics/{topic_id}', [TopicController::class, 'update'])->name('topics.update');
 
     Route::delete('/modules/{module_id}', [ModulesController::class, 'destroy'])->name('modules.destroy');
     Route::delete('/topics/modules/{module_id}/topics/{topic_id}', [TopicController::class, 'destroy'])->name('topics.destroy');

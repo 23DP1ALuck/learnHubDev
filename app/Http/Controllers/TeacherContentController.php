@@ -423,6 +423,61 @@ class TeacherContentController extends Controller
             'moduleTopics' => $data['moduleTopics'],
         ]);
     }
+    public function editTopic(Request $request, int $module, int $topic): Response|RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+
+        $moduleModel = Module::query()
+            ->where('id', $module)
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if (! $moduleModel) {
+            return redirect()->route('teacher.modules')->with('error', 'Module not found.');
+        }
+
+        $topicModel = Topic::query()
+            ->where('module_id', $moduleModel->id)
+            ->where('topic_id', $topic)
+            ->first();
+
+        if (! $topicModel) {
+            return redirect()->route('teacher.modules.show', $moduleModel->id)->with('error', 'Topic not found.');
+        }
+
+        $data = $this->getTopicPageInfo($request, $topicModel);
+
+        return Inertia::render('teacher/edit-topic', [
+            'module' => [
+                'id' => $moduleModel->id,
+                'name' => $moduleModel->name,
+                'description' => $moduleModel->description,
+            ],
+            'topic' => [
+                'topic_id' => $topicModel->topic_id,
+                'module_id' => $topicModel->module_id,
+                'name' => $topicModel->name,
+                'description' => $topicModel->description,
+                'created_at' => $topicModel->created_at,
+            ],
+            'stats' => [
+                'materials' => count($data['materials']),
+                'assignments' => $data['assignmentsSummary']->count(),
+                'module_name' => $moduleModel->name,
+            ],
+        ]);
+    }
     private function getMaterialPageInfo(Material $material): array{
         $files = $material->fileLinks()->with('file')->get();
 

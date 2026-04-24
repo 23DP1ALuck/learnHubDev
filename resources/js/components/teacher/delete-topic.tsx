@@ -17,7 +17,7 @@ export const DeleteTopic = ({topic, onFullWidth}: DeleteTopicProps) => {
     const [open, setOpen] = useState(false)
     return <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-            <Button variant="destructive">Delete</Button>
+            <Button variant="destructive" className={onFullWidth ? 'w-full' : ''}>Delete</Button>
         </DialogTrigger>
         <DialogContent>
             <DialogHeader>
