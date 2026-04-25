@@ -1,14 +1,20 @@
 import AssignmentTaskCreate from '@/components/teacher/assignment-task-create';
 import AssignmentTasksList from '@/components/teacher/assignment-tasks-list';
 import AssignmentTopicsList from '@/components/teacher/assignment-topics-list';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
+import { preview } from '@/routes/teacher/tasks';
 import type { BreadcrumbItem, Flash } from '@/types';
-import {Head, Link, usePage} from '@inertiajs/react';
-import {preview} from "@/routes/teacher/tasks";
-import {Button} from "@/components/ui/button";
+import { Head, Link, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 type AssignmentSummary = {
     id: number;
     title: string;
@@ -17,14 +23,12 @@ type AssignmentSummary = {
     due_date: string | null;
     created_at: string | null;
 };
-
 type AssignmentTopic = {
     module_id: number;
     module_name: string | null;
     topic_id: number;
     topic_name: string | null;
 };
-
 type TaskSummary = {
     assignment_id: number;
     task_id: number;
@@ -34,7 +38,6 @@ type TaskSummary = {
     correct_answers: string[];
     created_at: string | null;
 };
-
 export default function TeacherAssignmentPage({
     assignment,
     topics,
@@ -44,9 +47,9 @@ export default function TeacherAssignmentPage({
     topics: AssignmentTopic[];
     tasks: TaskSummary[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
     const primaryTopic = topics[0];
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
@@ -55,12 +58,22 @@ export default function TeacherAssignmentPage({
         ...(primaryTopic
             ? [
                   {
-                      title: primaryTopic.module_name || `Module ${primaryTopic.module_id}`,
-                      href: route('teacher.modules.show', primaryTopic.module_id),
+                      title:
+                          primaryTopic.module_name ||
+                          `Module ${primaryTopic.module_id}`,
+                      href: route(
+                          'teacher.modules.show',
+                          primaryTopic.module_id,
+                      ),
                   },
                   {
-                      title: primaryTopic.topic_name || `Topic ${primaryTopic.topic_id}`,
-                      href: route('teacher.topics.show', [primaryTopic.module_id, primaryTopic.topic_id]),
+                      title:
+                          primaryTopic.topic_name ||
+                          `Topic ${primaryTopic.topic_id}`,
+                      href: route('teacher.topics.show', [
+                          primaryTopic.module_id,
+                          primaryTopic.topic_id,
+                      ]),
                   },
               ]
             : []),
@@ -69,7 +82,6 @@ export default function TeacherAssignmentPage({
             href: route('teacher.assignments.show', assignment.id),
         },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={assignment.title} />
@@ -86,32 +98,52 @@ export default function TeacherAssignmentPage({
                         <div className="flex flex-col gap-2">
                             <CardTitle>{assignment.title}</CardTitle>
                             <CardDescription>
-                                {assignment.description || 'Add tasks to define the questions or submission requirements for this assignment.'}
+                                {assignment.description ||
+                                    'Add tasks to define the questions or submission requirements for this assignment.'}
                             </CardDescription>
                         </div>
                         <Link
                             href={preview([assignment.id, 1])}
                             className="flex items-center gap-2 self-center font-medium"
                         >
-                            <Button variant="outline">Preview</Button>
+                            <Button variant="outline">
+                                {t('common.Preview')}
+                            </Button>
                         </Link>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Tasks</p>
-                            <p className="mt-1 text-3xl font-semibold">{tasks.length}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Tasks')}
+                            </p>
+                            <p className="mt-1 text-3xl font-semibold">
+                                {tasks.length}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Grading policy</p>
-                            <p className="mt-1 text-sm font-medium">{assignment.grading_policy || 'Not set'}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Grading policy')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {assignment.grading_policy ||
+                                    t('common.Not set')}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Due date</p>
-                            <p className="mt-1 text-sm font-medium">{assignment.due_date || 'Not set'}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Due date')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {assignment.due_date || t('common.Not set')}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Topics</p>
-                            <p className="mt-1 text-sm font-medium">{topics.length}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Topics')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {topics.length}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

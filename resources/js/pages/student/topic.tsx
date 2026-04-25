@@ -1,12 +1,17 @@
 import StudentAssignmentsList from '@/components/student/student-assignments-list';
 import StudentTopicMaterialsList from '@/components/student/student-topic-materials-list';
 import StudentTopicSummaryCard from '@/components/student/student-topic-summary';
-import type { StudentAssignmentSummary, StudentMaterialSummary, StudentModuleSummary, StudentTopicSummary } from '@/components/student/student-types';
+import type {
+    StudentAssignmentSummary,
+    StudentMaterialSummary,
+    StudentModuleSummary,
+    StudentTopicSummary,
+} from '@/components/student/student-types';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 export default function StudentTopicPage({
     module,
     topic,
@@ -18,6 +23,7 @@ export default function StudentTopicPage({
     materials: StudentMaterialSummary[];
     assignments: StudentAssignmentSummary[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -33,7 +39,6 @@ export default function StudentTopicPage({
             href: route('student.topics.show', [module.id, topic.topic_id]),
         },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={topic.name} />
@@ -51,8 +56,10 @@ export default function StudentTopicPage({
                     <StudentTopicMaterialsList materials={materials} />
                     <StudentAssignmentsList
                         assignments={assignments}
-                        title="Assignments"
-                        description="Assignments linked to this topic."
+                        title={t('learning.Assignments')}
+                        description={t(
+                            'student.Assignments linked to this topic.',
+                        )}
                     />
                 </div>
             </div>

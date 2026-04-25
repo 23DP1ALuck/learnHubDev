@@ -1,9 +1,8 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
-import AppLogoIcon from '@/components/app-logo-icon';
+import Logo from '@/components/icons/Logo';
 import { home } from '@/routes';
 import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
-import Logo from "@/components/icons/Logo";
 
 interface AuthLayoutProps {
     name?: string;

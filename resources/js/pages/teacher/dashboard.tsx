@@ -1,3 +1,4 @@
+import { JoinedOrg } from '@/components/shared/joined-org';
 import TeacherDashboardAssignments from '@/components/teacher/teacher-dashboard-assignments';
 import TeacherDashboardModules from '@/components/teacher/teacher-dashboard-modules';
 import TeacherDashboardOverview from '@/components/teacher/teacher-dashboard-overview';
@@ -6,23 +7,27 @@ import type {
     TeacherDashboardModule,
     TeacherDashboardStats,
 } from '@/components/teacher/teacher-dashboard-types';
-import { JoinedOrg } from '@/components/shared/joined-org';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, Flash, SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
         href: dashboard().url,
     },
 ];
-
 const emptyStats: TeacherDashboardStats = {
     modules: 0,
     topics: 0,
@@ -30,7 +35,6 @@ const emptyStats: TeacherDashboardStats = {
     assignments: 0,
     tasks: 0,
 };
-
 export default function TeacherDashboardPage({
     stats = emptyStats,
     recentModules = [],
@@ -40,13 +44,13 @@ export default function TeacherDashboardPage({
     recentModules?: TeacherDashboardModule[];
     upcomingAssignments?: TeacherDashboardAssignment[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
     const { auth } = usePage<SharedData>().props;
     const [open, onOpenChange] = useState<boolean>(flash?.afterLogin ?? false);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Teacher dashboard" />
+            <Head title={t('teacher.Teacher dashboard')} />
 
             {flash?.afterLogin && auth.organizations.length > 1 && (
                 <JoinedOrg
@@ -67,18 +71,25 @@ export default function TeacherDashboardPage({
                 <Card className="border-sidebar-border/70">
                     <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         <div className="space-y-1">
-                            <CardTitle>Teacher dashboard</CardTitle>
+                            <CardTitle>
+                                {t('teacher.Teacher dashboard')}
+                            </CardTitle>
                             <CardDescription>
-                                Overview of modules, topics, materials, assignments, and tasks in the active organization.
+                                {t(
+                                    'teacher.Overview of modules, topics, materials, assignments, and tasks in the active organization.',
+                                )}
                             </CardDescription>
                         </div>
                         <Button asChild>
-                            <Link href={route('teacher.modules')}>Open workspace</Link>
+                            <Link href={route('teacher.modules')}>
+                                {t('common.Open workspace')}
+                            </Link>
                         </Button>
                     </CardHeader>
                     <CardContent className="text-sm text-muted-foreground">
-                        Use this page as the entry point into your teaching workspace. The detail pages still handle the actual
-                        content creation and editing flow.
+                        {t(
+                            'teacher.Use this page as the entry point into your teaching workspace. The detail pages still handle the actual content creation and editing flow.',
+                        )}
                     </CardContent>
                 </Card>
 
@@ -86,7 +97,9 @@ export default function TeacherDashboardPage({
 
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
                     <TeacherDashboardModules modules={recentModules} />
-                    <TeacherDashboardAssignments assignments={upcomingAssignments} />
+                    <TeacherDashboardAssignments
+                        assignments={upcomingAssignments}
+                    />
                 </div>
             </div>
         </AppLayout>

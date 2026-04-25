@@ -7,24 +7,22 @@ import type {
     TeacherMarksModuleOption,
     TeacherMarksStudentOption,
 } from '@/components/teacher/teacher-marks-types';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Marks',
         href: route('teacher.marks'),
     },
 ];
-
 const emptyFilters: TeacherMarksFilterValues = {
     student_id: '',
     module_id: '',
     assignment_id: '',
 };
-
 export default function TeacherMarksPage({
     marks = [],
     filters = emptyFilters,
@@ -38,11 +36,11 @@ export default function TeacherMarksPage({
     modules?: TeacherMarksModuleOption[];
     assignments?: TeacherMarksAssignmentOption[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Teacher marks" />
+            <Head title={t('teacher.Teacher marks')} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 {flash?.success && (
@@ -52,9 +50,13 @@ export default function TeacherMarksPage({
                 )}
 
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">Marks</h1>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        {t('common.Marks')}
+                    </h1>
                     <p className="text-sm text-muted-foreground">
-                        Review submitted work and filter the results by student, module, or assignment.
+                        {t(
+                            'teacher.Review submitted work and filter the results by student, module, or assignment.',
+                        )}
                     </p>
                 </div>
 

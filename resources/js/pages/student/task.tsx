@@ -1,13 +1,17 @@
 import StudentTaskContent from '@/components/student/student-task-content';
 import StudentTaskSidebar from '@/components/student/student-task-sidebar';
-import type { StudentTaskAssignment, StudentTaskNavigationItem, StudentTaskSummary } from '@/components/student/student-types';
+import type {
+    StudentTaskAssignment,
+    StudentTaskNavigationItem,
+    StudentTaskSummary,
+} from '@/components/student/student-types';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { route } from 'ziggy-js';
-
 export default function StudentTaskPage({
     moduleId,
     assignment,
@@ -19,6 +23,7 @@ export default function StudentTaskPage({
     task: StudentTaskSummary;
     taskNavigation: StudentTaskNavigationItem[];
 }) {
+    const { t } = useTranslation();
     console.log(task);
     const { flash } = usePage<Flash>().props;
     const breadcrumbs: BreadcrumbItem[] = [
@@ -36,7 +41,7 @@ export default function StudentTaskPage({
         },
     ];
     useEffect(() => {
-        if(flash?.success) {
+        if (flash?.success) {
             toast.success(flash?.success);
         }
     }, [flash?.success]);
@@ -45,15 +50,26 @@ export default function StudentTaskPage({
             <Head title={`Task #${task.task_id}`} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
-
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">{assignment.title}</h1>
-                    <p className="text-sm text-muted-foreground">Task workspace for the student view.</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        {assignment.title}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        {t('student.Task workspace for the student view.')}
+                    </p>
                 </div>
 
                 <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,22rem)]">
-                    <StudentTaskContent assignmentId={assignment.id} task={task} />
-                    <StudentTaskSidebar assignment={assignment} task={task} taskNavigation={taskNavigation} moduleId={moduleId}/>
+                    <StudentTaskContent
+                        assignmentId={assignment.id}
+                        task={task}
+                    />
+                    <StudentTaskSidebar
+                        assignment={assignment}
+                        task={task}
+                        taskNavigation={taskNavigation}
+                        moduleId={moduleId}
+                    />
                 </div>
             </div>
         </AppLayout>

@@ -1,40 +1,40 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
+import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { edit } from '@/routes/user-password';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
-
-import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/user-password';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Password settings',
         href: edit().url,
     },
 ];
-
 export default function Password() {
+    const { t } = useTranslation();
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Password settings" />
+            <Head title={t('settings.Password settings')} />
 
-            <h1 className="sr-only">Password Settings</h1>
+            <h1 className="sr-only">{t('settings.Password Settings')}</h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall
-                        title="Update password"
-                        description="Ensure your account is using a long, random password to stay secure"
+                        title={t('settings.Update password')}
+                        description={t(
+                            'settings.Ensure your account is using a long, random password to stay secure',
+                        )}
                     />
 
                     <Form
@@ -52,7 +52,6 @@ export default function Password() {
                             if (errors.password) {
                                 passwordInput.current?.focus();
                             }
-
                             if (errors.current_password) {
                                 currentPasswordInput.current?.focus();
                             }
@@ -63,7 +62,7 @@ export default function Password() {
                             <>
                                 <div className="grid gap-2">
                                     <Label htmlFor="current_password">
-                                        Current password
+                                        {t('settings.Current password')}
                                     </Label>
 
                                     <Input
@@ -73,7 +72,9 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="current-password"
-                                        placeholder="Current password"
+                                        placeholder={t(
+                                            'settings.Current password',
+                                        )}
                                     />
 
                                     <InputError
@@ -83,7 +84,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">
-                                        New password
+                                        {t('settings.New password')}
                                     </Label>
 
                                     <Input
@@ -93,7 +94,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="New password"
+                                        placeholder={t('settings.New password')}
                                     />
 
                                     <InputError message={errors.password} />
@@ -101,7 +102,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">
-                                        Confirm password
+                                        {t('settings.Confirm password')}
                                     </Label>
 
                                     <Input
@@ -110,7 +111,9 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="Confirm password"
+                                        placeholder={t(
+                                            'settings.Confirm password',
+                                        )}
                                     />
 
                                     <InputError
@@ -123,7 +126,7 @@ export default function Password() {
                                         disabled={processing}
                                         data-test="update-password-button"
                                     >
-                                        Save password
+                                        {t('settings.Save password')}
                                     </Button>
 
                                     <Transition

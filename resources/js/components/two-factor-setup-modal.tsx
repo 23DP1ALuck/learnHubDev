@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/input-otp';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
+import { useTranslation } from '@/hooks/use-translation';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
@@ -22,33 +23,41 @@ import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from './alert-error';
 import { Spinner } from './ui/spinner';
-
 function GridScanIcon() {
     return (
         <div className="mb-3 rounded-full border border-border bg-card p-0.5 shadow-sm">
             <div className="relative overflow-hidden rounded-full border border-border bg-muted p-2.5">
                 <div className="absolute inset-0 grid grid-cols-5 opacity-50">
-                    {Array.from({ length: 5 }, (_, i) => (
-                        <div
-                            key={`col-${i + 1}`}
-                            className="border-r border-border last:border-r-0"
-                        />
-                    ))}
+                    {Array.from(
+                        {
+                            length: 5,
+                        },
+                        (_, i) => (
+                            <div
+                                key={`col-${i + 1}`}
+                                className="border-r border-border last:border-r-0"
+                            />
+                        ),
+                    )}
                 </div>
                 <div className="absolute inset-0 grid grid-rows-5 opacity-50">
-                    {Array.from({ length: 5 }, (_, i) => (
-                        <div
-                            key={`row-${i + 1}`}
-                            className="border-b border-border last:border-b-0"
-                        />
-                    ))}
+                    {Array.from(
+                        {
+                            length: 5,
+                        },
+                        (_, i) => (
+                            <div
+                                key={`row-${i + 1}`}
+                                className="border-b border-border last:border-b-0"
+                            />
+                        ),
+                    )}
                 </div>
                 <ScanLine className="relative z-20 size-6 text-foreground" />
             </div>
         </div>
     );
 }
-
 function TwoFactorSetupStep({
     qrCodeSvg,
     manualSetupKey,
@@ -62,10 +71,10 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
+    const { t } = useTranslation();
     const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
-
     return (
         <>
             {errors?.length ? (
@@ -104,7 +113,7 @@ function TwoFactorSetupStep({
                     <div className="relative flex w-full items-center justify-center">
                         <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
                         <span className="relative bg-card px-2 py-1">
-                            or, enter the code manually
+                            {t('common.or, enter the code manually')}
                         </span>
                     </div>
 
@@ -137,7 +146,6 @@ function TwoFactorSetupStep({
         </>
     );
 }
-
 function TwoFactorVerificationStep({
     onClose,
     onBack,
@@ -145,15 +153,14 @@ function TwoFactorVerificationStep({
     onClose: () => void;
     onBack: () => void;
 }) {
+    const { t } = useTranslation();
     const [code, setCode] = useState<string>('');
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
         setTimeout(() => {
             pinInputContainerRef.current?.querySelector('input')?.focus();
         }, 0);
     }, []);
-
     return (
         <Form
             {...confirm.form()}
@@ -166,7 +173,11 @@ function TwoFactorVerificationStep({
                 errors,
             }: {
                 processing: boolean;
-                errors?: { confirmTwoFactorAuthentication?: { code?: string } };
+                errors?: {
+                    confirmTwoFactorAuthentication?: {
+                        code?: string;
+                    };
+                };
             }) => (
                 <>
                     <div
@@ -184,7 +195,9 @@ function TwoFactorVerificationStep({
                             >
                                 <InputOTPGroup>
                                     {Array.from(
-                                        { length: OTP_MAX_LENGTH },
+                                        {
+                                            length: OTP_MAX_LENGTH,
+                                        },
                                         (_, index) => (
                                             <InputOTPSlot
                                                 key={index}
@@ -209,7 +222,7 @@ function TwoFactorVerificationStep({
                                 onClick={onBack}
                                 disabled={processing}
                             >
-                                Back
+                                {t('common.Back')}
                             </Button>
                             <Button
                                 type="submit"
@@ -227,7 +240,6 @@ function TwoFactorVerificationStep({
         </Form>
     );
 }
-
 interface TwoFactorSetupModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -239,7 +251,6 @@ interface TwoFactorSetupModalProps {
     fetchSetupData: () => Promise<void>;
     errors: string[];
 }
-
 export default function TwoFactorSetupModal({
     isOpen,
     onClose,
@@ -253,7 +264,6 @@ export default function TwoFactorSetupModal({
 }: TwoFactorSetupModalProps) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
-
     const modalConfig = useMemo<{
         title: string;
         description: string;
@@ -267,7 +277,6 @@ export default function TwoFactorSetupModal({
                 buttonText: 'Close',
             };
         }
-
         if (showVerificationStep) {
             return {
                 title: 'Verify Authentication Code',
@@ -276,7 +285,6 @@ export default function TwoFactorSetupModal({
                 buttonText: 'Continue',
             };
         }
-
         return {
             title: 'Enable Two-Factor Authentication',
             description:
@@ -284,36 +292,29 @@ export default function TwoFactorSetupModal({
             buttonText: 'Continue',
         };
     }, [twoFactorEnabled, showVerificationStep]);
-
     const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {
             setShowVerificationStep(true);
             return;
         }
-
         clearSetupData();
         onClose();
     }, [requiresConfirmation, clearSetupData, onClose]);
-
     const resetModalState = useCallback(() => {
         setShowVerificationStep(false);
-
         if (twoFactorEnabled) {
             clearSetupData();
         }
     }, [twoFactorEnabled, clearSetupData]);
-
     useEffect(() => {
         if (isOpen && !qrCodeSvg) {
             fetchSetupData();
         }
     }, [isOpen, qrCodeSvg, fetchSetupData]);
-
     const handleClose = useCallback(() => {
         resetModalState();
         onClose();
     }, [onClose, resetModalState]);
-
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
             <DialogContent className="sm:max-w-md">

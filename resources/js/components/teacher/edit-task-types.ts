@@ -55,20 +55,31 @@ export function mapTaskOptions(taskOptions: TaskOption[]): ChoiceOption[] {
     }));
 }
 
-export function getInitialCorrectCheckboxOptionIds(task: TaskSummary): number[] {
-    const correctValues = new Set(task.correct_answers.map((answer) => answer.answer));
+export function getInitialCorrectCheckboxOptionIds(
+    task: TaskSummary,
+): number[] {
+    const correctValues = new Set(
+        task.correct_answers.map((answer) => answer.answer),
+    );
 
-    return task.options.filter((option) => correctValues.has(option.option_text)).map((option) => option.option_id);
+    return task.options
+        .filter((option) => correctValues.has(option.option_text))
+        .map((option) => option.option_id);
 }
 
-export function getInitialCorrectSingleOptionId(task: TaskSummary): number | null {
+export function getInitialCorrectSingleOptionId(
+    task: TaskSummary,
+): number | null {
     const firstCorrectAnswer = task.correct_answers[0]?.answer;
 
     if (!firstCorrectAnswer) {
         return null;
     }
 
-    return task.options.find((option) => option.option_text === firstCorrectAnswer)?.option_id ?? null;
+    return (
+        task.options.find((option) => option.option_text === firstCorrectAnswer)
+            ?.option_id ?? null
+    );
 }
 
 export function getInitialTextAnswer(task: TaskSummary): string {

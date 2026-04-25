@@ -6,34 +6,31 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from './alert-error';
-
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];
     fetchRecoveryCodes: () => Promise<void>;
     errors: string[];
 }
-
 export default function TwoFactorRecoveryCodes({
     recoveryCodesList,
     fetchRecoveryCodes,
     errors,
 }: TwoFactorRecoveryCodesProps) {
+    const { t } = useTranslation();
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
-
     const toggleCodesVisibility = useCallback(async () => {
         if (!codesAreVisible && !recoveryCodesList.length) {
             await fetchRecoveryCodes();
         }
-
         setCodesAreVisible(!codesAreVisible);
-
         if (!codesAreVisible) {
             setTimeout(() => {
                 codesSectionRef.current?.scrollIntoView({
@@ -43,25 +40,23 @@ export default function TwoFactorRecoveryCodes({
             });
         }
     }, [codesAreVisible, recoveryCodesList.length, fetchRecoveryCodes]);
-
     useEffect(() => {
         if (!recoveryCodesList.length) {
             fetchRecoveryCodes();
         }
     }, [recoveryCodesList.length, fetchRecoveryCodes]);
-
     const RecoveryCodeIconComponent = codesAreVisible ? EyeOff : Eye;
-
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex gap-3">
-                    <LockKeyhole className="size-4" aria-hidden="true" />
-                    2FA Recovery Codes
+                    <LockKeyhole className="size-4" aria-hidden="true" />{' '}
+                    {t('common.2FA Recovery Codes')}
                 </CardTitle>
                 <CardDescription>
-                    Recovery codes let you regain access if you lose your 2FA
-                    device. Store them in a secure password manager.
+                    {t(
+                        'common.Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.',
+                    )}
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -76,13 +71,16 @@ export default function TwoFactorRecoveryCodes({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        {codesAreVisible ? 'Hide' : 'View'} Recovery Codes
+                        {codesAreVisible ? 'Hide' : 'View'}{' '}
+                        {t('common.Recovery Codes')}
                     </Button>
 
                     {canRegenerateCodes && (
                         <Form
                             {...regenerateRecoveryCodes.form()}
-                            options={{ preserveScroll: true }}
+                            options={{
+                                preserveScroll: true,
+                            }}
                             onSuccess={fetchRecoveryCodes}
                         >
                             {({ processing }) => (
@@ -92,7 +90,7 @@ export default function TwoFactorRecoveryCodes({
                                     disabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
-                                    <RefreshCw /> Regenerate Codes
+                                    <RefreshCw /> {t('common.Regenerate Codes')}
                                 </Button>
                             )}
                         </Form>
@@ -112,7 +110,7 @@ export default function TwoFactorRecoveryCodes({
                                     ref={codesSectionRef}
                                     className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
                                     role="list"
-                                    aria-label="Recovery codes"
+                                    aria-label={t('settings.Recovery codes')}
                                 >
                                     {recoveryCodesList.length ? (
                                         recoveryCodesList.map((code, index) => (
@@ -127,10 +125,14 @@ export default function TwoFactorRecoveryCodes({
                                     ) : (
                                         <div
                                             className="space-y-2"
-                                            aria-label="Loading recovery codes"
+                                            aria-label={t(
+                                                'common.Loading recovery codes',
+                                            )}
                                         >
                                             {Array.from(
-                                                { length: 8 },
+                                                {
+                                                    length: 8,
+                                                },
                                                 (_, index) => (
                                                     <div
                                                         key={index}
@@ -145,11 +147,11 @@ export default function TwoFactorRecoveryCodes({
 
                                 <div className="text-xs text-muted-foreground select-none">
                                     <p id="regenerate-warning">
-                                        Each recovery code can be used once to
-                                        access your account and will be removed
-                                        after use. If you need more, click{' '}
+                                        {t(
+                                            'common.Each recovery code can be used once to access your account and will be removed after use. If you need more, click',
+                                        )}{' '}
                                         <span className="font-bold">
-                                            Regenerate Codes
+                                            {t('common.Regenerate Codes')}
                                         </span>{' '}
                                         above.
                                     </p>

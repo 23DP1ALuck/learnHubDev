@@ -1,12 +1,12 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { configureEcho } from '@laravel/echo-react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Toaster } from 'sonner';
 import { initializeTheme } from './hooks/use-appearance';
-import {Toaster} from "sonner";
-import { configureEcho } from '@laravel/echo-react';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -26,7 +26,7 @@ createInertiaApp({
 
         root.render(
             <StrictMode>
-                <Toaster/>
+                <Toaster />
                 <App {...props} />
             </StrictMode>,
         );

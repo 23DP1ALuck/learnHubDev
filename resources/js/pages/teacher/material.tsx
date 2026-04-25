@@ -1,24 +1,28 @@
 import MaterialContext from '@/components/teacher/material-context';
 import MaterialFilesList from '@/components/teacher/material-files-list';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 type ModuleSummary = {
     id: number;
     name: string;
     description: string | null;
 };
-
 type TopicSummary = {
     topic_id: number;
     module_id: number;
     name: string;
     description: string | null;
 };
-
 type MaterialSummary = {
     material_id: number;
     module_id: number;
@@ -27,7 +31,6 @@ type MaterialSummary = {
     description: string | null;
     created_at: string | null;
 };
-
 type MaterialFileSummary = {
     id: number;
     module_id: number;
@@ -39,7 +42,6 @@ type MaterialFileSummary = {
         file_path: string | null;
     };
 };
-
 export default function TeacherMaterialPage({
     module,
     topic,
@@ -51,8 +53,8 @@ export default function TeacherMaterialPage({
     material: MaterialSummary;
     files: MaterialFileSummary[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
@@ -68,15 +70,18 @@ export default function TeacherMaterialPage({
         },
         {
             title: material.title,
-            href: route('teacher.materials.show', [module.id, topic.topic_id, material.material_id]),
+            href: route('teacher.materials.show', [
+                module.id,
+                topic.topic_id,
+                material.material_id,
+            ]),
         },
     ];
-
     const materialContext: Record<string, number> = {
         module_id: topic.module_id,
         topic_id: topic.topic_id,
         material_id: material.material_id,
-    }
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={material.title} />
@@ -92,31 +97,51 @@ export default function TeacherMaterialPage({
                     <CardHeader>
                         <CardTitle>{material.title}</CardTitle>
                         <CardDescription>
-                            {material.description || 'Use this page to review the material details and the files linked to it.'}
+                            {material.description ||
+                                'Use this page to review the material details and the files linked to it.'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Files</p>
-                            <p className="mt-1 text-3xl font-semibold">{files.length}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Files
+                            </p>
+                            <p className="mt-1 text-3xl font-semibold">
+                                {files.length}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Material ID</p>
-                            <p className="mt-1 text-sm font-medium">#{material.material_id}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('teacher.Material ID')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                #{material.material_id}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Topic</p>
-                            <p className="mt-1 text-sm font-medium">{topic.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Topic')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {topic.name}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Module</p>
-                            <p className="mt-1 text-sm font-medium">{module.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Module')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {module.name}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
 
                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(22rem,1fr)]">
-                    <MaterialFilesList files={files} materialContext={materialContext}/>
+                    <MaterialFilesList
+                        files={files}
+                        materialContext={materialContext}
+                    />
                     <MaterialContext module={module} topic={topic} />
                 </div>
             </div>

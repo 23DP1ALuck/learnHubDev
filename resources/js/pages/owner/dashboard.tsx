@@ -1,26 +1,37 @@
+import { JoinedOrg } from '@/components/shared/joined-org';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
-import { dashboard as ownerDashboard, invitations as ownerInvitations, organization as ownerOrganization, users as ownerUsers } from '@/routes';
+import {
+    dashboard as ownerDashboard,
+    invitations as ownerInvitations,
+    organization as ownerOrganization,
+    users as ownerUsers,
+} from '@/routes';
 import type {
-    BreadcrumbItem, Flash,
+    BreadcrumbItem,
+    Flash,
     Organization,
     OrganizationInvite,
     OrganizationMember,
     OrganizationStats,
-    SharedData
+    SharedData,
 } from '@/types';
-import {Head, Link, usePage} from '@inertiajs/react';
-import {JoinedOrg} from "@/components/shared/joined-org";
-
+import { Head, Link, usePage } from '@inertiajs/react';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organization dashboard',
         href: ownerDashboard().url,
     },
 ];
-
 const statLabels: Record<keyof OrganizationStats, string> = {
     members: 'Members',
     teachers: 'Teachers',
@@ -28,13 +39,14 @@ const statLabels: Record<keyof OrganizationStats, string> = {
     school_groups: 'Groups',
     pending_invites: 'Pending invites',
 };
-
-const inviteStatusTone: Record<OrganizationInvite['status'], 'default' | 'secondary' | 'outline'> = {
+const inviteStatusTone: Record<
+    OrganizationInvite['status'],
+    'default' | 'secondary' | 'outline'
+> = {
     pending: 'default',
     used: 'secondary',
     expired: 'outline',
 };
-
 export default function OwnerDashboard({
     organization,
     stats,
@@ -46,33 +58,50 @@ export default function OwnerDashboard({
     latestMembers: OrganizationMember[];
     latestInvites: OrganizationInvite[];
 }) {
-    const {flash} = usePage<Flash>().props;
-    const {auth} = usePage<SharedData>().props;
-    if(flash?.afterLogin){
+    const { t } = useTranslation();
+    const { flash } = usePage<Flash>().props;
+    const { auth } = usePage<SharedData>().props;
+    if (flash?.afterLogin) {
         console.log(auth.organizations);
     }
     console.log(auth.currentOrganization);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Organization dashboard" />
-            {(flash?.afterLogin && auth.organizations.length > 1) && <JoinedOrg organizations={auth.organizations} showList={true} currentOrganization={auth.currentOrganization}/>}
+            <Head title={t('owner.Organization dashboard')} />
+            {flash?.afterLogin && auth.organizations.length > 1 && (
+                <JoinedOrg
+                    organizations={auth.organizations}
+                    showList={true}
+                    currentOrganization={auth.currentOrganization}
+                />
+            )}
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <Card className="border-sidebar-border/70">
                     <CardHeader>
                         <CardTitle>{organization.organization_name}</CardTitle>
                         <CardDescription>
-                            Owner workspace for your {organization.organization_type === 'school' ? 'school' : 'organization'}.
+                            {t('owner.Owner workspace for your')}{' '}
+                            {organization.organization_type === 'school'
+                                ?  t('owner.'+'For school')
+                                : t('owner.'+'For org')}
+                            .
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-wrap gap-3">
                         <Button asChild>
-                            <Link href={ownerUsers()}>Manage users</Link>
+                            <Link href={ownerUsers()}>
+                                {t('common.Manage users')}
+                            </Link>
                         </Button>
                         <Button asChild variant="outline">
-                            <Link href={ownerInvitations()}>Send invitations</Link>
+                            <Link href={ownerInvitations()}>
+                                {t('owner.Send invitations')}
+                            </Link>
                         </Button>
                         <Button asChild variant="secondary">
-                            <Link href={ownerOrganization()}>View organization</Link>
+                            <Link href={ownerOrganization()}>
+                                {t('owner.View organization')}
+                            </Link>
                         </Button>
                     </CardContent>
                 </Card>
@@ -81,8 +110,12 @@ export default function OwnerDashboard({
                     {Object.entries(stats).map(([key, value]) => (
                         <Card key={key} className="border-sidebar-border/70">
                             <CardHeader className="gap-3">
-                                <CardDescription>{statLabels[key as keyof OrganizationStats]}</CardDescription>
-                                <CardTitle className="text-3xl">{value}</CardTitle>
+                                <CardDescription>
+                                    {statLabels[key as keyof OrganizationStats]}
+                                </CardDescription>
+                                <CardTitle className="text-3xl">
+                                    {value}
+                                </CardTitle>
                             </CardHeader>
                         </Card>
                     ))}
@@ -91,20 +124,35 @@ export default function OwnerDashboard({
                 <div className="grid gap-4 xl:grid-cols-2">
                     <Card className="border-sidebar-border/70">
                         <CardHeader>
-                            <CardTitle>Latest members</CardTitle>
-                            <CardDescription>Recent people added to your organization.</CardDescription>
+                            <CardTitle>{t('owner.Latest members')}</CardTitle>
+                            <CardDescription>
+                                {t(
+                                    'owner.Recent people added to your organization.',
+                                )}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             {latestMembers.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No members yet.</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {t('owner.No members yet.')}
+                                </p>
                             ) : (
                                 latestMembers.map((member) => (
-                                    <div key={member.id} className="flex items-center justify-between rounded-lg border p-3">
+                                    <div
+                                        key={member.id}
+                                        className="flex items-center justify-between rounded-lg border p-3"
+                                    >
                                         <div>
-                                            <p className="font-medium">{member.name}</p>
-                                            <p className="text-sm text-muted-foreground">{member.email}</p>
+                                            <p className="font-medium">
+                                                {member.name}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {member.email}
+                                            </p>
                                         </div>
-                                        <Badge variant="secondary">{member.role_in_org}</Badge>
+                                        <Badge variant="secondary">
+                                            {member.role_in_org}
+                                        </Badge>
                                     </div>
                                 ))
                             )}
@@ -113,22 +161,46 @@ export default function OwnerDashboard({
 
                     <Card className="border-sidebar-border/70">
                         <CardHeader>
-                            <CardTitle>Recent invitations</CardTitle>
-                            <CardDescription>Track whether teacher and student invites were accepted.</CardDescription>
+                            <CardTitle>
+                                {t('owner.Recent invitations')}
+                            </CardTitle>
+                            <CardDescription>
+                                {t(
+                                    'owner.Track whether teacher and student invites were accepted.',
+                                )}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-3">
                             {latestInvites.length === 0 ? (
-                                <p className="text-sm text-muted-foreground">No invitations sent yet.</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {t('owner.No invitations sent yet.')}
+                                </p>
                             ) : (
                                 latestInvites.map((invite) => (
-                                    <div key={invite.id} className="flex items-center justify-between rounded-lg border p-3">
+                                    <div
+                                        key={invite.id}
+                                        className="flex items-center justify-between rounded-lg border p-3"
+                                    >
                                         <div>
                                             <p className="font-medium">
-                                                {[invite.first_name, invite.last_name].filter(Boolean).join(' ') || invite.email}
+                                                {[
+                                                    invite.first_name,
+                                                    invite.last_name,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(' ') || invite.email}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">{invite.email}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {invite.email}
+                                            </p>
                                         </div>
-                                        <Badge variant={inviteStatusTone[invite.status]}>{invite.status}</Badge>
+                                        <Badge
+                                            variant={
+                                                inviteStatusTone[invite.status]
+                                            }
+                                        >
+                                            {invite.status}
+                                        </Badge>
                                     </div>
                                 ))
                             )}

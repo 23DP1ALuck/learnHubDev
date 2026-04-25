@@ -1,5 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 type EditModuleOverviewProps = {
     module: {
         id: number;
@@ -15,36 +21,57 @@ type EditModuleOverviewProps = {
         topic_assignments: number;
     };
 };
-
-export default function EditModuleOverview({ module, stats }: EditModuleOverviewProps) {
+export default function EditModuleOverview({
+    module,
+    stats,
+}: EditModuleOverviewProps) {
+    const { t } = useTranslation();
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>
-                <CardTitle>Edit module</CardTitle>
+                <CardTitle>{t('learning.Edit module')}</CardTitle>
                 <CardDescription>
-                    Update the core details of this module without changing its topics, materials, or assignments.
+                    {t(
+                        'teacher.Update the core details of this module without changing its topics, materials, or assignments.',
+                    )}
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-5">
                 <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Topics</p>
-                    <p className="mt-1 text-3xl font-semibold">{stats.topics}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {t('learning.Topics')}
+                    </p>
+                    <p className="mt-1 text-3xl font-semibold">
+                        {stats.topics}
+                    </p>
                 </div>
                 <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Materials</p>
-                    <p className="mt-1 text-3xl font-semibold">{stats.materials}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {t('learning.Materials')}
+                    </p>
+                    <p className="mt-1 text-3xl font-semibold">
+                        {stats.materials}
+                    </p>
                 </div>
                 <div className="rounded-lg border p-4">
-                    <p className="text-sm text-muted-foreground">Assignments</p>
-                    <p className="mt-1 text-3xl font-semibold">{stats.topic_assignments}</p>
+                    <p className="text-sm text-muted-foreground">
+                        {t('learning.Assignments')}
+                    </p>
+                    <p className="mt-1 text-3xl font-semibold">
+                        {stats.topic_assignments}
+                    </p>
                 </div>
                 <div className="rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">Start</p>
-                    <p className="mt-1 text-sm font-medium">{module.start_date || 'Not set'}</p>
+                    <p className="mt-1 text-sm font-medium">
+                        {module.start_date || t('common.Not set')}
+                    </p>
                 </div>
                 <div className="rounded-lg border p-4">
                     <p className="text-sm text-muted-foreground">End</p>
-                    <p className="mt-1 text-sm font-medium">{module.end_date || 'Not set'}</p>
+                    <p className="mt-1 text-sm font-medium">
+                        {module.end_date || t('common.Not set')}
+                    </p>
                 </div>
             </CardContent>
         </Card>

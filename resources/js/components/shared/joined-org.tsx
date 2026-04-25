@@ -1,4 +1,5 @@
-
+import { setActiveOrganization } from '@/actions/App/Http/Controllers/SessionController';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -8,57 +9,80 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import {Button} from "@/components/ui/button";
-import {Organization} from "@/types";
-import {Form} from "@inertiajs/react";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import {Label} from "@/components/ui/label";
-import {setActiveOrganization} from "@/actions/App/Http/Controllers/SessionController";
-
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useTranslation } from '@/hooks/use-translation';
+import { Organization } from '@/types';
+import { Form } from '@inertiajs/react';
 type JoinedOrgProps = {
     organizations: Organization[];
     showList?: boolean;
     onOpenChange?: (open: boolean) => void;
     currentOrganization?: Organization | null | undefined;
 };
-export const JoinedOrg = ({organizations, showList, onOpenChange, currentOrganization} : JoinedOrgProps) => {
-    return <Dialog open={showList} onOpenChange={onOpenChange}>
+export const JoinedOrg = ({
+    organizations,
+    showList,
+    onOpenChange,
+    currentOrganization,
+}: JoinedOrgProps) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={showList} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>Organizations</DialogTitle>
+                    <DialogTitle>{t('owner.Organizations')}</DialogTitle>
                     <DialogDescription>
-                        Select an organization to continue your learning.
+                        {t(
+                            'common.Select an organization to continue your learning.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
                 <div>
-                    <Form className="mt-2 space-y-3" id="active-org-form" action={setActiveOrganization()} onSuccess={() => onOpenChange?.(false)}>
-                        <RadioGroup name="currentOrganization" defaultValue={currentOrganization?.id.toString()}>
-                        {organizations.length > 1 && (
-                            organizations.map((org) => (
-                                <div
-                                    key={org.id}
-                                    className="flex justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
-                                >
-                                {/*<RadioGroupItem value={org.id.toString()}/>*/}
-                                {/*    <Label className="text-sm font-medium text-gray-900" htmlFor={org.id.toString()}>{org.organization_name}</Label>*/}
-                                    <div className="flex items-center gap-3 w-full">
-                                        <RadioGroupItem value={org.id.toString()} id={org.id.toString()}/>
-                                        <Label htmlFor={org.id.toString()} className="w-full cursor-pointer">{org.organization_name}</Label>
+                    <Form
+                        className="mt-2 space-y-3"
+                        id="active-org-form"
+                        action={setActiveOrganization()}
+                        onSuccess={() => onOpenChange?.(false)}
+                    >
+                        <RadioGroup
+                            name="currentOrganization"
+                            defaultValue={currentOrganization?.id.toString()}
+                        >
+                            {organizations.length > 1 &&
+                                organizations.map((org) => (
+                                    <div
+                                        key={org.id}
+                                        className="flex justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3"
+                                    >
+                                        {/*<RadioGroupItem value={org.id.toString()}/>*/}
+                                        {/*    <Label className="text-sm font-medium text-gray-900" htmlFor={org.id.toString()}>{org.organization_name}</Label>*/}
+                                        <div className="flex w-full items-center gap-3">
+                                            <RadioGroupItem
+                                                value={org.id.toString()}
+                                                id={org.id.toString()}
+                                            />
+                                            <Label
+                                                htmlFor={org.id.toString()}
+                                                className="w-full cursor-pointer"
+                                            >
+                                                {org.organization_name}
+                                            </Label>
+                                        </div>
                                     </div>
-                                </div>
-                            ))
-                        )}
+                                ))}
                         </RadioGroup>
                     </Form>
-
                 </div>
                 <DialogFooter>
-                    <Button type="submit" form="active-org-form">Save changes</Button>
+                    <Button type="submit" form="active-org-form">
+                        {t('common.Save changes')}
+                    </Button>
                     <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
+                        <Button variant="outline">{t('common.Cancel')}</Button>
                     </DialogClose>
-
                 </DialogFooter>
             </DialogContent>
-    </Dialog>
-}
+        </Dialog>
+    );
+};

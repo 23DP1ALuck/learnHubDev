@@ -1,19 +1,30 @@
-import type { NavItem } from '@/types';
-import { dashboard, onboardingRequests, organizations } from '@/routes';
-import { edit as editProfile } from '@/routes/profile';
 import {
+    dashboard,
+    onboardingRequests,
+    organizations,
     dashboard as ownerDashboard,
     invitations as ownerInvitations,
     organization as ownerOrganization,
     users as ownerUsers,
 } from '@/routes';
-import { BookOpen, Building, Calendar, FileText, LayoutGrid, MessageSquare, Settings, Users } from 'lucide-react';
+import { chats } from '@/routes/';
+import { edit as editProfile } from '@/routes/profile';
 import {
-    modules as teacherModules,
     marks as teacherMarks,
+    modules as teacherModules,
 } from '@/routes/teacher';
+import type { NavItem } from '@/types';
+import {
+    BookOpen,
+    Building,
+    Calendar,
+    FileText,
+    LayoutGrid,
+    MessageSquare,
+    Settings,
+    Users,
+} from 'lucide-react';
 import { route } from 'ziggy-js';
-import {chats} from '@/routes/';
 
 export const userNavItems: NavItem[] = [
     {

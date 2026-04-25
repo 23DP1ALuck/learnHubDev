@@ -1,11 +1,11 @@
-import AuthLayout from "@/layouts/auth-layout";
-import {Form, Head} from "@inertiajs/react";
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import InputError from "@/components/input-error";
-import {Button} from "@/components/ui/button";
-import {Spinner} from "@/components/ui/spinner";
-
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { useTranslation } from '@/hooks/use-translation';
+import AuthLayout from '@/layouts/auth-layout';
+import { Form, Head } from '@inertiajs/react';
 type InviteDetails = {
     invitation_type: 'join_org' | 'onboarding_request';
     recipient_name?: string | null;
@@ -13,22 +13,32 @@ type InviteDetails = {
     organization_name?: string | null;
     role_in_org?: string | null;
     requires_password: boolean;
-}
-
-export default function Join({token, invite}: {token: string; invite: InviteDetails}){
+};
+export default function Join({
+    token,
+    invite,
+}: {
+    token: string;
+    invite: InviteDetails;
+}) {
+    const { t } = useTranslation();
     return (
         <AuthLayout
-            title={invite.requires_password ? "Create password" : "Accept invitation"}
+            title={
+                invite.requires_password
+                    ? 'Create password'
+                    : t('auth_ui.Accept invitation')
+            }
             description={
                 invite.requires_password
-                    ? "Set your password to activate this invitation."
-                    : "This email already has an account. Accept the invitation to join the organization."
+                    ? 'Set your password to activate this invitation.'
+                    : 'This email already has an account. Accept the invitation to join the organization.'
             }
         >
-            <Head title="Accept invitation" />
+            <Head title={t('auth_ui.Accept invitation')} />
 
             <Form
-                method='post'
+                method="post"
                 action={`/join/${encodeURIComponent(token)}`}
                 resetOnSuccess={['password', 'password_confirmation']}
             >
@@ -36,7 +46,8 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                     <div className="grid gap-6">
                         <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm">
                             <p className="font-medium text-foreground">
-                                {invite.organization_name ?? 'LearnHub invitation'}
+                                {invite.organization_name ??
+                                    'LearnHub invitation'}
                             </p>
                             <p className="mt-1 text-muted-foreground">
                                 {invite.recipient_name ?? 'Invited user'}
@@ -44,7 +55,12 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                             </p>
                             {invite.role_in_org && (
                                 <p className="mt-2 text-muted-foreground">
-                                    Role: {invite.role_in_org === 'TEACHER' ? 'Teacher' : invite.role_in_org === 'STUDENT' ? 'Student' : invite.role_in_org}
+                                    Role:{' '}
+                                    {invite.role_in_org === 'TEACHER'
+                                        ? t('common.Teacher')
+                                        : invite.role_in_org === 'STUDENT'
+                                          ? t('common.Student')
+                                          : invite.role_in_org}
                                 </p>
                             )}
                         </div>
@@ -52,7 +68,9 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                         {invite.requires_password && (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">Password</Label>
+                                    <Label htmlFor="password">
+                                        {t('settings.Password')}
+                                    </Label>
                                     <Input
                                         id="password"
                                         type="password"
@@ -60,13 +78,13 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                                         autoComplete="new-password"
                                         className="mt-1 block w-full"
                                         autoFocus
-                                        placeholder="Password"
+                                        placeholder={t('settings.Password')}
                                     />
                                     <InputError message={errors.password} />
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">
-                                        Confirm password
+                                        {t('settings.Confirm password')}
                                     </Label>
                                     <Input
                                         id="password_confirmation"
@@ -74,7 +92,9 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                                         name="password_confirmation"
                                         autoComplete="new-password"
                                         className="mt-1 block w-full"
-                                        placeholder="Confirm password"
+                                        placeholder={t(
+                                            'settings.Confirm password',
+                                        )}
                                     />
                                     <InputError
                                         message={errors.password_confirmation}
@@ -91,7 +111,9 @@ export default function Join({token, invite}: {token: string; invite: InviteDeta
                             data-test="reset-password-button"
                         >
                             {processing && <Spinner />}
-                            {invite.requires_password ? 'Set password and join' : 'Accept invitation'}
+                            {invite.requires_password
+                                ? 'Set password and join'
+                                : t('auth_ui.Accept invitation')}
                         </Button>
                     </div>
                 )}

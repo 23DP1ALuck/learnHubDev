@@ -12,34 +12,42 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import { type PropsWithChildren, useState } from 'react';
-
 export default function OnboardingRequestDialog({
     children,
 }: PropsWithChildren) {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [formKey, setFormKey] = useState(0);
-    const [organizationType, setOrganizationType] = useState<string>("");
-
+    const [organizationType, setOrganizationType] = useState<string>('');
     function handleOpenChange(nextOpen: boolean) {
         setOpen(nextOpen);
-
         if (!nextOpen) {
             setFormKey((current) => current + 1);
         }
     }
-
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>{children}</DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle className="text-black/60">Pieprasīt piekļuvi</DialogTitle>
+                    <DialogTitle className="text-black/60">
+                        {t('landing.Pieprasīt piekļuvi')}
+                    </DialogTitle>
                     <DialogDescription>
-                        Aizpildiet veidlapu, un mēs ar jums sazināsimies.
+                        {t(
+                            'landing.Aizpildiet veidlapu, un mēs ar jums sazināsimies.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
                 <Form
@@ -54,8 +62,11 @@ export default function OnboardingRequestDialog({
                         <>
                             <div className="grid gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="first_name" className="text-black/70">
-                                        Vārds
+                                    <Label
+                                        htmlFor="first_name"
+                                        className="text-black/70"
+                                    >
+                                        {t('landing.Vārds')}
                                     </Label>
                                     <Input
                                         id="first_name"
@@ -63,14 +74,17 @@ export default function OnboardingRequestDialog({
                                         type="text"
                                         required
                                         autoComplete="name"
-                                        placeholder="Vārds"
+                                        placeholder={t('landing.Vārds')}
                                         className="text-gray-700"
                                     />
                                     <InputError message={errors.first_name} />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="last_name" className="text-black/70">
-                                        Uzvārds
+                                    <Label
+                                        htmlFor="last_name"
+                                        className="text-black/70"
+                                    >
+                                        {t('landing.Uzvārds')}
                                     </Label>
                                     <Input
                                         id="last_name"
@@ -78,15 +92,18 @@ export default function OnboardingRequestDialog({
                                         type="text"
                                         required
                                         autoComplete="name"
-                                        placeholder="Uzvārds"
+                                        placeholder={t('landing.Uzvārds')}
                                         className="text-gray-700"
                                     />
                                     <InputError message={errors.last_name} />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="onboarding_email" className="text-black/70">
-                                        E-pasts
+                                    <Label
+                                        htmlFor="onboarding_email"
+                                        className="text-black/70"
+                                    >
+                                        {t('landing.E-pasts')}
                                     </Label>
                                     <Input
                                         id="onboarding_email"
@@ -101,8 +118,11 @@ export default function OnboardingRequestDialog({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="onboarding_organization_type" className="text-black/70">
-                                        Organizācijas tips
+                                    <Label
+                                        htmlFor="onboarding_organization_type"
+                                        className="text-black/70"
+                                    >
+                                        {t('landing.Organizācijas tips')}
                                     </Label>
                                     <input
                                         type="hidden"
@@ -114,13 +134,24 @@ export default function OnboardingRequestDialog({
                                         value={organizationType}
                                         onValueChange={setOrganizationType}
                                     >
-                                        <SelectTrigger id="onboarding_organization_type" className="text-black/70">
-                                            <SelectValue placeholder="Izvelēties…" />
+                                        <SelectTrigger
+                                            id="onboarding_organization_type"
+                                            className="text-black/70"
+                                        >
+                                            <SelectValue
+                                                placeholder={t(
+                                                    'landing.Izvelēties…',
+                                                )}
+                                            />
                                         </SelectTrigger>
 
                                         <SelectContent>
-                                            <SelectItem value="individual">Kursa veidotājs</SelectItem>
-                                            <SelectItem value="school">Skola</SelectItem>
+                                            <SelectItem value="individual">
+                                                {t('landing.Kursa veidotājs')}
+                                            </SelectItem>
+                                            <SelectItem value="school">
+                                                {t('landing.Skola')}
+                                            </SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <InputError
@@ -129,16 +160,26 @@ export default function OnboardingRequestDialog({
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="onboarding_organization_name" className="text-black/70">
-                                        {organizationType === "individual" ? "Kursa nosaukums" : "Organizācijas nosaukums"}
+                                    <Label
+                                        htmlFor="onboarding_organization_name"
+                                        className="text-black/70"
+                                    >
+                                        {organizationType === 'individual'
+                                            ? t('landing.Kursa nosaukums')
+                                            : t(
+                                                  'landing.Organizācijas nosaukums',
+                                              )}
                                     </Label>
                                     <Input
                                         id="onboarding_organization_name"
                                         name="organization_name"
                                         type="text"
                                         required
-                                        placeholder=
-                                            {organizationType === "individual" ? "Jūsu kurss" : "Jūsu organizācija"}
+                                        placeholder={
+                                            organizationType === 'individual'
+                                                ? t('landing.Jūsu kurss')
+                                                : t('landing.Jūsu organizācija')
+                                        }
                                         className="text-gray-700"
                                     />
                                     <InputError
@@ -154,13 +195,13 @@ export default function OnboardingRequestDialog({
                                         variant="secondary"
                                         onClick={() => resetAndClearErrors()}
                                     >
-                                        Cancel
+                                        {t('common.Cancel')}
                                     </Button>
                                 </DialogClose>
 
                                 <Button type="submit" disabled={processing}>
                                     {processing && <Spinner />}
-                                    Submit
+                                    {t('common.Submit')}
                                 </Button>
                             </DialogFooter>
                         </>
@@ -170,4 +211,3 @@ export default function OnboardingRequestDialog({
         </Dialog>
     );
 }
-

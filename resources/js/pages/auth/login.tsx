@@ -5,38 +5,37 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { useTranslation } from '@/hooks/use-translation';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import {Form, Head, usePage} from '@inertiajs/react';
-import {Flash} from "@/types";
-import {useEffect} from "react";
-import {toast} from "sonner";
-
+import { Flash } from '@/types';
+import { Form, Head, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
 }
-
-export default function Login({
-    status,
-    canResetPassword,
-}: LoginProps) {
-    const {flash} = usePage<Flash>().props;
+export default function Login({ status, canResetPassword }: LoginProps) {
+    const { t } = useTranslation();
+    const { flash } = usePage<Flash>().props;
     useEffect(() => {
-        if(flash?.error){
-            toast.error(flash.error)
+        if (flash?.error) {
+            toast.error(flash.error);
         }
-        if(flash?.success){
-            toast.success(flash.success)
+        if (flash?.success) {
+            toast.success(flash.success);
         }
-    },[flash?.success, flash?.error])
+    }, [flash?.success, flash?.error]);
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title={t('auth_ui.Log in to your account')}
+            description={t(
+                'settings.Enter your email and password below to log in',
+            )}
         >
-            <Head title="Log in" />
+            <Head title={t('auth_ui.Log in')} />
 
             <Form
                 {...store.form()}
@@ -47,8 +46,11 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="grid gap-2">
-                                <Label htmlFor="email" className="text-muted-foreground">
-                                    Email address
+                                <Label
+                                    htmlFor="email"
+                                    className="text-muted-foreground"
+                                >
+                                    {t('auth_ui.Email address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -65,8 +67,11 @@ export default function Login({
 
                             <div className="grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password" className="text-muted-foreground">
-                                        Password
+                                    <Label
+                                        htmlFor="password"
+                                        className="text-muted-foreground"
+                                    >
+                                        {t('settings.Password')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
@@ -74,7 +79,7 @@ export default function Login({
                                             className="ml-auto text-sm text-muted-foreground hover:text-foreground"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            {t('settings.Forgot password?')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -85,7 +90,7 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder={t('settings.Password')}
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -96,8 +101,11 @@ export default function Login({
                                     name="remember"
                                     tabIndex={3}
                                 />
-                                <Label htmlFor="remember" className="text-muted-foreground">
-                                    Remember me
+                                <Label
+                                    htmlFor="remember"
+                                    className="text-muted-foreground"
+                                >
+                                    {t('auth_ui.Remember me')}
                                 </Label>
                             </div>
 
@@ -109,7 +117,7 @@ export default function Login({
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
-                                Log in
+                                {t('auth_ui.Log in')}
                             </Button>
                         </div>
                     </>

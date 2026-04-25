@@ -1,9 +1,10 @@
-import Building from '@/components/icons/Building'
-import Envelope from '@/components/icons/Envelope'
-import Phone from '@/components/icons/Phone'
-import {Container} from "@/components/ui/container";
-
+import Building from '@/components/icons/Building';
+import Envelope from '@/components/icons/Envelope';
+import Phone from '@/components/icons/Phone';
+import { Container } from '@/components/ui/container';
+import { useTranslation } from '@/hooks/use-translation';
 export const Contacts = () => {
+    const { t } = useTranslation();
     return (
         <Container>
             <div className="relative isolate bg-white" id="contacts">
@@ -24,14 +25,34 @@ export const Contacts = () => {
                                             height={200}
                                             patternUnits="userSpaceOnUse"
                                         >
-                                            <path d="M130 200V.5M.5 .5H200" fill="none" />
+                                            <path
+                                                d="M130 200V.5M.5 .5H200"
+                                                fill="none"
+                                            />
                                         </pattern>
                                     </defs>
-                                    <rect width="100%" height="100%" strokeWidth={0} className="fill-white" />
-                                    <svg x="100%" y={-1} className="overflow-visible fill-gray-50">
-                                        <path d="M-470.5 0h201v201h-201Z" strokeWidth={0} />
+                                    <rect
+                                        width="100%"
+                                        height="100%"
+                                        strokeWidth={0}
+                                        className="fill-white"
+                                    />
+                                    <svg
+                                        x="100%"
+                                        y={-1}
+                                        className="overflow-visible fill-gray-50"
+                                    >
+                                        <path
+                                            d="M-470.5 0h201v201h-201Z"
+                                            strokeWidth={0}
+                                        />
                                     </svg>
-                                    <rect fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" width="100%" height="100%" strokeWidth={0} />
+                                    <rect
+                                        fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)"
+                                        width="100%"
+                                        height="100%"
+                                        strokeWidth={0}
+                                    />
                                 </svg>
                                 <div
                                     aria-hidden="true"
@@ -47,41 +68,61 @@ export const Contacts = () => {
                                 </div>
                             </div>
                             <h2 className="text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">
-                                Sazinies ar mums
+                                {t('landing.Sazinies ar mums')}
                             </h2>
                             <p className="mt-6 text-lg/8 text-gray-600">
-                                Ja tev ir jautājumi par LearnHub vai vēlies uzzināt vairāk par iespējām skolām un kursiem — uzraksti mums. Atbildēsim pēc iespējas ātrāk.
+                                {t(
+                                    'landing.Ja tev ir jautājumi par LearnHub vai vēlies uzzināt vairāk par iespējām skolām un kursiem — uzraksti mums. Atbildēsim pēc iespējas ātrāk.',
+                                )}
                             </p>
                             <dl className="mt-10 space-y-4 text-base/7 text-gray-600">
                                 <div className="flex gap-x-4">
                                     <dt className="flex-none">
                                         <span className="sr-only">Address</span>
-                                        <Building aria-hidden="true" className="h-7 w-6 text-gray-400" />
+                                        <Building
+                                            aria-hidden="true"
+                                            className="h-7 w-6 text-gray-400"
+                                        />
                                     </dt>
                                     <dd>
-                                        Zeiferta iela 20
-                                        <br />
-                                        Olaine, LV-2114
+                                        {t('landing.Zeiferta iela 20')} <br />{' '}
+                                        {t('landing.Olaine, LV-2114')}
                                     </dd>
                                 </div>
                                 <div className="flex gap-x-4">
                                     <dt className="flex-none">
-                                        <span className="sr-only">Telephone</span>
-                                        <Phone aria-hidden="true" className="h-7 w-6 text-gray-400" />
+                                        <span className="sr-only">
+                                            Telephone
+                                        </span>
+                                        <Phone
+                                            aria-hidden="true"
+                                            className="h-7 w-6 text-gray-400"
+                                        />
                                     </dt>
                                     <dd>
-                                        <a href="tel:+37122233344" className="hover:text-gray-900">
+                                        <a
+                                            href="tel:+37122233344"
+                                            className="hover:text-gray-900"
+                                        >
                                             +371 22233344
                                         </a>
                                     </dd>
                                 </div>
-                                <div className="flex gap-x-4 items-center">
+                                <div className="flex items-center gap-x-4">
                                     <dt className="flex-none">
-                                        <span className="sr-only">Email</span>
-                                        <Envelope aria-hidden="true" className="h-7 w-6 text-gray-400" />
+                                        <span className="sr-only">
+                                            {t('common.Email')}
+                                        </span>
+                                        <Envelope
+                                            aria-hidden="true"
+                                            className="h-7 w-6 text-gray-400"
+                                        />
                                     </dt>
                                     <dd>
-                                        <a href="mailto:help@learnhub.com" className="hover:text-gray-900">
+                                        <a
+                                            href="mailto:help@learnhub.com"
+                                            className="hover:text-gray-900"
+                                        >
                                             help@learnhub.com
                                         </a>
                                     </dd>
@@ -89,12 +130,19 @@ export const Contacts = () => {
                             </dl>
                         </div>
                     </div>
-                    <form action="#" method="POST" className="px-6 pt-20 pb-24 sm:pb-32 lg:px-8 lg:py-48">
+                    <form
+                        action="#"
+                        method="POST"
+                        className="px-6 pt-20 pb-24 sm:pb-32 lg:px-8 lg:py-48"
+                    >
                         <div className="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
                             <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
                                 <div>
-                                    <label htmlFor="first-name" className="block text-sm/6 font-semibold text-gray-900">
-                                        Vārds
+                                    <label
+                                        htmlFor="first-name"
+                                        className="block text-sm/6 font-semibold text-gray-900"
+                                    >
+                                        {t('landing.Vārds')}
                                     </label>
                                     <div className="mt-2.5">
                                         <input
@@ -107,8 +155,11 @@ export const Contacts = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
-                                        Uzvārds
+                                    <label
+                                        htmlFor="last-name"
+                                        className="block text-sm/6 font-semibold text-gray-900"
+                                    >
+                                        {t('landing.Uzvārds')}
                                     </label>
                                     <div className="mt-2.5">
                                         <input
@@ -121,8 +172,11 @@ export const Contacts = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label htmlFor="email" className="block text-sm/6 font-semibold text-gray-900">
-                                        E-pasts
+                                    <label
+                                        htmlFor="email"
+                                        className="block text-sm/6 font-semibold text-gray-900"
+                                    >
+                                        {t('landing.E-pasts')}
                                     </label>
                                     <div className="mt-2.5">
                                         <input
@@ -135,8 +189,11 @@ export const Contacts = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label htmlFor="phone-number" className="block text-sm/6 font-semibold text-gray-900">
-                                        Telefona numurs
+                                    <label
+                                        htmlFor="phone-number"
+                                        className="block text-sm/6 font-semibold text-gray-900"
+                                    >
+                                        {t('landing.Telefona numurs')}
                                     </label>
                                     <div className="mt-2.5">
                                         <input
@@ -149,17 +206,20 @@ export const Contacts = () => {
                                     </div>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <label htmlFor="message" className="block text-sm/6 font-semibold text-gray-900">
-                                        Jautājums
+                                    <label
+                                        htmlFor="message"
+                                        className="block text-sm/6 font-semibold text-gray-900"
+                                    >
+                                        {t('landing.Jautājums')}
                                     </label>
                                     <div className="mt-2.5">
-                  <textarea
-                      id="message"
-                      name="message"
-                      rows={4}
-                      className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
-                      defaultValue={''}
-                  />
+                                        <textarea
+                                            id="message"
+                                            name="message"
+                                            rows={4}
+                                            className="block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                                            defaultValue={''}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +228,7 @@ export const Contacts = () => {
                                     type="submit"
                                     className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                                 >
-                                    Sūtīt ziņojumu
+                                    {t('landing.Sūtīt ziņojumu')}
                                 </button>
                             </div>
                         </div>
@@ -176,6 +236,5 @@ export const Contacts = () => {
                 </div>
             </div>
         </Container>
-
-    )
-}
+    );
+};

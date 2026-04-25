@@ -36,6 +36,8 @@ export interface SharedData {
     org: Organization | null;
     sidebarOpen: boolean;
     chatUnreadCount?: number;
+    locale: 'lv' | 'en' | 'ru';
+    translations: Record<string, Record<string, string>>;
     [key: string]: unknown;
 }
 export interface Session {
@@ -53,7 +55,7 @@ export type Organization = {
         role_in_org: OrganizationRole;
         admin_privileges: boolean;
     };
-}
+};
 export type Flash = {
     flash?: {
         success?: string;
@@ -61,7 +63,7 @@ export type Flash = {
         error?: string;
         afterLogin?: boolean;
     };
-}
+};
 
 export interface User {
     id: number;
@@ -84,7 +86,7 @@ export type OrganizationMember = {
     admin_privileges: boolean;
     joined_on: string | null;
     created_at: string;
-}
+};
 export type OrganizationInvite = {
     id: number;
     first_name: string | null;
@@ -96,14 +98,14 @@ export type OrganizationInvite = {
     used_at: string | null;
     status: 'pending' | 'used' | 'expired';
     inviter_name: string | null;
-}
+};
 export type OrganizationStats = {
     members: number;
     teachers: number;
     students: number;
     school_groups: number;
     pending_invites: number;
-}
+};
 export type OrganizationGroup = {
     school_id: number;
     group_id: number;
@@ -112,7 +114,7 @@ export type OrganizationGroup = {
     teachers_count: number;
     modules_count: number;
     created_at: string | null;
-}
+};
 export type OrganizationModule = {
     id: number;
     name: string;
@@ -123,7 +125,7 @@ export type OrganizationModule = {
     start_date: string | null;
     end_date: string | null;
     creator_id: number;
-}
+};
 export type OnboardingRequest = {
     id: number;
     created_at: Date;
@@ -134,21 +136,25 @@ export type OnboardingRequest = {
     organization_name: string;
     organization_type: 'individual' | 'school';
     status: 'pending' | 'approved' | 'rejected';
-}
+};
 export interface PaginatedData {
-    current_page: number,
-    last_page: number,
-    total: number,
-    next_page_url?: string,
-    prev_page_url?: string,
-    links: [
-        { active: boolean, url?: string, label: string, page?: number }
-    ]
+    current_page: number;
+    last_page: number;
+    total: number;
+    next_page_url?: string;
+    prev_page_url?: string;
+    links: [{ active: boolean; url?: string; label: string; page?: number }];
 }
-export type TaskType = 'CHECKBOX' | 'TEXT' | 'FILE' | 'TRUE_FALSE' | 'NUMBER' | 'CUSTOM_SELECT';
+export type TaskType =
+    | 'CHECKBOX'
+    | 'TEXT'
+    | 'FILE'
+    | 'TRUE_FALSE'
+    | 'NUMBER'
+    | 'CUSTOM_SELECT';
 export type TaskOption = {
     assignment_id: number;
     task_id: number;
     option_id: number;
     option_text: string;
-}
+};

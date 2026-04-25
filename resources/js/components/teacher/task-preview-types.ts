@@ -1,4 +1,10 @@
-export type TaskType = 'CHECKBOX' | 'TEXT' | 'FILE' | 'TRUE_FALSE' | 'NUMBER' | 'CUSTOM_SELECT';
+export type TaskType =
+    | 'CHECKBOX'
+    | 'TEXT'
+    | 'FILE'
+    | 'TRUE_FALSE'
+    | 'NUMBER'
+    | 'CUSTOM_SELECT';
 
 export type AssignmentPreview = {
     id: number;

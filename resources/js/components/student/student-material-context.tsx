@@ -1,20 +1,36 @@
-import type { StudentModuleSummary, StudentTopicSummary } from '@/components/student/student-types';
+import type {
+    StudentModuleSummary,
+    StudentTopicSummary,
+} from '@/components/student/student-types';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 type StudentMaterialContextProps = {
     module: StudentModuleSummary;
     topic: StudentTopicSummary;
 };
-
-export default function StudentMaterialContext({ module, topic }: StudentMaterialContextProps) {
+export default function StudentMaterialContext({
+    module,
+    topic,
+}: StudentMaterialContextProps) {
+    const { t } = useTranslation();
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>
-                <CardTitle>Context</CardTitle>
-                <CardDescription>This material belongs to the topic and module shown below.</CardDescription>
+                <CardTitle>{t('common.Context')}</CardTitle>
+                <CardDescription>
+                    {t(
+                        'learning.This material belongs to the topic and module shown below.',
+                    )}
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
                 <Link
@@ -24,20 +40,23 @@ export default function StudentMaterialContext({ module, topic }: StudentMateria
                 >
                     <div className="flex justify-between gap-4">
                         <p className="font-medium">{module.name}</p>
-                        <Badge variant="outline">Module</Badge>
+                        <Badge variant="outline">{t('learning.Module')}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
                         {module.description || 'No module description yet.'}
                     </p>
                 </Link>
                 <Link
-                    href={route('student.topics.show', [module.id, topic.topic_id])}
+                    href={route('student.topics.show', [
+                        module.id,
+                        topic.topic_id,
+                    ])}
                     className="block rounded-lg border p-4 transition-colors hover:bg-muted/40"
                     prefetch
                 >
                     <div className="flex justify-between gap-4">
                         <p className="font-medium">{topic.name}</p>
-                        <Badge variant="outline">Topic</Badge>
+                        <Badge variant="outline">{t('learning.Topic')}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
                         {topic.description || 'No topic description yet.'}

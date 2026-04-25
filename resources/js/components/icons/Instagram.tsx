@@ -1,5 +1,4 @@
-import * as React from "react"
-import { SVGProps } from "react"
+import { SVGProps } from 'react';
 const Instagram = (props: SVGProps<SVGSVGElement>) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -18,5 +17,5 @@ const Instagram = (props: SVGProps<SVGSVGElement>) => (
             </clipPath>
         </defs>
     </svg>
-)
-export default Instagram
+);
+export default Instagram;

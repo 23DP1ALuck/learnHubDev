@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/hooks/use-translation';
 import type { TaskType } from '@/types';
-
 type EditTaskChoiceOptionsProps = {
     correctCheckboxOptionIds: number[];
     correctSingleOptionId: number | null;
@@ -20,7 +20,6 @@ type EditTaskChoiceOptionsProps = {
     options: ChoiceOption[];
     taskType: TaskType;
 };
-
 export default function EditTaskChoiceOptions({
     correctCheckboxOptionIds,
     correctSingleOptionId,
@@ -35,11 +34,12 @@ export default function EditTaskChoiceOptions({
     options,
     taskType,
 }: EditTaskChoiceOptionsProps) {
+    const { t } = useTranslation();
     return (
         <div className="grid gap-3">
             <div className="flex items-center justify-between gap-4">
                 <div>
-                    <Label>Answer options</Label>
+                    <Label>{t('teacher.Answer options')}</Label>
                     <p className="text-sm text-muted-foreground">
                         {taskType === 'CHECKBOX'
                             ? 'Add at least two options and mark all correct ones.'
@@ -47,7 +47,7 @@ export default function EditTaskChoiceOptions({
                     </p>
                 </div>
                 <Button type="button" variant="outline" onClick={onAddOption}>
-                    Add option
+                    {t('teacher.Add option')}
                 </Button>
             </div>
 
@@ -57,12 +57,23 @@ export default function EditTaskChoiceOptions({
                     const isChecked = isCheckboxType
                         ? correctCheckboxOptionIds.includes(option.option_id)
                         : correctSingleOptionId === option.option_id;
-
                     return (
-                        <div key={option.option_id} className="grid gap-2 rounded-md border p-3">
+                        <div
+                            key={option.option_id}
+                            className="grid gap-2 rounded-md border p-3"
+                        >
                             <div className="flex items-center justify-between gap-4">
-                                <Label htmlFor={`option-${option.option_id}`}>Option {index + 1}</Label>
-                                <Button type="button" variant="ghost" disabled={options.length <= 2} onClick={() => onRemoveOption(option.option_id)}>
+                                <Label htmlFor={`option-${option.option_id}`}>
+                                    Option {index + 1}
+                                </Label>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    disabled={options.length <= 2}
+                                    onClick={() =>
+                                        onRemoveOption(option.option_id)
+                                    }
+                                >
                                     Remove
                                 </Button>
                             </div>
@@ -70,23 +81,44 @@ export default function EditTaskChoiceOptions({
                             <Input
                                 id={`option-${option.option_id}`}
                                 name="options[]"
-                                onChange={(event) => onUpdateOptionValue(option.option_id, event.target.value)}
+                                onChange={(event) =>
+                                    onUpdateOptionValue(
+                                        option.option_id,
+                                        event.target.value,
+                                    )
+                                }
                                 value={option.value}
                             />
 
                             <label className="flex items-center gap-3 text-sm">
                                 {isCheckboxType ? (
-                                    <Checkbox checked={isChecked} onCheckedChange={(checked) => onToggleCheckboxAnswer(option.option_id, checked === true)} />
+                                    <Checkbox
+                                        checked={isChecked}
+                                        onCheckedChange={(checked) =>
+                                            onToggleCheckboxAnswer(
+                                                option.option_id,
+                                                checked === true,
+                                            )
+                                        }
+                                    />
                                 ) : (
                                     <input
                                         checked={isChecked}
                                         className="size-4"
                                         name="correct_custom_select"
-                                        onChange={() => onSetCorrectSingleOptionId(option.option_id)}
+                                        onChange={() =>
+                                            onSetCorrectSingleOptionId(
+                                                option.option_id,
+                                            )
+                                        }
                                         type="radio"
                                     />
                                 )}
-                                <span>{isCheckboxType ? 'Correct answer' : 'Correct option'}</span>
+                                <span>
+                                    {isCheckboxType
+                                        ? 'Correct answer'
+                                        : 'Correct option'}
+                                </span>
                             </label>
 
                             <InputError message={errors[`options.${index}`]} />
@@ -98,10 +130,21 @@ export default function EditTaskChoiceOptions({
             <InputError message={errors.options} />
 
             {derivedCheckboxAnswers.map((answer, index) => (
-                <input key={`${answer}-${index}`} type="hidden" name="correct_answers[]" value={answer} />
+                <input
+                    key={`${answer}-${index}`}
+                    type="hidden"
+                    name="correct_answers[]"
+                    value={answer}
+                />
             ))}
 
-            {taskType === 'CUSTOM_SELECT' && derivedSingleAnswer !== '' && <input type="hidden" name="correct_answers[]" value={derivedSingleAnswer} />}
+            {taskType === 'CUSTOM_SELECT' && derivedSingleAnswer !== '' && (
+                <input
+                    type="hidden"
+                    name="correct_answers[]"
+                    value={derivedSingleAnswer}
+                />
+            )}
 
             <InputError message={errors.correct_answers} />
         </div>

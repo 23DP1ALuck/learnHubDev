@@ -56,6 +56,18 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'chatUnreadCount' => 0,
+            'locale' => app()->getLocale(),
+            'translations' => [
+                'common' => trans('common'),
+                'landing' => trans('landing'),
+                'learning' => trans('learning'),
+                'owner' => trans('owner'),
+                'teacher' => trans('teacher'),
+                'student' => trans('student'),
+                'chat' => trans('chat'),
+                'settings' => trans('settings'),
+                'auth_ui' => trans('auth_ui'),
+            ],
             'auth' => [
                 'user' => $request->user(),
                 'currentOrganization' => $currentOrganization,

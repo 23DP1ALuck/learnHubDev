@@ -1,28 +1,39 @@
+import { RecentActivity } from '@/components/dashboard/admin/RecentActivity';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import {type BreadcrumbItem, OnboardingRequest, type SharedData} from '@/types';
+import {
+    type BreadcrumbItem,
+    OnboardingRequest,
+    type SharedData,
+} from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import {RecentActivity} from "@/components/dashboard/admin/RecentActivity";
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
         href: dashboard().url,
     },
 ];
-
-export default function AdminDashboard({onboardingRequests}: {onboardingRequests: OnboardingRequest[]}) {
+export default function AdminDashboard({
+    onboardingRequests,
+}: {
+    onboardingRequests: OnboardingRequest[];
+}) {
+    const { t } = useTranslation();
     const { auth } = usePage<SharedData>().props;
     console.log(onboardingRequests);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Admin Dashboard" />
+            <Head title={t('common.Admin Dashboard')} />
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="rounded-xl border border-sidebar-border/70 p-6 dark:border-sidebar-border">
-                    <h2 className="text-lg font-semibold">Admin dashboard</h2>
+                    <h2 className="text-lg font-semibold">
+                        {t('common.Admin dashboard')}
+                    </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        Welcome back, {auth.user.name}. You have admin access.
+                        {t('common.Welcome back,')} {auth.user.name}
+                        {t('common.. You have admin access.')}
                     </p>
                 </div>
 
@@ -40,8 +51,8 @@ export default function AdminDashboard({onboardingRequests}: {onboardingRequests
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
-                <div className="grid gap-4 md:grid-cols-6 ">
-                    <div className="flex col-span-4 rounded-xl border border-sidebar-border/70">
+                <div className="grid gap-4 md:grid-cols-6">
+                    <div className="col-span-4 flex rounded-xl border border-sidebar-border/70">
                         <RecentActivity />
                     </div>
                 </div>

@@ -1,6 +1,9 @@
 import StudentModuleSummaryCard from '@/components/student/student-module-summary';
 import StudentModuleTopicsList from '@/components/student/student-module-topics-list';
-import type { StudentModuleSummary, StudentTopicSummary } from '@/components/student/student-types';
+import type {
+    StudentModuleSummary,
+    StudentTopicSummary,
+} from '@/components/student/student-types';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

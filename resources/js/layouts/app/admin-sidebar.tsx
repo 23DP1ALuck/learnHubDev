@@ -1,21 +1,21 @@
+import Logo from '@/components/icons/Logo';
 import { NavUser } from '@/components/nav-user';
 import {
-    Sidebar as UISidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    Sidebar as UISidebar,
 } from '@/components/ui/sidebar';
 import { useActiveUrl } from '@/hooks/use-active-url';
+import { adminNavItems } from '@/layouts/app/navitems';
 import { dashboard } from '@/routes';
 import { Link } from '@inertiajs/react';
-import Logo from '@/components/icons/Logo';
-import {adminNavItems} from "@/layouts/app/navitems";
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
-    console.log(adminNavItems)
+    console.log(adminNavItems);
     return (
         <UISidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -24,7 +24,7 @@ export function Sidebar() {
                         <SidebarMenuButton size="lg" asChild>
                             <Link href={dashboard()} prefetch>
                                 <div className="flex w-full items-center group-data-[collapsible=icon]:justify-center">
-                                    <Logo className="h-12 w-auto group-data-[collapsible=icon]:h-5"/>
+                                    <Logo className="h-12 w-auto group-data-[collapsible=icon]:h-5" />
                                 </div>
                             </Link>
                         </SidebarMenuButton>
@@ -38,7 +38,11 @@ export function Sidebar() {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                isActive={urlIsActive(item.href, undefined, true)}
+                                isActive={urlIsActive(
+                                    item.href,
+                                    undefined,
+                                    true,
+                                )}
                                 tooltip={item.title}
                             >
                                 <Link href={item.href} prefetch>

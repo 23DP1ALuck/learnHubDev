@@ -1,11 +1,11 @@
-import {Link} from "@inertiajs/react";
+import { Link } from '@inertiajs/react';
 
 export function NavLink({
-                            href,
-                            children,
-                        }: {
-    href: string
-    children: React.ReactNode
+    href,
+    children,
+}: {
+    href: string;
+    children: React.ReactNode;
 }) {
     return (
         <Link
@@ -14,5 +14,5 @@ export function NavLink({
         >
             {children}
         </Link>
-    )
+    );
 }

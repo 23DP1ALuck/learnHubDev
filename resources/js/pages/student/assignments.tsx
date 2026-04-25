@@ -1,23 +1,26 @@
 import StudentAssignmentsList from '@/components/student/student-assignments-list';
 import type { StudentAssignmentSummary } from '@/components/student/student-types';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Assignments',
         href: route('student.assignments'),
     },
 ];
-
-export default function StudentAssignmentsPage({ assignments }: { assignments: StudentAssignmentSummary[] }) {
+export default function StudentAssignmentsPage({
+    assignments,
+}: {
+    assignments: StudentAssignmentSummary[];
+}) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Student assignments" />
+            <Head title={t('student.Student assignments')} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 {flash?.success && (
@@ -27,8 +30,14 @@ export default function StudentAssignmentsPage({ assignments }: { assignments: S
                 )}
 
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">Assignments</h1>
-                    <p className="text-sm text-muted-foreground">Open an assignment to review its details and then start the task flow.</p>
+                    <h1 className="text-2xl font-semibold tracking-tight">
+                        {t('learning.Assignments')}
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        {t(
+                            'learning.Open an assignment to review its details and then start the task flow.',
+                        )}
+                    </p>
                 </div>
 
                 <StudentAssignmentsList assignments={assignments} />

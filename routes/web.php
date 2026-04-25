@@ -106,5 +106,12 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);
+Route::post('/locale/{locale}', function (string $locale) {
+    if (! in_array($locale, ['en', 'ru', 'lv'])) {
+        abort(400);
+    }
+    session(['locale' => $locale]);
+    return back();
+})->name('locale.set');
 
 require __DIR__.'/settings.php';

@@ -1,5 +1,4 @@
-import * as React from "react"
-import { SVGProps } from "react"
+import { SVGProps } from 'react';
 const ChevronRight = (props: SVGProps<SVGSVGElement>) => (
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -15,5 +14,5 @@ const ChevronRight = (props: SVGProps<SVGSVGElement>) => (
             clipRule="evenodd"
         />
     </svg>
-)
+);
 export default ChevronRight;

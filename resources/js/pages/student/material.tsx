@@ -6,12 +6,18 @@ import type {
     StudentModuleSummary,
     StudentTopicSummary,
 } from '@/components/student/student-types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
 export default function StudentMaterialPage({
     module,
     topic,
@@ -23,8 +29,8 @@ export default function StudentMaterialPage({
     material: StudentMaterialSummary;
     files: StudentMaterialFileSummary[];
 }) {
+    const { t } = useTranslation();
     const { flash } = usePage<Flash>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
@@ -40,10 +46,13 @@ export default function StudentMaterialPage({
         },
         {
             title: material.title,
-            href: route('student.materials.show', [module.id, topic.topic_id, material.material_id]),
+            href: route('student.materials.show', [
+                module.id,
+                topic.topic_id,
+                material.material_id,
+            ]),
         },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={material.title} />
@@ -59,25 +68,42 @@ export default function StudentMaterialPage({
                     <CardHeader>
                         <CardTitle>{material.title}</CardTitle>
                         <CardDescription>
-                            {material.description || 'Open the linked files below to view the material resources.'}
+                            {material.description ||
+                                'Open the linked files below to view the material resources.'}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Files</p>
-                            <p className="mt-1 text-3xl font-semibold">{files.length}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Files
+                            </p>
+                            <p className="mt-1 text-3xl font-semibold">
+                                {files.length}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Material ID</p>
-                            <p className="mt-1 text-sm font-medium">#{material.material_id}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('student.Material ID')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                #{material.material_id}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Topic</p>
-                            <p className="mt-1 text-sm font-medium">{topic.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Topic')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {topic.name}
+                            </p>
                         </div>
                         <div className="rounded-lg border p-4">
-                            <p className="text-sm text-muted-foreground">Module</p>
-                            <p className="mt-1 text-sm font-medium">{module.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {t('learning.Module')}
+                            </p>
+                            <p className="mt-1 text-sm font-medium">
+                                {module.name}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>

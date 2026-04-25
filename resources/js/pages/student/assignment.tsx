@@ -1,11 +1,14 @@
 import StudentAssignmentSummaryCard from '@/components/student/student-assignment-summary';
 import StudentAssignmentTopicsList from '@/components/student/student-assignment-topics-list';
-import type { StudentAssignmentDetail, StudentAssignmentTopic } from '@/components/student/student-types';
+import type {
+    StudentAssignmentDetail,
+    StudentAssignmentTopic,
+} from '@/components/student/student-types';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { route } from 'ziggy-js';
 
 export default function StudentAssignmentPage({
@@ -28,7 +31,7 @@ export default function StudentAssignmentPage({
         },
     ];
     useEffect(() => {
-        if(flash?.success){
+        if (flash?.success) {
             toast.success(flash?.success);
         }
     }, [flash?.success]);

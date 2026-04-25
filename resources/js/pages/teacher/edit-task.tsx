@@ -1,17 +1,26 @@
 import EditTaskForm from '@/components/teacher/edit-task-form';
-import type { AssignmentSummary, TaskSummary } from '@/components/teacher/edit-task-types';
+import type {
+    AssignmentSummary,
+    TaskSummary,
+} from '@/components/teacher/edit-task-types';
+import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import { modules } from '@/routes/teacher';
 import { editTask } from '@/routes/teacher/tasks';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-
-function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: TaskSummary }) {
+function EditTask({
+    assignment,
+    task,
+}: {
+    assignment: AssignmentSummary;
+    task: TaskSummary;
+}) {
+    const { t } = useTranslation();
     const primaryTopic = assignment.topics[0];
-    console.log(primaryTopic)
+    console.log(primaryTopic);
     const { flash } = usePage<Flash>().props;
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Modules',
@@ -20,12 +29,21 @@ function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: T
         ...(primaryTopic
             ? [
                   {
-                      title: primaryTopic.module_name || `Module ${primaryTopic.module_id}`,
-                      href: route('teacher.modules.show', primaryTopic.module_id),
+                      title:
+                          primaryTopic.module_name ||
+                          `Module ${primaryTopic.module_id}`,
+                      href: route(
+                          'teacher.modules.show',
+                          primaryTopic.module_id,
+                      ),
                   },
                   {
-                      title: primaryTopic.name || `Topic ${primaryTopic.topic_id}`,
-                      href: route('teacher.topics.show', [primaryTopic.module_id, primaryTopic.topic_id]),
+                      title:
+                          primaryTopic.name || `Topic ${primaryTopic.topic_id}`,
+                      href: route('teacher.topics.show', [
+                          primaryTopic.module_id,
+                          primaryTopic.topic_id,
+                      ]),
                   },
               ]
             : []),
@@ -38,10 +56,9 @@ function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: T
             href: editTask([assignment.id, task.task_id]).url,
         },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Edit task" />
+            <Head title={t('teacher.Edit task')} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
                 {flash?.success && (
@@ -55,5 +72,4 @@ function EditTask({ assignment, task }: { assignment: AssignmentSummary; task: T
         </AppLayout>
     );
 }
-
 export default EditTask;
