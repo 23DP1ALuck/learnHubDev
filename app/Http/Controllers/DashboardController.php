@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\OnboardingRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): Response | RedirectResponse
     {
         $role = $request->user()?->role;
 

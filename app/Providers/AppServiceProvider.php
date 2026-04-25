@@ -20,8 +20,9 @@ class AppServiceProvider extends ServiceProvider
                     return redirect()->route('dashboard');
                 }
                 $organization = $user->currentOrganization();
-
-                session()->put('activeOrganization', $organization->id);
+                if($organization){
+                    session()->put('activeOrganization', $organization->id);
+                }
 
                 return redirect()->route('dashboard')
                     ->with('afterLogin', true);
