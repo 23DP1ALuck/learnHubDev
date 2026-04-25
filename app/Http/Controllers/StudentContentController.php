@@ -22,6 +22,15 @@ class StudentContentController extends Controller
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
         $groupId = $organization->pivot->group_id;
+        $dashboardSummary = [
+            'modules' => 0,
+            'assignments' => 0,
+            'pending' => 0,
+            'averagePercent' => 0,
+        ];
+        $studentModuleSummary = [];
+        $studentAssignmentSummary = [];
+
         if($groupId){
             $group = $this->getOrganizationGroup($organization);
 
@@ -31,12 +40,7 @@ class StudentContentController extends Controller
         }
 //        TODO: send isAssignedToGroup
         return Inertia::render('student/dashboard', [
-            "stats" => $dashboardSummary ?? [
-                    'modules' => 0,
-                    'assignments' => 0,
-                    'pending' => 0,
-                    'averagePercent' => 0,
-                ],
+            "stats" => $dashboardSummary,
             "modules" => $studentModuleSummary,
             "upcomingAssignments" => $studentAssignmentSummary,
         ]);
