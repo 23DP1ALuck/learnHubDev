@@ -18,6 +18,7 @@ import { Input } from '@headlessui/react';
 import { Form } from '@inertiajs/react';
 import { Search } from 'lucide-react';
 import { useRoute } from 'ziggy-js';
+import {useState} from "react";
 export const AssignStudents = ({
     group,
     students,
@@ -26,9 +27,10 @@ export const AssignStudents = ({
     students: User[];
 }) => {
     const { t } = useTranslation();
+    const [open, setOpen] = useState<boolean>(false);
     const route = useRoute();
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline">{t('common.Assign students')}</Button>
             </DialogTrigger>
@@ -38,6 +40,7 @@ export const AssignStudents = ({
                     action={route('groups.assign-students')}
                     method={'patch'}
                     className="flex min-h-0 flex-1 flex-col"
+                    onSuccess={() => setOpen(false)}
                 >
                     <DialogHeader>
                         <DialogTitle>{t('common.Assign students')}</DialogTitle>
