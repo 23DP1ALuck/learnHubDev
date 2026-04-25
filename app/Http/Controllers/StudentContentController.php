@@ -31,7 +31,12 @@ class StudentContentController extends Controller
         }
 //        TODO: send isAssignedToGroup
         return Inertia::render('student/dashboard', [
-            "stats" => $dashboardSummary,
+            "stats" => $dashboardSummary ?? [
+                    'modules' => 0,
+                    'assignments' => 0,
+                    'pending' => 0,
+                    'averagePercent' => 0,
+                ],
             "modules" => $studentModuleSummary,
             "upcomingAssignments" => $studentAssignmentSummary,
         ]);
