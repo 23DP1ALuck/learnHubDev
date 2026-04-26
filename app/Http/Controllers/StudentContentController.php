@@ -60,14 +60,16 @@ class StudentContentController extends Controller
         })->filter(); // filter removes null values
 
         $topics = $modules->flatMap(function ($module) {
-            return $module->topics()->withCount('assignments')->get();
+            return $module->topics()->get();
         });
 
-        $assignmentsCount = $topics->sum('assignments_count');
+        $assignmentsCount = $topics->flatMap(function ($topic) {
+           return $topic->assignments()->get();
+        })->unique('id')->count();
 
         $assignments = $topics->flatMap(function ($topic) {
             return $topic->assignments()->with('submissions')->get();
-        });
+        })->unique('id')->values();
 
         $submissions = $assignments->flatMap(function ($assignment) {
             return $assignment->submissions;
@@ -80,7 +82,7 @@ class StudentContentController extends Controller
 
         $averagePercent = $submissions
             ->where('student_id', $user->id)
-            ->avg('percent') ?? 0;
+            ->avg('total_percent') ?? 0;
         return[
             'modules' => $moduleCount,
             'assignments' => $assignmentsCount,
