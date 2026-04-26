@@ -85,4 +85,8 @@ return [
     'Start with modules, then build topics inside them. Materials and assignments live on the topic level, and tasks live inside assignments.' => 'Start with modules, then build topics inside them. Materials and assignments live on the topic level, and tasks live inside assignments.',
     'Teacher preview for' => 'Teacher preview for',
     '. This page shows how the task is positioned inside the assignment flow.' => '. This page shows how the task is positioned inside the assignment flow.',
+    'Student assignment review' => 'Student assignment review',
+    'Review each submitted task and choose how many points the student received.' => 'Review each submitted task and choose how many points the student received.',
+    'Teacher comment' => 'Teacher Comment',
+    'Save grade' => 'Save grade',
 ];

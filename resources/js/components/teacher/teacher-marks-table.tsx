@@ -66,6 +66,9 @@ export default function TeacherMarksTable({ marks }: TeacherMarksTableProps) {
                                     <th className="px-4 py-3 font-medium">
                                         {t('common.Submitted')}
                                     </th>
+                                    <th className="px-4 py-3 text-right font-medium">
+                                        {t('common.Actions')}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -104,6 +107,20 @@ export default function TeacherMarksTable({ marks }: TeacherMarksTableProps) {
                                         </td>
                                         <td className="px-4 py-3">
                                             {formatDate(mark.submitted_on)}
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <Link
+                                                href={route(
+                                                    'teacher.assignments.students.show',
+                                                    [
+                                                        mark.assignment_id,
+                                                        mark.student_id,
+                                                    ],
+                                                )}
+                                                className="font-medium text-primary hover:underline"
+                                            >
+                                                {t('teacher.Review')}
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}

@@ -85,4 +85,8 @@ return [
     'Start with modules, then build topics inside them. Materials and assignments live on the topic level, and tasks live inside assignments.' => 'Начните с модулей, затем создавайте темы внутри них. Материалы и задания находятся на уровне темы, а вопросы — внутри заданий.',
     'Teacher preview for' => 'Предпросмотр учителя для',
     '. This page shows how the task is positioned inside the assignment flow.' => '. Эта страница показывает, как вопрос расположен в потоке задания.',
+    'Student assignment review' => 'Проверка задания ученика',
+    'Review each submitted task and choose how many points the student received.' => 'Проверьте каждое отправленное задание и выберите, сколько баллов получил ученик.',
+    'Teacher comment' => 'Комментарий учителя',
+    'Save grade' => 'Сохранить оценку',
 ];

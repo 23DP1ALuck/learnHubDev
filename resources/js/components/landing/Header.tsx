@@ -1,6 +1,7 @@
 import { Logo } from '@/components/icons/Logo';
 import { NavLink } from '@/components/NavLink';
 import OnboardingRequestDialog from '@/components/onboarding-request-dialog';
+import LanguageSwitcher from '@/components/shared/language-switcher';
 import { Container } from '@/components/ui/container';
 import { useTranslation } from '@/hooks/use-translation';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@headlessui/react';
 import { Link } from '@inertiajs/react';
 import clsx from 'clsx';
-import LanguageSwitcher from "@/components/shared/language-switcher";
 function MobileNavLink({
     href,
     children,
@@ -109,7 +109,7 @@ export function Header() {
                         </div>
                     </div>
                     <div className="flex items-center gap-x-5 md:gap-x-8">
-                        <LanguageSwitcher/>
+                        <LanguageSwitcher />
                         <div className="hidden md:block">
                             <NavLink href="/login">
                                 {t('landing.Ieiet')}

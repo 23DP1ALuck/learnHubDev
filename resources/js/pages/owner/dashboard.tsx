@@ -82,8 +82,8 @@ export default function OwnerDashboard({
                         <CardDescription>
                             {t('owner.Owner workspace for your')}{' '}
                             {organization.organization_type === 'school'
-                                ?  t('owner.'+'For school')
-                                : t('owner.'+'For org')}
+                                ? t('owner.' + 'For school')
+                                : t('owner.' + 'For org')}
                             .
                         </CardDescription>
                     </CardHeader>

@@ -85,4 +85,8 @@ return [
     'Start with modules, then build topics inside them. Materials and assignments live on the topic level, and tasks live inside assignments.' => 'Sāc ar moduļiem, tad veido tajos tēmas. Materiāli un uzdevumi atrodas tēmas līmenī, bet jautājumi atrodas uzdevumos.',
     'Teacher preview for' => 'Skolotāja priekšskatījums:',
     '. This page shows how the task is positioned inside the assignment flow.' => '. Šī lapa rāda, kā jautājums ir novietots uzdevuma plūsmā.',
+    'Student assignment review' => 'Skolēna uzdevuma pārbaude',
+    'Review each submitted task and choose how many points the student received.' => 'Pārbaudiet katru iesniegto uzdevumu un izvēlieties, cik punktus skolēns saņēma.',
+    'Teacher comment' => 'Skolotāja komentārs',
+    'Save grade' => 'Saglabāt vērtējumu',
 ];

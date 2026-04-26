@@ -17,11 +17,8 @@ import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
-import {useTranslation} from "@/hooks/use-translation";
 
 export function NavUser() {
-    const {t} = useTranslation();
-    console.log(t('common.Create'));
     const { auth } = usePage<SharedData>().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();

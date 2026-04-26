@@ -17,8 +17,8 @@ import { OrganizationGroup, User } from '@/types';
 import { Input } from '@headlessui/react';
 import { Form } from '@inertiajs/react';
 import { Search } from 'lucide-react';
+import { useState } from 'react';
 import { useRoute } from 'ziggy-js';
-import {useState} from "react";
 export const AssignStudents = ({
     group,
     students,

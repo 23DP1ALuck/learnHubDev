@@ -102,7 +102,9 @@ export function PrimaryFeatures() {
                                                     )}
                                                 >
                                                     <span className="absolute inset-0 rounded-full lg:rounded-l-xl lg:rounded-r-none" />
-                                                    {t(`landing.${feature.title}`)}
+                                                    {t(
+                                                        `landing.${feature.title}`,
+                                                    )}
                                                 </Tab>
                                             </h3>
                                             <p
@@ -114,7 +116,9 @@ export function PrimaryFeatures() {
                                                         : 'text-blue-100 group-hover:text-white',
                                                 )}
                                             >
-                                                {t(`landing.${feature.description}`)}
+                                                {t(
+                                                    `landing.${feature.description}`,
+                                                )}
                                             </p>
                                         </div>
                                     ))}

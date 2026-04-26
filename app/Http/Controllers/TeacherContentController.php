@@ -8,11 +8,13 @@ use App\Models\Module;
 use App\Models\Organization;
 use App\Models\Submission;
 use App\Models\Task;
+use App\Models\TaskAnswer;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -205,6 +207,173 @@ class TeacherContentController extends Controller
             ];
         })->toArray();
     }
+
+    public function studentAssignment(Request $request, int $assignment, int $student): Response|RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+
+        $assignmentModel = Assignment::query()
+            ->where('id', $assignment)
+            ->with(['tasks' => fn ($query) => $query->orderBy('task_id'), 'topics.module'])
+            ->first();
+
+        if (! $assignmentModel) {
+            return redirect()->route('teacher.marks')->with('error', 'Assignment not found');
+        }
+
+        $module = $assignmentModel->topics->first()?->module;
+        if (! $module || (int) $module->creator_id !== (int) $user->id || (int) $module->organization_id !== (int) $organizationId) {
+            return redirect()->route('teacher.marks')->with('error', 'You do not have permission to view this assignment.');
+        }
+
+        $submission = Submission::query()
+            ->where('assignment_id', $assignmentModel->id)
+            ->where('student_id', $student)
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
+            ->with(['student.user', 'taskAnswers.fileLinks.file'])
+            ->first();
+
+        if (! $submission) {
+            return redirect()->route('teacher.marks')->with('error', 'Submission not found');
+        }
+
+        $answers = $submission->taskAnswers->keyBy('task_id');
+
+        return Inertia::render('teacher/student-assignment', [
+            'assignment' => [
+                'id' => $assignmentModel->id,
+                'title' => $assignmentModel->title,
+                'description' => $assignmentModel->description,
+                'grading_policy' => $assignmentModel->grading_policy,
+                'due_date' => $assignmentModel->due_date?->toDateString(),
+                'max_points' => $assignmentModel->totalPoints(),
+                'module' => [
+                    'id' => $module->id,
+                    'name' => $module->name,
+                ],
+            ],
+            'student' => [
+                'id' => $submission->student_id,
+                'name' => $submission->student?->user?->name,
+                'email' => $submission->student?->user?->email,
+            ],
+            'submission' => [
+                'student_id' => $submission->student_id,
+                'assignment_id' => $submission->assignment_id,
+                'status' => $submission->status,
+                'submitted_on' => $submission->submitted_on?->toDateString(),
+                'total_points' => $submission->total_points,
+                'total_percent' => $submission->total_percent,
+            ],
+            'tasks' => $assignmentModel->tasks->map(function (Task $task) use ($answers) {
+                $answer = $answers->get($task->task_id);
+                return [
+                    'assignment_id' => $task->assignment_id,
+                    'task_id' => $task->task_id,
+                    'question_text' => $task->question_text,
+                    'task_type' => $task->task_type,
+                    'max_points' => $task->max_points,
+                    'answer' => $answer ? [
+                        'answer_text' => $this->decodeAnswerText($answer->answer_text),
+                        'points' => $answer->points,
+                        'teacher_comment' => $answer->teacher_comment,
+                        'files' => $answer->fileLinks->map(fn ($fileLink) => [
+                            'id' => $fileLink->file_id,
+                            'file_name' => $fileLink->file?->file_name,
+                            'file_path' => $fileLink->file?->file_path,
+                        ])->values(),
+                    ] : null,
+                ];
+            })->values(),
+        ]);
+    }
+
+    public function gradeStudentTask(Request $request, int $assignment, int $student, int $task): RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $validated = $request->validate([
+            'points' => ['required', 'numeric', 'min:0'],
+            'teacher_comment' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $organizationId = $request->session()->get('activeOrganization');
+        $assignmentModel = Assignment::query()
+            ->where('id', $assignment)
+            ->with('topics.module')
+            ->first();
+
+        $module = $assignmentModel?->topics->first()?->module;
+        if (! $assignmentModel || ! $module || (int) $module->creator_id !== (int) $user->id || (int) $module->organization_id !== (int) $organizationId) {
+            return redirect()->route('teacher.marks')->with('error', 'You do not have permission to grade this assignment.');
+        }
+
+        $taskModel = $assignmentModel->tasks()->where('task_id', $task)->first();
+        if (! $taskModel) {
+            return redirect()->back()->with('error', 'Task not found');
+        }
+
+        if ((float) $validated['points'] > (float) $taskModel->max_points) {
+            throw ValidationException::withMessages([
+                'points' => 'Points cannot be greater than task max points.',
+            ]);
+        }
+
+        DB::transaction(function () use ($assignmentModel, $student, $task, $validated) {
+            TaskAnswer::query()
+                ->where('student_id', $student)
+                ->where('assignment_id', $assignmentModel->id)
+                ->where('task_id', $task)
+                ->update([
+                    'points' => round((float) $validated['points'], 2),
+                    'teacher_comment' => $validated['teacher_comment'] ?? null,
+                ]);
+
+            $submission = Submission::query()
+                ->where('student_id', $student)
+                ->where('assignment_id', $assignmentModel->id)
+                ->firstOrFail();
+
+            $totalPoints = $submission->taskAnswers()->sum('points');
+            $assignmentTotal = $assignmentModel->totalPoints();
+
+            Submission::query()
+                ->where('student_id', $student)
+                ->where('assignment_id', $assignmentModel->id)
+                ->update([
+                'status' => 'GRADED',
+                'total_points' => round((float) $totalPoints, 2),
+                'total_percent' => $assignmentTotal > 0 ? round(((float) $totalPoints / $assignmentTotal) * 100, 2) : null,
+            ]);
+        });
+
+        return redirect()
+            ->route('teacher.assignments.students.show', [$assignment, $student])
+            ->with('success', 'Task grade updated.');
+    }
+
+    private function decodeAnswerText(?string $answerText): array
+    {
+        if (! $answerText) {
+            return [];
+        }
+
+        $decoded = json_decode($answerText, true);
+
+        return is_array($decoded) ? $decoded : [$answerText];
+    }
+
     public function modules(Request $request): Response|RedirectResponse
     {
         $user = $request->user();

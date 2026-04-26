@@ -67,6 +67,7 @@ Route::middleware([CheckIsSchoolOwner::class])->group(function () {
 });
 Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->group(function () {
     Route::get('/teacher/marks', [TeacherContentController::class, 'marks'])->name('teacher.marks');
+    Route::get('/teacher/assignments/{assignment}/students/{student}', [TeacherContentController::class, 'studentAssignment'])->name('teacher.assignments.students.show');
     Route::get('/teacher/modules', [TeacherContentController::class, 'modules'])->name('teacher.modules');
     Route::get('/teacher/modules/{module}', [TeacherContentController::class, 'module'])->name('teacher.modules.show');
     Route::get('/teacher/modules/{module}/edit', [TeacherContentController::class, 'editModule'])->name('teacher.modules.edit');
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::post('tasks', [TasksController::class, 'store'])->name('tasks.store');
 
     Route::patch('/assignments/{assignment_id}/tasks/{task_id}', [TasksController::class, 'update'])->name('tasks.update');
+    Route::patch('/teacher/assignments/{assignment}/students/{student}/tasks/{task}', [TeacherContentController::class, 'gradeStudentTask'])->name('teacher.assignments.students.tasks.grade');
     Route::patch('/modules/{module_id}', [ModulesController::class, 'update'])->name('modules.update');
     Route::patch('/modules/{module_id}/topics/{topic_id}', [TopicController::class, 'update'])->name('topics.update');
 

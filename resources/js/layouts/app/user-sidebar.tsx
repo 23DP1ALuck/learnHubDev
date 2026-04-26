@@ -102,7 +102,9 @@ export function Sidebar() {
                                     >
                                         <Link href={item.href}>
                                             {item.icon && <item.icon />}
-                                            <span>{t(`common.${item.title}`)}</span>
+                                            <span>
+                                                {t(`common.${item.title}`)}
+                                            </span>
                                         </Link>
                                     </SidebarMenuButton>
                                     {item.badge ? (
@@ -127,7 +129,9 @@ export function Sidebar() {
                                     >
                                         <Link href={item.href}>
                                             {item.icon && <item.icon />}
-                                            <span>{t(`common.${item.title}`)}</span>
+                                            <span>
+                                                {t(`common.${item.title}`)}
+                                            </span>
                                         </Link>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -148,7 +152,9 @@ export function Sidebar() {
                                                     <innerItem.icon />
                                                 )}
                                                 <span>
-                                                    {t(`common.${innerItem.title}`)}
+                                                    {t(
+                                                        `common.${innerItem.title}`,
+                                                    )}
                                                 </span>
                                             </Link>
                                         </SidebarMenuButton>
