@@ -8,6 +8,7 @@ return [
     'All students' => 'Visi studenti',
     'Apply' => 'Pielietot',
     'Are you absolutely sure?' => 'Vai tiešām esi pārliecināts?',
+    'Assignments' => 'Uzdevumi',
     'Assign students' => 'Piešķirt studentus',
     'Average' => 'Vidējais',
     'Back' => 'Atpakaļ',

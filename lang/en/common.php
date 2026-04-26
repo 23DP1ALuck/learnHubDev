@@ -8,6 +8,7 @@ return [
     'All students' => 'All students',
     'Apply' => 'Apply',
     'Are you absolutely sure?' => 'Are you absolutely sure?',
+    'Assignments' => 'Assignments',
     'Assign students' => 'Assign students',
     'Average' => 'Average',
     'Back' => 'Back',

@@ -8,6 +8,7 @@ return [
     'All students' => 'Все студенты',
     'Apply' => 'Применить',
     'Are you absolutely sure?' => 'Вы абсолютно уверены?',
+    'Assignments' => 'Задания',
     'Assign students' => 'Назначить студентов',
     'Average' => 'Среднее',
     'Back' => 'Назад',
