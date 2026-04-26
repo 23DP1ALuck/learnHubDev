@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreModuleRequest;
+use App\Models\GroupModuleTeacher;
 use App\Models\Module;
 use App\Models\Organization;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class ModulesController extends Controller
 {
@@ -16,13 +19,42 @@ class ModulesController extends Controller
 //    }
     public function store(StoreModuleRequest $request): RedirectResponse
     {
+        $user = $request->user();
+        if(!$user){
+            return redirect()->route('login');
+        }
+        $organizationId = $request->session()->get('activeOrganization');
+        if(!$organizationId){
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
         $validated = $request->validated();
+        try{
+            DB::transaction(function () use ($organization, $user, $validated){
+                $module = Module::create([
+                        ...$validated,
+                        'creator_id' => $user->id,
+                        'organization_id' => $organization->id]
+                );
+                if($organization->organization_type === 'individual'){
+                    GroupModuleTeacher::create([
+                        'school_id' => $organization->id,
+                        'group_id' => $organization->schoolGroups()->first()->group_id,
+                        'module_id' => $module->id,
+                        'teacher_id' => $user->id,
+                    ]);
+                };
+            });
+        } catch (Exception $e){
+            return redirect()->back()->with('error', 'Failed to create module');
+        }
 
-        Module::create([
-            ...$validated,
-            'creator_id' => $request->user()->id,
-            'organization_id' => $request->session()->get('activeOrganization', '')]
-        );
+
+
+
 
         return redirect()->back()->with('success', 'Module created.');
     }
