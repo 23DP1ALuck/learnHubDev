@@ -40,7 +40,6 @@ class ChatController extends Controller
         if (!$organization) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
-        $this->getOrganizationPools($organization, $user);
 
         $groupId = $organization->pivot?->group_id;
 
@@ -198,7 +197,7 @@ class ChatController extends Controller
                 'group_name' => $group->name ?? null,
             ];
         });
-        return $classMates->merge($teachers)->toArray();
+        return $classMates->concat($teachers)->unique('id')->values()->toArray();
     }
     private function getOrganizationPools(Organization $organization, User $user)
     {
@@ -223,7 +222,7 @@ class ChatController extends Controller
                'role_in_org' => $user->pivot?->role_in_org,
                'group_name' => $group->name ?? null,
            ];
-        });
+        })->values()->toArray();
     }
     private function getGroup($groupId, $organization): ?SchoolGroup
     {
