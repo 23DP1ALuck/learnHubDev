@@ -1,4 +1,5 @@
-import type { TeacherMarkRow } from '@/components/teacher/teacher-marks-types';
+import type { TeacherSubmissionRow } from '@/components/teacher/teacher-submissions-types';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -9,36 +10,42 @@ import {
 import { useTranslation } from '@/hooks/use-translation';
 import { Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
-type TeacherMarksTableProps = {
-    marks: TeacherMarkRow[];
+
+type TeacherSubmissionsListProps = {
+    submissions: TeacherSubmissionRow[];
 };
+
 function formatDate(value: string | null): string {
     if (!value) {
         return '-';
     }
+
     const parsed = new Date(value);
+
     if (Number.isNaN(parsed.getTime())) {
         return value;
     }
+
     return parsed.toLocaleDateString();
 }
-export default function TeacherMarksTable({ marks }: TeacherMarksTableProps) {
+
+export default function TeacherSubmissionsList({
+    submissions,
+}: TeacherSubmissionsListProps) {
     const { t } = useTranslation();
-    console.log(marks);
+
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>
-                <CardTitle>{t('common.Marks')}</CardTitle>
+                <CardTitle>{t('teacher.Assignment submissions')}</CardTitle>
                 <CardDescription>
-                    {t(
-                        'learning.Recent student submissions and grading results.',
-                    )}
+                    {t('teacher.Submitted student assignments for review.')}
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {marks.length === 0 ? (
+                {submissions.length === 0 ? (
                     <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        {t('teacher.No marks match the current filters.')}
+                        {t('teacher.No submissions found.')}
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -49,19 +56,19 @@ export default function TeacherMarksTable({ marks }: TeacherMarksTableProps) {
                                         {t('common.Student')}
                                     </th>
                                     <th className="px-4 py-3 font-medium">
-                                        {t('learning.Module')}
+                                        {t('common.Group')}
                                     </th>
                                     <th className="px-4 py-3 font-medium">
                                         {t('learning.Assignment')}
+                                    </th>
+                                    <th className="px-4 py-3 font-medium">
+                                        {t('learning.Module')}
                                     </th>
                                     <th className="px-4 py-3 font-medium">
                                         {t('common.Status')}
                                     </th>
                                     <th className="px-4 py-3 font-medium">
                                         {t('learning.Points')}
-                                    </th>
-                                    <th className="px-4 py-3 font-medium">
-                                        {t('common.Percent')}
                                     </th>
                                     <th className="px-4 py-3 font-medium">
                                         {t('common.Submitted')}
@@ -72,55 +79,60 @@ export default function TeacherMarksTable({ marks }: TeacherMarksTableProps) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {marks.map((mark, index) => (
+                                {submissions.map((submission) => (
                                     <tr
-                                        key={`${mark.student_id}-${mark.assignment_id}-${index}`}
+                                        key={`${submission.assignment_id}-${submission.student_id}`}
                                         className="border-t"
                                     >
                                         <td className="px-4 py-3">
-                                            {mark.student_name}
+                                            <div className="font-medium">
+                                                {submission.student_name}
+                                            </div>
+                                            {submission.student_email ? (
+                                                <div className="text-xs text-muted-foreground">
+                                                    {submission.student_email}
+                                                </div>
+                                            ) : null}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {mark.module_name || '-'}
+                                            {submission.group_name || '-'}
                                         </td>
                                         <td className="px-4 py-3">
-                                            <Link
-                                                href={route(
-                                                    'teacher.assignments.show',
-                                                    mark.assignment_id,
-                                                )}
-                                                className="font-medium text-primary hover:underline"
-                                            >
-                                                {mark.assignment_title}
-                                            </Link>
+                                            {submission.assignment_title}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {mark.status}
+                                            {submission.module_name || '-'}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {mark.total_points || '-'}
+                                            {submission.status}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {mark.total_percent
-                                                ? `${mark.total_percent}%`
-                                                : '-'}
+                                            {submission.total_points || '-'}
+                                            {submission.total_percent
+                                                ? ` (${submission.total_percent}%)`
+                                                : ''}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {formatDate(mark.submitted_on)}
+                                            {formatDate(
+                                                submission.submitted_on,
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 text-right">
-                                            <Link
-                                                href={route(
-                                                    'teacher.assignments.students.show',
-                                                    [
-                                                        mark.assignment_id,
-                                                        mark.student_id,
-                                                    ],
-                                                )}
-                                                className="font-medium text-primary hover:underline"
-                                            >
-                                                {t('teacher.View submission')}
-                                            </Link>
+                                            <Button asChild variant="outline">
+                                                <Link
+                                                    href={route(
+                                                        'teacher.assignments.students.show',
+                                                        [
+                                                            submission.assignment_id,
+                                                            submission.student_id,
+                                                        ],
+                                                    )}
+                                                >
+                                                    {t(
+                                                        'teacher.View submission',
+                                                    )}
+                                                </Link>
+                                            </Button>
                                         </td>
                                     </tr>
                                 ))}

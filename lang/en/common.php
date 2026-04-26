@@ -39,6 +39,7 @@ return [
     'First name' => 'First name',
     'Full name' => 'Full name',
     'Graded' => 'Graded',
+    'Group' => 'Group',
     'Home' => 'Home',
     'Joined' => 'Joined',
     'Language' => 'Language',

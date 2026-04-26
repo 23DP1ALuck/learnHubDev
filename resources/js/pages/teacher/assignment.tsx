@@ -102,14 +102,23 @@ export default function TeacherAssignmentPage({
                                     'Add tasks to define the questions or submission requirements for this assignment.'}
                             </CardDescription>
                         </div>
-                        <Link
-                            href={preview([assignment.id, 1])}
-                            className="flex items-center gap-2 self-center font-medium"
-                        >
-                            <Button variant="outline">
-                                {t('common.Preview')}
-                            </Button>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <Link href={route('teacher.assignments.submissions', [assignment.id])}
+                                  className="flex items-center gap-2 self-center font-medium">
+                                <Button variant="outline">
+                                    {t('common.View submissions')}
+                                </Button>
+                            </Link>
+                            <Link
+                                href={preview([assignment.id, 1])}
+                                className="flex items-center gap-2 self-center font-medium"
+                            >
+                                <Button variant="outline">
+                                    {t('common.Preview')}
+                                </Button>
+                            </Link>
+                        </div>
+
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">

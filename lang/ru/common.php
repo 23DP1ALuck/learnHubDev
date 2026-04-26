@@ -40,6 +40,7 @@ return [
     'First name' => 'Имя',
     'Full name' => 'Полное имя',
     'Graded' => 'Оценено',
+    'Group' => 'Группа',
     'Home' => 'Главная',
     'Invitations' => 'Приглашения',
     'Joined' => 'Присоединился',

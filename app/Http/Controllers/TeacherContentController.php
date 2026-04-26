@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assignment;
+use App\Models\GroupModuleTeacher;
 use App\Models\Material;
 use App\Models\Module;
 use App\Models\Organization;
+use App\Models\SchoolGroup;
 use App\Models\Submission;
 use App\Models\Task;
 use App\Models\TaskAnswer;
@@ -309,7 +311,7 @@ class TeacherContentController extends Controller
         ]);
 
         $organizationId = $request->session()->get('activeOrganization');
-        $assignmentModel = Assignment::query()
+        $assignmentModel = Assignment::query() // check rights
             ->where('id', $assignment)
             ->with('topics.module')
             ->first();
@@ -372,6 +374,95 @@ class TeacherContentController extends Controller
         $decoded = json_decode($answerText, true);
 
         return is_array($decoded) ? $decoded : [$answerText];
+    }
+
+    public function submissions(Request $request, int $assignmentId): Response|RedirectResponse
+    {
+        $user = $request->user();
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $organizationId = $request->session()->get('activeOrganization');
+        if (! $organizationId) {
+            return redirect()->route('dashboard')->with('afterLogin', true);
+        }
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('error', 'Organization not found');
+        }
+        $assignment = Assignment::query()
+            ->where('id', $assignmentId)
+            ->with('topics.module')
+            ->first();
+        $module = $assignment?->topics->first()?->module;
+        if (! $assignment ||    // check rights
+            ! $module ||
+            (int) $module->creator_id !== (int) $user->id ||
+            (int) $module->organization_id !== (int) $organizationId) {
+            return redirect()->route('teacher.marks')->with('error', 'You do not have permission to grade this assignment.');
+        }
+        $availableGroups = GroupModuleTeacher::query()
+            ->where('module_id', $module->id)
+            ->with('group')
+            ->get();
+        $availableGroups = $availableGroups->map(function (GroupModuleTeacher $groupModuleTeacher) {
+            return [
+                'group_id' => $groupModuleTeacher->group_id,
+                'name' => $groupModuleTeacher->group?->name,
+            ];
+        });
+        $groupIdFilter = $request->query('group_id');
+
+        $submissions = collect();
+        $studentsInGroup = collect();
+        if($groupIdFilter){
+            $studentsInGroup = SchoolGroup::query()->where('group_id', $groupIdFilter)
+                ->with('school')
+                ->first();
+            $studentsInGroup = $studentsInGroup->school->students()->wherePivot('group_id', $groupIdFilter)->pluck('id');
+
+        }
+        $submissions = Submission::query()
+            ->where('assignment_id', $assignmentId)
+            ->with(['student.user', 'assignment.topics.module'])
+            ->get();
+        $submissions = $studentsInGroup ? $submissions->whereIn('student_id', $studentsInGroup) : $submissions;
+        $submissions = $submissions->map(function (Submission $submission) use ($organization, $assignment){
+            $submitter = $submission->student->user;
+
+            $group = $submitter
+                ->organizations()
+                ->where('id', $organization->id)
+                ->first()->pivot->group_id;
+            $group = SchoolGroup::query()->where('group_id', $group)->first();
+
+            $module = $assignment->topics->first()->module;
+           return [
+               'student_id' => $submitter->id,
+               'student_name' => $submitter->name,
+               'student_email' => $submitter->email,
+               'group_id' => $group->group_id,
+               'group_name' => $group->name,
+               'assignment_id' => $assignment->id,
+               'assignment_title' => $assignment->title,
+               'module_name' => $module->name,
+               'status' => $submission->status,
+               'total_points' => $submission->total_points,
+               'total_percent' => $submission->total_percent,
+               'submitted_on' => $submission->submitted_on,
+           ];
+        });
+
+        return Inertia::render('teacher/submissions', [
+            'filters' => [
+                'group_id' => (string) $request->query('group_id', ''),
+            ],
+            'organizationType' => $organization->organization_type,
+            'groups' => $availableGroups ?? [],
+            'submissions' => $submissions,
+            'assignment' => $assignment->id,
+        ]);
     }
 
     public function modules(Request $request): Response|RedirectResponse

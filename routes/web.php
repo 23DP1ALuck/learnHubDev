@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::get('/teacher/modules/{module}/topics/{topic}/edit', [TeacherContentController::class, 'editTopic'])->name('teacher.topics.edit');
     Route::get('/teacher/modules/{module}/topics/{topic}', [TeacherContentController::class, 'topic'])->name('teacher.topics.show');
     Route::get('/teacher/modules/{module}/topics/{topic}/materials/{material}', [TeacherContentController::class, 'material'])->name('teacher.materials.show');
+    Route::get('/teacher/assignments/{assignment_id}/submissions', [TeacherContentController::class, 'submissions'])->name('teacher.assignments.submissions');
     Route::get('/teacher/assignments/{assignment}', [TeacherContentController::class, 'assignment'])->name('teacher.assignments.show');
     Route::get('/preview/{assignment_id}/task/{task_id}', [TeacherContentController::class, 'task'])->name('teacher.tasks.preview');
     Route::get('/teacher/assignments/{assignment}/tasks/{task}/edit', [TeacherContentController::class, 'editTask'])->name('teacher.tasks.editTask');

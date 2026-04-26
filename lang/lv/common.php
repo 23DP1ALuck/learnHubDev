@@ -40,6 +40,7 @@ return [
     'First name' => 'Vārds',
     'Full name' => 'Pilns vārds',
     'Graded' => 'Novērtēts',
+    'Group' => 'Grupa',
     'Home' => 'Sākums',
     'Invitations' => 'Uzaicinājumi',
     'Joined' => 'Pievienojās',

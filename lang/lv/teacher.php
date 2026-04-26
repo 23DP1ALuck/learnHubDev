@@ -89,4 +89,11 @@ return [
     'Review each submitted task and choose how many points the student received.' => 'Pārbaudiet katru iesniegto uzdevumu un izvēlieties, cik punktus skolēns saņēma.',
     'Teacher comment' => 'Skolotāja komentārs',
     'Save grade' => 'Saglabāt vērtējumu',
+    'Assignment submissions' => 'Iesniegtie uzdevumi',
+    'Open a student submission and review every task answer.' => 'Atveriet skolēna iesniegumu un pārbaudiet katra uzdevuma atbildi.',
+    'Search submissions by student name.' => 'Meklējiet iesniegumus pēc skolēna vārda.',
+    'Search by student name' => 'Meklēt pēc skolēna vārda',
+    'Submitted student assignments for review.' => 'Skolēnu iesniegtie uzdevumi pārbaudei.',
+    'No submissions found.' => 'Iesniegumi nav atrasti.',
+    'View submission' => 'Skatīt iesniegumu',
 ];

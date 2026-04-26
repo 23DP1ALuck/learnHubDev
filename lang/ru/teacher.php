@@ -89,4 +89,11 @@ return [
     'Review each submitted task and choose how many points the student received.' => 'Проверьте каждое отправленное задание и выберите, сколько баллов получил ученик.',
     'Teacher comment' => 'Комментарий учителя',
     'Save grade' => 'Сохранить оценку',
+    'Assignment submissions' => 'Сданные задания',
+    'Open a student submission and review every task answer.' => 'Откройте работу ученика и проверьте ответ на каждое задание.',
+    'Search submissions by student name.' => 'Ищите сданные работы по имени ученика.',
+    'Search by student name' => 'Поиск по имени ученика',
+    'Submitted student assignments for review.' => 'Сданные ученические задания для проверки.',
+    'No submissions found.' => 'Сданные работы не найдены.',
+    'View submission' => 'Посмотреть работу',
 ];

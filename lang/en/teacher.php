@@ -89,4 +89,11 @@ return [
     'Review each submitted task and choose how many points the student received.' => 'Review each submitted task and choose how many points the student received.',
     'Teacher comment' => 'Teacher Comment',
     'Save grade' => 'Save grade',
+    'Assignment submissions' => 'Assignment submissions',
+    'Open a student submission and review every task answer.' => 'Open a student submission and review every task answer.',
+    'Search submissions by student name.' => 'Search submissions by student name.',
+    'Search by student name' => 'Search by student name',
+    'Submitted student assignments for review.' => 'Submitted student assignments for review.',
+    'No submissions found.' => 'No submissions found.',
+    'View submission' => 'View submission',
 ];
