@@ -158,3 +158,16 @@ export type TaskOption = {
     option_id: number;
     option_text: string;
 };
+// 'module_name' => $moduleName,
+//     'percent' => $submission->total_percent,
+//     'grade' => round($submission->total_percent / 10),
+//     'submitted_on' => $submission->submitted_on,
+type MarksTablePreview = {
+    marks: {
+        'module_name': string,
+        'percent': number,
+        'grade': number,
+        'submitted_on': string,
+    }[];
+    enrolledModules: string[];
+}
