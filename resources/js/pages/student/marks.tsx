@@ -6,7 +6,9 @@ import type {
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import {Head, Link, usePage} from '@inertiajs/react';
+import {route} from "ziggy-js";
+import {Button} from "@/components/ui/button";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Marks',
@@ -32,16 +34,20 @@ export default function StudentMarksPage({
                         {flash.success}
                     </div>
                 )}
-
-                <div className="space-y-1">
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        {t('common.Marks')}
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {t(
-                            'student.Submitted and graded results for the active organization.',
-                        )}
-                    </p>
+                <div className="flex justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-semibold tracking-tight">
+                            {t('common.Marks')}
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            {t(
+                                'student.Submitted and graded results for the active organization.',
+                            )}
+                        </p>
+                    </div>
+                    <Link href={route('student.marks.table-preview')} className="btn btn-primary">
+                        <Button variant={"outline"}>Atvert liecību</Button>
+                    </Link>
                 </div>
 
                 <StudentMarksTable marks={marks} stats={stats} />

@@ -106,6 +106,8 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
     Route::post('/student/assignments/{assignment}/start', [SubmissionController::class, 'store'])->name('student.submission.store');
     Route::post('/student/assignments/{assignment}/task/{task}', [TaskAnswersController::class, 'store'])->name('student.answers.store');
     Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
+
+    Route::get('student/marks/table-preview', [StudentContentController::class, 'marksTablePreview'])->name('student.marks.table-preview');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);

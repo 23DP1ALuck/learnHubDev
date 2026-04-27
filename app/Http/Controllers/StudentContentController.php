@@ -550,4 +550,49 @@ class StudentContentController extends Controller
             'averagePercent' => $averagePercent,
         ];
     }
+    public function marksTablePreview(Request $request){
+        $user = $request->user();
+        $organization = $this->getActiveOrganization($user, $request);
+        if(!$organization){
+            return redirect()->back()->with('error', 'Organization not found');
+        }
+        $group = $this->getOrganizationGroup($organization);
+        if(!$group){
+            return redirect()->back()->with('error', 'Group not found');
+        }
+        $marks = $this->getStudentMarksTableInfo($user);
+        $enrolledModules = $group
+            ->groupModulesTeachers()
+            ->with('module')
+            ->get()
+            ->pluck('module.name')->toArray();;
+
+        return Inertia::render('student/marks-table-preview', [
+            "marks" => $marks,
+            "enrolledModules" => $enrolledModules,
+        ]);
+
+
+    }
+    private function getStudentMarksTableInfo(User $user){
+        $submissions = Submission::query() // get completed assignment submissions ids
+        ->where('student_id', $user->id)
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
+            ->pluck('assignment_id');
+        $assignments = Assignment::query()
+            ->whereIn('id', $submissions)
+            ->with('topics.module')
+            ->get();
+        return $assignments->map(function ($assignment) use ($user) {
+            $submission = $assignment->submissions()->where('student_id', $user->id)->first();
+            $moduleName = $assignment->topics()->with('module')->first()->module->name;
+            return [
+                'module_name' => $moduleName,
+                'percent' => $submission->total_percent,
+                'grade' => round($submission->total_percent / 10),
+                'submitted_on' => $submission->submitted_on,
+            ];
+        })->toArray();
+
+    }
 }
