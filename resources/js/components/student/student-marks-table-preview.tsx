@@ -1,6 +1,8 @@
-import { MarksTablePreview } from '@/types';
+import {MarksTablePreview, SharedData} from '@/types';
 import moment from 'moment';
 import { useTranslation } from '@/hooks/use-translation';
+import {usePage} from "@inertiajs/react";
+import {forwardRef} from "react";
 
 const schoolYearMonths = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
 
@@ -9,10 +11,11 @@ const getShortenMonthName = (month: string) => {
 
     return allowedLong.includes(month) ? month : month.substring(0, 3);
 };
+export const StudentMarksTablePreview = forwardRef<HTMLDivElement, MarksTablePreview>(
+    ({ marks, enrolledModules }, ref) => {
 
-export const StudentMarksTablePreview = ({ enrolledModules, marks }: MarksTablePreview) => {
     const { t } = useTranslation();
-
+    const {auth} = usePage<SharedData>().props;
     const getMarksForModuleAndMonth = (moduleName: string, month: string) => {
         // filter marks for the current module and month
         return marks.filter((mark) => {
@@ -36,33 +39,42 @@ export const StudentMarksTablePreview = ({ enrolledModules, marks }: MarksTableP
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full rounded-md border bg-background p-2" ref={ref}>
+            <div className="border-b pb-2 text-center">
+                <h1 className="text-sm font-semibold leading-tight">
+                    {auth.user.name}
+                </h1>
+                <p className="text-xs leading-tight text-muted-foreground">
+                    {auth.currentOrganization?.organization_name}
+                </p>
+            </div>
+
             <table className="w-full table-fixed border-collapse text-[6px] sm:text-xs">
                 <thead>
-                <tr>
-                    <th className="w-[22%] border px-0.5 py-1 text-center font-semibold">
+                <tr className="bg-muted/30">
+                    <th className="w-[22%] border px-1 py-1.5 text-center font-semibold">
                         {t('learning.Module')}
                     </th>
 
                     {schoolYearMonths.map((month) => (
                         <th
                             key={month}
-                            className="border px-0.5 py-1 text-center font-semibold"
+                            className="border px-0.5 py-1.5 text-center font-semibold"
                         >
                             {getShortenMonthName(t('common.' + month))}
                         </th>
                     ))}
 
-                    <th className="border px-0.5 py-1 text-center font-semibold">
+                    <th className="border px-0.5 py-1.5 text-center font-semibold">
                         {t('common.Average')}
                     </th>
                 </tr>
                 </thead>
 
                 <tbody>
-                {enrolledModules.map((moduleName) => (
-                    <tr key={moduleName}>
-                        <td className="break-words border px-0.5 py-1 text-center">
+                {enrolledModules.map((moduleName, rowIndex) => (
+                    <tr key={moduleName} className={rowIndex % 2 === 0 ? 'bg-background' : 'bg-muted/10'}>
+                        <td className="break-words border px-1 py-1.5 text-left font-medium leading-tight">
                             {moduleName}
                         </td>
 
@@ -72,18 +84,22 @@ export const StudentMarksTablePreview = ({ enrolledModules, marks }: MarksTableP
                             return (
                                 <td
                                     key={month}
-                                    className="break-words border px-0.5 py-1 text-center align-top"
+                                    className="break-words border px-0.5 py-1.5 text-center align-top leading-tight"
                                 >
-                                    {monthMarks.length > 0 // show percent for formative darbs and mark for summative
-                                        ? monthMarks.map((mark) => (
-                                            mark.grading_policy === 'SUMMATIVE' ? mark.grade : `${mark.percent}%`))
+                                    {monthMarks.length > 0
+                                        ? monthMarks
+                                            .map((mark) =>
+                                                mark.grading_policy === 'SUMMATIVE'
+                                                    ? mark.grade
+                                                    : `${mark.percent}%`,
+                                            )
                                             .join(' ')
                                         : '-'}
                                 </td>
                             );
                         })}
 
-                        <td className="border px-0.5 py-1 text-center font-semibold">
+                        <td className="border px-0.5 py-1.5 text-center font-semibold leading-tight">
                             {getAverageGrade(moduleName)}
                         </td>
                     </tr>
@@ -92,4 +108,4 @@ export const StudentMarksTablePreview = ({ enrolledModules, marks }: MarksTableP
             </table>
         </div>
     );
-};
+});
