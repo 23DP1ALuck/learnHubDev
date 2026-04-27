@@ -1,10 +1,10 @@
-import {Head, Link, usePage} from "@inertiajs/react";
+import {Head} from "@inertiajs/react";
 import {Button} from "@/components/ui/button";
 import {useTranslation} from "@/hooks/use-translation";
-import type {MarksTablePreview, SharedData} from "@/types";
+import type {MarksTablePreview} from "@/types";
 import {StudentMarksTablePreview} from "@/components/student/student-marks-table-preview";
 import html2canvas from 'html2canvas-pro';
-import React, {useLayoutEffect, useRef} from "react";
+import React, {useRef} from "react";
 import jsPDF from "jspdf";
 
 function MarksTablePreview({marks, enrolledModules}: MarksTablePreview) {
@@ -42,7 +42,6 @@ function MarksTablePreview({marks, enrolledModules}: MarksTablePreview) {
         });
 
         const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
 
         const margin = 20;
         const imgWidth = pageWidth - margin * 2;
