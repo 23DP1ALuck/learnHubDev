@@ -4,34 +4,22 @@ import {Button} from "@/components/ui/button";
 import StudentMarksTable from "@/components/student/student-marks-table";
 import AppLayout from "@/layouts/app-layout";
 import {useTranslation} from "@/hooks/use-translation";
+import type {MarksTablePreview, SharedData} from "@/types";
+import {StudentMarksTablePreview} from "@/components/student/student-marks-table-preview";
 
-type MarksTablePreview = {
-    marks: any;
-    enrolledModules: any;
-}
+
 function MarksTablePreview({marks, enrolledModules}: MarksTablePreview) {
     const {t} = useTranslation();
-    console.log(marks);
-    console.log(enrolledModules);
+    const {auth} = usePage<SharedData>().props;
+
     return <div>
             <Head title={t('student.Student marks')} />
 
-            <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex justify-between">
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-semibold tracking-tight">
-                            {t('common.Marks')}
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            {t(
-                                'student.Submitted and graded results for the active organization.',
-                            )}
-                        </p>
-                    </div>
-                    <Link href={route('student.marks.table-preview')} className="btn btn-primary">
-                        <Button variant={"outline"}>Atvert liecību</Button>
-                    </Link>
+            <div className="flex flex-1 flex-col gap-4 rounded-xl p-2">
+                <div className="flex w-screen text-center justify-center">
+                    <h1>{auth.user.name}</h1>
                 </div>
+                <StudentMarksTablePreview marks={marks} enrolledModules={enrolledModules}/>
             </div>
         </div>
 
