@@ -589,8 +589,10 @@ class StudentContentController extends Controller
             return [
                 'module_name' => $moduleName,
                 'percent' => $submission->total_percent,
-                'grade' => round($submission->total_percent / 10),
-                'submitted_on' => $submission->submitted_on,
+                'grading_policy' => $assignment->grading_policy,
+                'grade' =>  $assignment->grading_policy === 'SUMMATIVE' ? round($submission->total_percent / 10)
+                    : null,
+                'submitted_on' => $assignment->grading_policy === 'FORMATIVE' ? $submission->submitted_on : null,
             ];
         })->toArray();
 
