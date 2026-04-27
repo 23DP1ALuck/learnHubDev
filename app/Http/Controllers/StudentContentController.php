@@ -519,7 +519,7 @@ class StudentContentController extends Controller
     private function getStudentMarksInfo(User $user): array{
         $submissions = Submission::query() // get completed assignment submissions ids
             ->where('student_id', $user->id)
-            ->where('status', ['SUBMITTED', 'GRADED'])
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
             ->pluck('assignment_id');
         $assignments = Assignment::query()
             ->whereIn('id', $submissions)
