@@ -11,7 +11,6 @@ import type { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
-
 const emptyFilters: TeacherSubmissionsFilterValues = {
     group_id: '',
 };

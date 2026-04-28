@@ -103,8 +103,12 @@ export default function TeacherAssignmentPage({
                             </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Link href={route('teacher.assignments.submissions', [assignment.id])}
-                                  className="flex items-center gap-2 self-center font-medium">
+                            <Link
+                                href={route('teacher.assignments.submissions', [
+                                    assignment.id,
+                                ])}
+                                className="flex items-center gap-2 self-center font-medium"
+                            >
                                 <Button variant="outline">
                                     {t('common.View submissions')}
                                 </Button>
@@ -118,7 +122,6 @@ export default function TeacherAssignmentPage({
                                 </Button>
                             </Link>
                         </div>
-
                     </CardHeader>
                     <CardContent className="grid gap-3 md:grid-cols-4">
                         <div className="rounded-lg border p-4">

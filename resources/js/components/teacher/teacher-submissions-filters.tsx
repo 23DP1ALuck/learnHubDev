@@ -29,7 +29,7 @@ export default function TeacherSubmissionsFilters({
     filters,
     groups,
     organizationType,
-    assignmentId
+    assignmentId,
 }: TeacherSubmissionsFiltersProps) {
     const { t } = useTranslation();
     const isSchool = organizationType === 'school';
@@ -48,7 +48,10 @@ export default function TeacherSubmissionsFilters({
             </CardHeader>
             <CardContent>
                 <form
-                    action={route('teacher.assignments.submissions', assignmentId!)}
+                    action={route(
+                        'teacher.assignments.submissions',
+                        assignmentId!,
+                    )}
                     method="get"
                     className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]"
                 >
@@ -96,7 +99,10 @@ export default function TeacherSubmissionsFilters({
                         <Button type="submit">{t('common.Apply')}</Button>
                         <Button asChild type="button" variant="outline">
                             <Link
-                                href={route('teacher.assignments.submissions', assignmentId!)}
+                                href={route(
+                                    'teacher.assignments.submissions',
+                                    assignmentId!,
+                                )}
                             >
                                 {t('common.Reset')}
                             </Link>

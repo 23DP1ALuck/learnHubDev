@@ -1,14 +1,14 @@
-import {Head} from "@inertiajs/react";
-import {Button} from "@/components/ui/button";
-import {useTranslation} from "@/hooks/use-translation";
-import type {MarksTablePreview} from "@/types";
-import {StudentMarksTablePreview} from "@/components/student/student-marks-table-preview";
+import { StudentMarksTablePreview } from '@/components/student/student-marks-table-preview';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/use-translation';
+import type { MarksTablePreview } from '@/types';
+import { Head } from '@inertiajs/react';
 import html2canvas from 'html2canvas-pro';
-import React, {useRef} from "react";
-import jsPDF from "jspdf";
+import jsPDF from 'jspdf';
+import { useRef } from 'react';
 
-function MarksTablePreview({marks, enrolledModules}: MarksTablePreview) {
-    const {t} = useTranslation();
+function MarksTablePreview({ marks, enrolledModules }: MarksTablePreview) {
+    const { t } = useTranslation();
     const tableRef = useRef<HTMLDivElement>(null);
     const handlePrint = async () => {
         if (!tableRef.current) return;
@@ -58,17 +58,21 @@ function MarksTablePreview({marks, enrolledModules}: MarksTablePreview) {
 
         pdf.save('marks-table.pdf');
     };
-    return <div>
+    return (
+        <div>
             <Head title={t('student.Student marks')} />
 
             <div className="flex flex-1 flex-col gap-4 rounded-xl p-4">
-
                 <div className="flex justify-end">
                     <Button onClick={handlePrint}>Print</Button>
                 </div>
-                <StudentMarksTablePreview marks={marks} enrolledModules={enrolledModules} ref={tableRef}/>
+                <StudentMarksTablePreview
+                    marks={marks}
+                    enrolledModules={enrolledModules}
+                    ref={tableRef}
+                />
             </div>
         </div>
-
+    );
 }
 export default MarksTablePreview;

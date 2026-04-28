@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OnboardingRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
@@ -15,7 +13,7 @@ class DashboardController extends Controller
         $role = $request->user()?->role;
 
         if ($role === 'admin') {
-            return $this->adminDashboard();
+            return app(AdminContentController::class)->dashboard($request);
         }
 
         $currentOrg = $request->session()->get('activeOrganization', '');
@@ -37,15 +35,6 @@ class DashboardController extends Controller
 
 
         return $this->userDashboard($request);
-    }
-
-    private function adminDashboard(): Response
-    {
-        $latestOnboardingRequests = OnboardingRequest::latest()->take(5)->get();
-
-        return Inertia::render('admin/dashboard', [
-            'onboardingRequests' => $latestOnboardingRequests,
-        ]);
     }
 
     private function userDashboard(Request $request): Response

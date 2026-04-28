@@ -160,11 +160,11 @@ export type TaskOption = {
 };
 type MarksTablePreview = {
     marks: {
-        'module_name': string,
-        'percent': number,
-        'grade': number,
-        'grading_policy': 'SUMMATIVE' | 'FORMATIVE',
-        'submitted_on': string,
+        module_name: string;
+        percent: number;
+        grade: number;
+        grading_policy: 'SUMMATIVE' | 'FORMATIVE';
+        submitted_on: string;
     }[];
     enrolledModules: string[];
-}
+};

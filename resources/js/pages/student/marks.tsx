@@ -3,12 +3,12 @@ import type {
     StudentAssignmentSummary,
     StudentMarksStats,
 } from '@/components/student/student-types';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/use-translation';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
-import {Head, Link, usePage} from '@inertiajs/react';
-import {route} from "ziggy-js";
-import {Button} from "@/components/ui/button";
+import { Head, Link, usePage } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Marks',
@@ -45,8 +45,11 @@ export default function StudentMarksPage({
                             )}
                         </p>
                     </div>
-                    <Link href={route('student.marks.table-preview')} className="btn btn-primary">
-                        <Button variant={"outline"}>Atvert liecību</Button>
+                    <Link
+                        href={route('student.marks.table-preview')}
+                        className="btn btn-primary"
+                    >
+                        <Button variant={'outline'}>Atvert liecību</Button>
                     </Link>
                 </div>
 
