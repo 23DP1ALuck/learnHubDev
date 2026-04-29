@@ -370,7 +370,7 @@ class OrganizationOwnerController extends Controller
         // 2. Extract the header and convert it into a Laravel collection.
         // https://stackoverflow.com/questions/54145035/cant-remove-ufeff-from-a-string
         // need to remove the BOM from the beginning of the string (if file was exported from Excel)
-                $header = collect(str_getcsv(array_shift($lines), ))
+                $header = collect(str_getcsv(array_shift($lines), ',', '"', '\\'))
                 ->map(fn($value) => preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value));
 
         // 3. Convert the rows into a Laravel collection.
@@ -378,8 +378,9 @@ class OrganizationOwnerController extends Controller
 
         // 4. Map through the rows and combine them with the header to produce the final collection.
                 $data = $rows->map(fn($row) => $header->combine(str_getcsv($row)));
-                dd($data);
-        $users = collect();
-        return $users;
+        return Inertia::render('owner/invite-csv', [
+            'organization' => $organization,
+            'users' => $data,
+        ]);
     }
 }

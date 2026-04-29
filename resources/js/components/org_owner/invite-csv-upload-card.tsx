@@ -14,11 +14,13 @@ import type { Organization } from '@/types';
 import { Form } from '@inertiajs/react';
 import {inviteCsv} from "@/routes/invitations";
 import {route} from "ziggy-js";
+import {PhotoProvider, PhotoView} from "react-photo-view";
+import 'react-photo-view/dist/react-photo-view.css';
 
 type InviteCsvUploadCardProps = {
     organization: Organization;
 };
-
+import csvExample from "@/images/csv-example.jpg"
 export function InviteCsvUploadCard({
     organization,
 }: InviteCsvUploadCardProps) {
@@ -67,6 +69,23 @@ export function InviteCsvUploadCard({
                         </>
                     )}
                 </Form>
+                <Card className="mt-6 flex flex-col items-center gap-4 border-dashed p-4">
+                    <CardHeader className="p-0 text-center">
+                        <CardDescription>
+                            {t('owner.Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:')}
+                        </CardDescription>
+                    </CardHeader>
+                    <PhotoProvider>
+                        <PhotoView src={csvExample}>
+                            <img
+                                src={csvExample}
+                                alt={t('owner.CSV file example')}
+                                className="max-h-64 cursor-zoom-in rounded-xl border object-contain"
+                            />
+                        </PhotoView>
+                    </PhotoProvider>
+                </Card>
+
             </CardContent>
         </Card>
     );

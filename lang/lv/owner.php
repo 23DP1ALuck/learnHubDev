@@ -75,4 +75,6 @@ return [
     'Search modules' => 'Meklēt moduļus',
     'Failed to fetch modules' => 'Neizdevās ielādēt moduļus',
     'No modules are available for this group.' => 'Šai grupai nav pieejamu moduļu.',
+    'Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:' =>
+        'Pārliecinieties, ka jūsu CSV fails ir pareizi noformēts. Šeit ir derīga CSV faila piemērs:',
 ];

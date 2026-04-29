@@ -31,7 +31,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const roleOptions = ['user', 'admin'];
+const roleOptions = ['STUDENT', 'TEACHER'];
 const statusOptions = ['active', 'pending', 'disabled'];
 
 export default function OwnerInviteCsvPage({

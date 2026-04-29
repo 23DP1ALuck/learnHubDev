@@ -70,4 +70,6 @@ return [
     'still waiting for acceptance.' => 'still waiting for acceptance.',
     'Send invite' => 'Send invite',
     'Teachers, students, and owners currently attached to this organization.' => 'Teachers, students, and owners currently attached to this organization.',
+    'Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:' =>
+        'Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:'
 ];

@@ -75,4 +75,6 @@ return [
     'Search modules' => 'Искать модули',
     'Failed to fetch modules' => 'Не удалось загрузить модули',
     'No modules are available for this group.' => 'Для этой группы нет доступных модулей.',
+    'Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:' =>
+        'Убедитесь, что ваш CSV-файл правильно отформатирован. Вот пример корректного CSV-файла:',
 ];
