@@ -26,14 +26,14 @@ export function InviteCsvUserRow({
         <tr>
             <td className="px-4 py-3 align-top">
                 <Input
-                    name={`users[${index}][first-name]`}
+                    name={`users[${index}][first_name]`}
                     defaultValue={user.first_name}
                 />
                 <InputError message={errors[`users.${index}.first-name`]} />
             </td>
             <td className="px-4 py-3 align-top">
                 <Input
-                    name={`users[${index}][last-name]`}
+                    name={`users[${index}][last_name]`}
                     defaultValue={user.last_name}
                 />
                 <InputError message={errors[`users.${index}.last-name`]} />

@@ -10,17 +10,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/hooks/use-translation';
+import csvExample from '@/images/csv-example.jpg';
 import type { Organization } from '@/types';
 import { Form } from '@inertiajs/react';
-import {inviteCsv} from "@/routes/invitations";
-import {route} from "ziggy-js";
-import {PhotoProvider, PhotoView} from "react-photo-view";
+import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+import { route } from 'ziggy-js';
 
 type InviteCsvUploadCardProps = {
     organization: Organization;
 };
-import csvExample from "@/images/csv-example.jpg"
 export function InviteCsvUploadCard({
     organization,
 }: InviteCsvUploadCardProps) {
@@ -72,7 +71,9 @@ export function InviteCsvUploadCard({
                 <Card className="mt-6 flex flex-col items-center gap-4 border-dashed p-4">
                     <CardHeader className="p-0 text-center">
                         <CardDescription>
-                            {t('owner.Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:')}
+                            {t(
+                                'owner.Please ensure your CSV file is formatted correctly. Here is an example of a valid CSV file:',
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <PhotoProvider>
@@ -85,7 +86,6 @@ export function InviteCsvUploadCard({
                         </PhotoView>
                     </PhotoProvider>
                 </Card>
-
             </CardContent>
         </Card>
     );

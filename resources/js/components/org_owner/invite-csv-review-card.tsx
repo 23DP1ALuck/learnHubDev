@@ -10,6 +10,7 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import type { ParsedCsvUser } from './invite-csv-types';
 import { InviteCsvUserRow } from './invite-csv-user-row';
+import {route} from "ziggy-js";
 
 type InviteCsvReviewCardProps = {
     roleOptions: string[];
@@ -44,7 +45,7 @@ export function InviteCsvReviewCard({
                     </div>
                 ) : (
                     <Form
-                        action={submitAction ?? '#'}
+                        action={route('invitations.invite-csv-parse.invite-users') ?? '#'}
                         method="post"
                         className="grid gap-4"
                     >
@@ -85,7 +86,7 @@ export function InviteCsvReviewCard({
                                 <div className="flex justify-end">
                                     <Button
                                         type="submit"
-                                        disabled={processing || !submitAction}
+                                        disabled={processing}
                                     >
                                         {t('owner.Save imported users')}
                                     </Button>

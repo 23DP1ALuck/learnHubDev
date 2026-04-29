@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InviteEmail;
 use App\Models\AccountInvites;
 use App\Models\GroupModuleTeacher;
 use App\Models\Module;
@@ -12,6 +13,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -370,17 +374,105 @@ class OrganizationOwnerController extends Controller
         // 2. Extract the header and convert it into a Laravel collection.
         // https://stackoverflow.com/questions/54145035/cant-remove-ufeff-from-a-string
         // need to remove the BOM from the beginning of the string (if file was exported from Excel)
-                $header = collect(str_getcsv(array_shift($lines), ',', '"', '\\'))
+                $header = collect(str_getcsv(array_shift($lines), separator: ',', enclosure: '"', escape: ""))
                 ->map(fn($value) => preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value));
 
         // 3. Convert the rows into a Laravel collection.
                 $rows = collect($lines);
 
         // 4. Map through the rows and combine them with the header to produce the final collection.
-                $data = $rows->map(fn($row) => $header->combine(str_getcsv($row)));
+                $data = $rows->map(fn($row) => $header->combine(str_getcsv($row, separator: ',', enclosure: '"', escape: "")));
         return Inertia::render('owner/invite-csv', [
             'organization' => $organization,
             'users' => $data,
         ]);
     }
+    public function invitePeopleByCSV(Request $request){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('error', 'Organization not found');
+        }
+        $users = $request->input('users', []);
+        $validated = $request->validate([
+            'users' => ['required', 'array', 'min:1'],
+            'users.*.first_name' => ['required', 'string', 'max:255'],
+            'users.*.last_name' => ['required', 'string', 'max:255'],
+            'users.*.email' => ['required', 'string', 'email', 'max:255'],
+            'users.*.role' => ['required', Rule::in(['STUDENT', 'TEACHER'])],
+        ]);
+        $usersCount = sizeof($validated['users']); // initial invite users count
+        $sentCount = 0;
+        foreach ($validated['users'] as $invitedUser) {
+            $result = $this->invite($organization, $user, [
+                'first_name' => $invitedUser['first_name'],
+                'last_name' => $invitedUser['last_name'],
+                'email' => $invitedUser['email'],
+                'role' => $invitedUser['role'],
+            ]);
+            if ($result['mail_sent']) {
+                $sentCount++;
+            } else {
+                $errors[] = $result['mail_error'];
+            }
+            sleep(1);
+        }
+        if($sentCount < $usersCount){ // if not all invites were sent, redirect back to the invitations message with an error message
+            return redirect()->route('invitations')
+                ->with('error', "{$sentCount} out of {$usersCount} invites were sent. " . implode(' ', $errors));;
+        }
+        return redirect()->route('invitations')->with('success', 'Invites sent successfully');
+    }
+    private function invite($organization, $user, $invitedUser){
+        $pendingInviteExists = AccountInvites::query()
+            ->where('invitation_type', 'join_org')
+            ->where('organization_id', $organization->id)
+            ->where('email', $invitedUser['email'])
+            ->whereNull('used_at')
+            ->where('expires_at', '>', now())
+            ->exists();
+        if ($pendingInviteExists) {
+            return [
+                'mail_sent' => false,
+                'mail_error' => "Active invite already exists for {$invitedUser['email']}.",
+            ];
+        }
+
+        $selector = bin2hex(random_bytes(32));
+        $verifier = bin2hex(random_bytes(32));
+
+        $invite = AccountInvites::query()->create([
+            'selector' => $selector,
+            'verifier_hash' => hash('sha256', $verifier),
+            'invitation_type' => 'join_org',
+            'organization_id' => $organization->id,
+            'email' => $invitedUser['email'],
+            'first_name' => $invitedUser['first_name'],
+            'last_name' => $invitedUser['last_name'],
+            'role_in_org' => $invitedUser['role'],
+            'expires_at' => now()->addDays(7),
+            'invited_by' => $user->id,
+        ]);
+        $mailSent = false;
+        $mailError = null;
+        $url = url('/join/'.$selector.'.'.$verifier);
+        try {
+            Mail::to($invitedUser['email'])->send(new InviteEmail(
+                inviteUrl: $url,
+                recipientName: $invitedUser['first_name'] . ' ' . $invitedUser['last_name'],
+                organizationName: $organization->organization_name,
+                expiresAt: $invite->expires_at,
+            ));
+            $mailSent = true;
+        } catch (\Throwable $e) {
+            report($e);
+            $mailError = 'Invite created, but email failed to send. Error: ' . $e->getMessage();
+            $invite->delete();
+        }
+        return [
+            'mail_sent' => $mailSent,
+            'mail_error' => $mailError,
+        ];
+}
 }
