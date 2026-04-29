@@ -35,9 +35,10 @@ import type {
     OrganizationStats,
     SharedData,
 } from '@/types';
-import { Form, Head, usePage } from '@inertiajs/react';
+import {Form, Head, Link, usePage} from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import {route} from "ziggy-js";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organization',
@@ -250,13 +251,18 @@ export default function OwnerInvitationsPage({
                                                 )}
                                             </p>
                                         </div>
-                                        <Button
-                                            type="submit"
-                                            disabled={processing}
-                                        >
-                                            {processing && <Spinner />}{' '}
-                                            {t('owner.Send invite')}
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Link href={route("invitations.invite-csv")}>
+                                                <Button>{t('owner.Import users from CSV')}</Button>
+                                            </Link>
+                                            <Button
+                                                type="submit"
+                                                disabled={processing}
+                                            >
+                                                {processing && <Spinner />}{' '}
+                                                {t('owner.Send invite')}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </>
                             )}

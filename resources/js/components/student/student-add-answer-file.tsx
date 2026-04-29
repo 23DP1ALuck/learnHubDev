@@ -1,19 +1,19 @@
-import { useTranslation } from '@/hooks/use-translation';
-import {ChangeEvent, Dispatch, SetStateAction, useEffect, useState} from 'react';
+import { Button } from '@/components/ui/button';
 import {
     Dialog,
-    DialogTrigger,
+    DialogClose,
     DialogContent,
-    DialogHeader,
-    DialogTitle,
     DialogDescription,
     DialogFooter,
-    DialogClose,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Field } from '@headlessui/react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/hooks/use-translation';
+import { Field } from '@headlessui/react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type LoadedFile = {
     file_name: string;
@@ -22,16 +22,19 @@ type LoadedFile = {
 
 type AddAnswerFileProps = {
     files: LoadedFile | null;
-    setFiles: Dispatch<SetStateAction<LoadedFile|null>>; // useState setter
+    setFiles: Dispatch<SetStateAction<LoadedFile | null>>; // useState setter
     openFilePicker: () => void;
 };
 
-export const AddAnswerFile = ({ files, setFiles, openFilePicker }: AddAnswerFileProps) => {
+export const AddAnswerFile = ({
+    files,
+    setFiles,
+    openFilePicker,
+}: AddAnswerFileProps) => {
     const { t } = useTranslation();
 
     const [fileName, setFileName] = useState(files?.file_name ?? '');
     const [fileExtension, setFileExtension] = useState('');
-
 
     const handleAddFile = () => {
         if (!files) return;
@@ -54,9 +57,13 @@ export const AddAnswerFile = ({ files, setFiles, openFilePicker }: AddAnswerFile
 
             <DialogContent className="sm:max-w-sm">
                 <DialogHeader>
-                    <DialogTitle>{t('learning.Upload material file')}</DialogTitle>
+                    <DialogTitle>
+                        {t('learning.Upload material file')}
+                    </DialogTitle>
                     <DialogDescription>
-                        {t('learning.Add a file to this material for your students. Choose a file and save your changes.')}
+                        {t(
+                            'learning.Add a file to this material for your students. Choose a file and save your changes.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -99,7 +106,11 @@ export const AddAnswerFile = ({ files, setFiles, openFilePicker }: AddAnswerFile
                         </DialogClose>
 
                         <DialogClose asChild>
-                            <Button type="button" disabled={!files} onClick={handleAddFile}>
+                            <Button
+                                type="button"
+                                disabled={!files}
+                                onClick={handleAddFile}
+                            >
                                 {t('teacher.Save file')}
                             </Button>
                         </DialogClose>

@@ -56,6 +56,8 @@ Route::middleware(['auth', 'verified', CheckIsOrganizationOwner::class])
 
         Route::get('organization/users', [OrganizationOwnerController::class, 'users'])->name('users');
         Route::get('organization/invitations', [OrganizationOwnerController::class, 'invitations'])->name('invitations');
+        Route::get('organization/invitations/import-csv', [OrganizationOwnerController::class, 'inviteCSV'])->name('invitations.invite-csv');
+        Route::post('organization/invitations/import-csv', [OrganizationOwnerController::class, 'inviteCSVParse'])->name('invitations.invite-csv-parse');
         Route::post('organization/invitations', [AccountInvitesController::class, 'storeOrganizationInvite'])->name('invitations.store');
     });
 Route::middleware([CheckIsSchoolOwner::class])->group(function () {

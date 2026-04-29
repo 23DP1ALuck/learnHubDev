@@ -338,4 +338,48 @@ class OrganizationOwnerController extends Controller
             'inviter_name' => $invite->inviter?->name,
         ];
     }
+    public function inviteCSV(Request $request){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('error', 'Organization not found');
+        }
+        return Inertia::render('owner/invite-csv', [
+            'organization' => $organization,
+            'users' => [],
+        ]);
+    }
+    public function inviteCSVParse(Request $request){
+        $user = $request->user();
+        $organizationId = $request->session()->get('activeOrganization');
+        $organization = Organization::query()->where('id', $organizationId)->first();
+        if(!$organization){
+            return redirect()->route('dashboard')->with('error', 'Organization not found');
+        }
+        $csvFile = $request->file('csv_file');
+        if(!$csvFile){
+            return redirect()->back()->with('error', 'Please select a CSV file');
+        }
+        $contents = file_get_contents($csvFile->getRealPath());
+        // got here
+        // https://medium.com/@jani.hidvegi/parsing-csv-contents-to-collections-in-laravel-e9e69db77b29
+        // 1. Split by new line. Use the PHP_EOL constant for cross-platform compatibility.
+        $lines = explode(PHP_EOL, trim($contents));
+
+        // 2. Extract the header and convert it into a Laravel collection.
+        // https://stackoverflow.com/questions/54145035/cant-remove-ufeff-from-a-string
+        // need to remove the BOM from the beginning of the string (if file was exported from Excel)
+                $header = collect(str_getcsv(array_shift($lines), ))
+                ->map(fn($value) => preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value));
+
+        // 3. Convert the rows into a Laravel collection.
+                $rows = collect($lines);
+
+        // 4. Map through the rows and combine them with the header to produce the final collection.
+                $data = $rows->map(fn($row) => $header->combine(str_getcsv($row)));
+                dd($data);
+        $users = collect();
+        return $users;
+    }
 }
