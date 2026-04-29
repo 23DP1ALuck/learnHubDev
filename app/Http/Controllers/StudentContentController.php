@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnswerFile;
 use App\Models\Assignment;
 use App\Models\Material;
 use App\Models\Module;
@@ -369,6 +370,13 @@ class StudentContentController extends Controller
     }
     private function getSpecificTaskSummary(Task $task, User $user): array{
         $answer = $task->answers()->where('student_id', $user->id)->first();
+        $answerFiles = $answer?->fileLinks()->with('file')->get();
+        $answerFiles = $answerFiles?->map(function (AnswerFile $answerFile){
+            return [
+                'file_name' => $answerFile->file?->file_name,
+                'file_path' => $answerFile->file?->file_path,
+            ];
+        });
         return [
             'task_id' => $task->task_id,
             'question_text' => $task->question_text,
@@ -376,6 +384,7 @@ class StudentContentController extends Controller
             'max_points' => $task->max_points,
             'options' => $task->options()->get()->toArray(),
             'answer' => json_decode($answer?->answer_text) ?? null,
+            'answer_files' => $answerFiles ?? null,
         ];
     }
     private function getTaskNavigation(Assignment $assignment, User $user): array{

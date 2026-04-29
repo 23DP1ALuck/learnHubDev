@@ -102,6 +102,10 @@ export type StudentTaskSummary = {
     max_points: string | number;
     options: StudentTaskOption[];
     answer: string[];
+    answer_files: {
+        file_name: string;
+        file_path: string | null;
+    }[];
 };
 
 export type StudentTaskNavigationItem = {

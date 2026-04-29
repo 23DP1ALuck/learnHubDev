@@ -23,6 +23,7 @@ class StoreTaskAnswerRequest extends FormRequest
     public function rules(): array
     {
         $autoGradableTypes = ['CHECKBOX', 'TEXT', 'TRUE_FALSE', 'NUMBER', 'CUSTOM_SELECT'];
+
         return [
             'answer_text' => [
                 Rule::requiredIf(fn () => in_array($this->input('task_type'), $autoGradableTypes, true)),
@@ -31,6 +32,11 @@ class StoreTaskAnswerRequest extends FormRequest
                 'min:1',
             ],
             'answer_text.*' => ['required', 'string', 'max:255'],
+            'file_name' => ['nullable', 'string', 'max:110'],
+            'file' => [
+                Rule::requiredIf(fn () => $this->input('task_type') === 'FILE'),
+                'file',
+            ],
         ];
     }
 }

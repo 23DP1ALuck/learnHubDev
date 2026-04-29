@@ -3,18 +3,17 @@
 use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\AssignmentsController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaterialFilesController;
 use App\Http\Controllers\MaterialsController;
 use App\Http\Controllers\ModulesController;
+use App\Http\Controllers\OnboardingRequestController;
 use App\Http\Controllers\OrganizationOwnerController;
 use App\Http\Controllers\OrganizationsPageController;
 use App\Http\Controllers\SchoolGroupController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StudentContentController;
 use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\TaskAnswerFilesController;
 use App\Http\Controllers\TaskAnswersController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeacherContentController;
@@ -106,7 +105,6 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
     Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
     Route::get('student/marks/table-preview', [StudentContentController::class, 'marksTablePreview'])->name('student.marks.table-preview');
 
-    Route::post('student/assignments/{assignment}/task/{task}/file', [TaskAnswerFilesController::class, 'store'])->name('student.task-answer-files.store');
     Route::post('/student/assignments/{assignment}/start', [SubmissionController::class, 'store'])->name('student.submission.store');
     Route::post('/student/assignments/{assignment}/task/{task}', [TaskAnswersController::class, 'store'])->name('student.answers.store');
 
@@ -118,6 +116,7 @@ Route::post('/locale/{locale}', function (string $locale) {
         abort(400);
     }
     session(['locale' => $locale]);
+
     return back();
 })->name('locale.set');
 

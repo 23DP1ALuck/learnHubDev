@@ -13,16 +13,24 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import {AddAnswerFile} from "@/components/student/student-add-answer-file";
+import {File} from "lucide-react";
+import {useRef, useState} from "react";
 type StudentTaskContentProps = {
     assignmentId: number;
     task: StudentTaskSummary;
 };
+type LoadedFile = {
+    file_name: string;
+    file_extension:string
+}
 export default function StudentTaskContent({
     assignmentId,
     task,
 }: StudentTaskContentProps) {
     const { t } = useTranslation();
     const isAnswered = task.answer !== null && task.answer !== undefined;
+    const [files, setFiles] = useState<LoadedFile|null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const selectedAnswers = Array.isArray(task.answer) // for next comparing logic
         ? task.answer
         : [task.answer];
@@ -58,6 +66,7 @@ export default function StudentTaskContent({
                     ])}
                     method="post"
                     className="space-y-4"
+                    encType="multipart/form-data"
                 >
                     <input
                         type="hidden"
@@ -149,7 +158,41 @@ export default function StudentTaskContent({
                     )}
 
                     {task.task_type === 'FILE' && (
-                        <AddAnswerFile assignmentId={assignmentId} taskId={task.task_id}/>
+                        <>
+                            <input
+                                ref={fileInputRef}
+                                type={"file"}
+                                name={"file"}
+                                className={"hidden"}
+                                onChange={(event) => {
+                                    const file = event.target.files?.[0]
+                                    if(!file) return;
+
+                                    const dotIndex = file.name.lastIndexOf('.');
+                                    setFiles({
+                                        file_name: dotIndex === -1 ? file.name : file.name.slice(0, dotIndex),
+                                        file_extension: dotIndex === -1 ? '' : file.name.slice(dotIndex),
+                                    });
+                                }}
+                            />
+                            <AddAnswerFile files={files}
+                                           setFiles={setFiles}
+                                           openFilePicker={() => fileInputRef.current?.click()}/>
+                        </>
+                    )}
+                    {task.task_type === 'FILE' && files && (
+                        <>
+                            <input
+                                type="hidden"
+                                name="file_name"
+                                value={files.file_name}
+                            />
+                            <input
+                                type="hidden"
+                                name="file_extension"
+                                value={files.file_extension}
+                            />
+                        </>
                     )}
 
                     {!task.answer && (
@@ -160,6 +203,16 @@ export default function StudentTaskContent({
                         </div>
                     )}
                 </Form>
+                <div className="flex items-center justify-center">
+                    {task.answer_files && task.answer_files.map((file) => (
+                        <Card>
+                            <div className={"flex items-center justify-center flex-col gap-2"}>
+                                <File/>
+                                <h1 className="text-muted-foreground">{file.file_name}</h1>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             </CardContent>
         </Card>
     );
