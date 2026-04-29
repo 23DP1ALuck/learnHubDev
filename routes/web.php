@@ -14,6 +14,7 @@ use App\Http\Controllers\SchoolGroupController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StudentContentController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\TaskAnswerFilesController;
 use App\Http\Controllers\TaskAnswersController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeacherContentController;
@@ -102,12 +103,13 @@ Route::middleware(['auth', 'verified', CheckIsStudent::class])->group(function (
     Route::get('/student/assignments', [StudentContentController::class, 'assignments'])->name('student.assignments');
     Route::get('/student/assignments/{assignment_id}', [StudentContentController::class, 'assignment'])->name('student.assignments.show');
     Route::get('/student/assignments/{assignment}/tasks/{task}', [StudentContentController::class, 'task'])->name('student.tasks.show');
+    Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
+    Route::get('student/marks/table-preview', [StudentContentController::class, 'marksTablePreview'])->name('student.marks.table-preview');
 
+    Route::post('student/assignments/{assignment}/task/{task}/file', [TaskAnswerFilesController::class, 'store'])->name('student.task-answer-files.store');
     Route::post('/student/assignments/{assignment}/start', [SubmissionController::class, 'store'])->name('student.submission.store');
     Route::post('/student/assignments/{assignment}/task/{task}', [TaskAnswersController::class, 'store'])->name('student.answers.store');
-    Route::get('/student/marks', [StudentContentController::class, 'marks'])->name('student.marks');
 
-    Route::get('student/marks/table-preview', [StudentContentController::class, 'marksTablePreview'])->name('student.marks.table-preview');
 });
 Route::get('/join/{token}', [AccountInvitesController::class, 'showJoinForm']);
 Route::post('/join/{token}', [AccountInvitesController::class, 'join']);

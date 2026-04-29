@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useTranslation } from '@/hooks/use-translation';
 import { Form } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import {AddAnswerFile} from "@/components/student/student-add-answer-file";
 type StudentTaskContentProps = {
     assignmentId: number;
     task: StudentTaskSummary;
@@ -148,11 +149,7 @@ export default function StudentTaskContent({
                     )}
 
                     {task.task_type === 'FILE' && (
-                        <Input
-                            name="answer_file"
-                            type="file"
-                            disabled={isAnswered}
-                        />
+                        <AddAnswerFile assignmentId={assignmentId} taskId={task.task_id}/>
                     )}
 
                     {!task.answer && (
