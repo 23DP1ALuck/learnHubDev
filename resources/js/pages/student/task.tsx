@@ -61,6 +61,7 @@ export default function StudentTaskPage({
 
                 <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(18rem,22rem)]">
                     <StudentTaskContent
+                        key={task.task_id}
                         assignmentId={assignment.id}
                         task={task}
                     />

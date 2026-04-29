@@ -14,14 +14,18 @@ import { Form } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 import {AddAnswerFile} from "@/components/student/student-add-answer-file";
 import {File} from "lucide-react";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 type StudentTaskContentProps = {
     assignmentId: number;
     task: StudentTaskSummary;
 };
 type LoadedFile = {
     file_name: string;
-    file_extension:string
+    file_extension:string | null
+}
+type SubmittedFile = {
+    file_name: string;
+    file_path: string | null;
 }
 export default function StudentTaskContent({
     assignmentId,
@@ -34,9 +38,16 @@ export default function StudentTaskContent({
     const selectedAnswers = Array.isArray(task.answer) // for next comparing logic
         ? task.answer
         : [task.answer];
+
+    const submittedFile: SubmittedFile | null = files
+        ? {
+            file_name: `${files.file_name}${files.file_extension ?? ''}`,
+            file_path: null,
+        }
+        : task.answer_files?.[0] ?? null;
     return (
         <Card className="min-h-[28rem] border-sidebar-border/70">
-            <CardHeader className="space-y-4">
+            <CardHeader className="space-   y-4">
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         <CardTitle className="text-xl">
@@ -190,7 +201,7 @@ export default function StudentTaskContent({
                             <input
                                 type="hidden"
                                 name="file_extension"
-                                value={files.file_extension}
+                                value={files.file_extension ?? ''}
                             />
                         </>
                     )}
@@ -204,14 +215,14 @@ export default function StudentTaskContent({
                     )}
                 </Form>
                 <div className="flex items-center justify-center">
-                    {task.answer_files && task.answer_files.map((file) => (
-                        <Card>
+                    {submittedFile && (
+                        <Card className="max-w-40 aspect-square">
                             <div className={"flex items-center justify-center flex-col gap-2"}>
                                 <File/>
-                                <h1 className="text-muted-foreground">{file.file_name}</h1>
+                                <h1 className="text-muted-foreground break-all text-center">{submittedFile.file_name}</h1>
                             </div>
                         </Card>
-                    ))}
+                    )}
                 </div>
             </CardContent>
         </Card>

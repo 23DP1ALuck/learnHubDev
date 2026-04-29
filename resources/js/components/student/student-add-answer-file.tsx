@@ -1,5 +1,5 @@
 import { useTranslation } from '@/hooks/use-translation';
-import {ChangeEvent, Dispatch, SetStateAction, useState} from 'react';
+import {ChangeEvent, Dispatch, SetStateAction, useEffect, useState} from 'react';
 import {
     Dialog,
     DialogTrigger,
@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 
 type LoadedFile = {
     file_name: string;
-    file_extension: string;
+    file_extension: string | null;
 };
 
 type AddAnswerFileProps = {
@@ -30,7 +30,8 @@ export const AddAnswerFile = ({ files, setFiles, openFilePicker }: AddAnswerFile
     const { t } = useTranslation();
 
     const [fileName, setFileName] = useState(files?.file_name ?? '');
-    const fileExtension = files?.file_extension ?? '';
+    const [fileExtension, setFileExtension] = useState('');
+
 
     const handleAddFile = () => {
         if (!files) return;
@@ -40,7 +41,11 @@ export const AddAnswerFile = ({ files, setFiles, openFilePicker }: AddAnswerFile
             file_extension: fileExtension,
         });
     };
-
+    useEffect(() => {
+        if (!files) return;
+        setFileName(files.file_name);
+        setFileExtension(files.file_extension ?? '');
+    }, [files]);
     return (
         <Dialog>
             <DialogTrigger asChild>
