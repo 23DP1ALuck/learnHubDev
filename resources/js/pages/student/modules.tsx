@@ -47,7 +47,7 @@ export default function StudentModulesPage({
                         )}
                     </p>
                 </div>
-                {module ? <StudentModulesList modules={modules} /> : <Card>
+                {modules ? <StudentModulesList modules={modules} /> : <Card>
                     <CardHeader>
                         <CardTitle>
                             {t('student.No modules are available yet')}
