@@ -153,7 +153,11 @@ class StudentContentController extends Controller
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
         $group = $this->getOrganizationGroup($organization);
-
+        if($group === null){
+            return Inertia::render('student/modules', [
+                "modules" => null,
+            ]);
+        }
         $studentModuleSummary = $this->getStudentModuleSummary($group);
         return Inertia::render('student/modules', [
             "modules" => $studentModuleSummary,

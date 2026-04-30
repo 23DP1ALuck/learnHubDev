@@ -7,6 +7,7 @@ import { Head, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { route } from 'ziggy-js';
+import {Card, CardHeader, CardTitle} from "@/components/ui/card";
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Modules',
@@ -46,8 +47,14 @@ export default function StudentModulesPage({
                         )}
                     </p>
                 </div>
+                {module ? <StudentModulesList modules={modules} /> : <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            {t('student.No modules are available yet')}
+                        </CardTitle>
+                    </CardHeader>
+                </Card>}
 
-                <StudentModulesList modules={modules} />
             </div>
         </AppLayout>
     );
