@@ -472,7 +472,7 @@ class StudentContentController extends Controller
         return $user->organizations()
             ->where('organizations.id', $organizationId)
             ->withPivot('group_id')
-            ->firstOrFail();
+            ->first();
     }
 
     private function getOrganizationGroup(Organization $organization): ?SchoolGroup
@@ -482,7 +482,7 @@ class StudentContentController extends Controller
         return $organization->schoolGroups()
             ->where('group_id', $groupId)
             ->where('school_id', $organization->id)
-            ->firstOrFail();
+            ->first();
     }
 
     private function getEnrolledGroupModule(SchoolGroup $group, int $moduleId)
