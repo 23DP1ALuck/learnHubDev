@@ -170,7 +170,7 @@ export default function StudentTaskContent({
                         </div>
                     )}
 
-                    {task.task_type === 'FILE' && (
+                    {task.task_type === 'FILE' && !task.answer_files &&(
                         <>
                             <input
                                 ref={fileInputRef}

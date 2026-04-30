@@ -76,7 +76,7 @@ export const AddAnswerFile = ({
                         <Button type="button" variant="outline" onClick={openFilePicker}>
                             {files
                                 ? `${files.file_name}${files.file_extension}`
-                                : t('learning.Choose file')}
+                                : t('learning.Attach file')}
                         </Button>
                     </Field>
 

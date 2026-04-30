@@ -52,7 +52,17 @@ class TaskAnswersController extends Controller
         if (! $task) {
             return redirect()->back()->with('error', 'Task not found');
         }
-
+        $alreadyAnswered = TaskAnswer::query()
+            ->where('student_id', $user->id)
+            ->where('assignment_id', $assignmentId)
+            ->where('task_id', $taskId)
+            ->exists();
+        if ($alreadyAnswered) {
+            return redirect()->route('student.tasks.show', [
+                'assignment' => $assignmentId,
+                'task' => $taskId,
+            ])->with('error', 'You have already answered this task');
+        }
         if ($task->correctAnswers()->exists()) {
             $result = 0; // initial value for calculating the score
             $maxPoints = $task->max_points;
@@ -74,6 +84,8 @@ class TaskAnswersController extends Controller
                 $result = $taskCorrectAnswer->answer == $validated['answer_text'][0] ? $maxPoints : 0; // max points for correct answer
             }
         }
+
+
         if ($task->task_type == 'FILE') {
             $this->storeTaskAnswerFile($request, $user, $task, $assignment);
         } else {
@@ -175,7 +187,7 @@ class TaskAnswersController extends Controller
                         'student_id' => $user->id,
                         'assignment_id' => $assignmentId,
                         'task_id' => $taskId,
-                        'answer_text' => 'file',
+                        'answer_text' => json_encode('file'),
                         'time_spent' => null,
                         'points' => 0,
                         'teacher_comment' => null,

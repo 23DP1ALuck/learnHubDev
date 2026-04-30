@@ -50,7 +50,7 @@ export default function StudentModulesPage({
                 {modules ? <StudentModulesList modules={modules} /> : <Card>
                     <CardHeader>
                         <CardTitle>
-                            {t('student.No modules are available yet')}
+                            {t('student.No modules are available yet.')}
                         </CardTitle>
                     </CardHeader>
                 </Card>}
