@@ -24,17 +24,21 @@ type AddAnswerFileProps = {
     files: LoadedFile | null;
     setFiles: Dispatch<SetStateAction<LoadedFile | null>>; // useState setter
     openFilePicker: () => void;
+    setFileName: Dispatch<SetStateAction<string | null>>; // useState setter
+    fileName: string;
+    fileExtension: string;
 };
 
 export const AddAnswerFile = ({
     files,
     setFiles,
     openFilePicker,
+    fileName,
+    setFileName,
+    fileExtension,
 }: AddAnswerFileProps) => {
     const { t } = useTranslation();
 
-    const [fileName, setFileName] = useState(files?.file_name ?? '');
-    const [fileExtension, setFileExtension] = useState('');
 
     const handleAddFile = () => {
         if (!files) return;
@@ -45,9 +49,7 @@ export const AddAnswerFile = ({
         });
     };
     useEffect(() => {
-        if (!files) return;
-        setFileName(files.file_name);
-        setFileExtension(files.file_extension ?? '');
+        console.log(files);
     }, [files]);
     return (
         <Dialog>
@@ -94,7 +96,7 @@ export const AddAnswerFile = ({
                             <span className="mr-1 font-bold">
                                 {t('learning.File extension:')}
                             </span>
-                            {fileExtension}
+                            {files?.file_extension}
                         </div>
                     </Field>
 

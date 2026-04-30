@@ -34,6 +34,8 @@ export default function StudentTaskContent({
     const { t } = useTranslation();
     const isAnswered = task.answer !== null && task.answer !== undefined;
     const [files, setFiles] = useState<LoadedFile | null>(null);
+    const [fileName, setFileName] = useState<string | null>(null);
+    const [fileExtension, setFileExtension] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const selectedAnswers = Array.isArray(task.answer) // for next comparing logic
         ? task.answer
@@ -178,18 +180,17 @@ export default function StudentTaskContent({
                                 onChange={(event) => {
                                     const file = event.target.files?.[0];
                                     if (!file) return;
-
                                     const dotIndex = file.name.lastIndexOf('.');
+                                    // if no dot found in file name take full name, otherwise take everything before a dot
+                                    const fileName = dotIndex === -1 ? file.name : file.name.slice(0, dotIndex);
+                                    // if no dot found in file name set empty extension otherwise take everything after a dot
+                                    const fileExtension = dotIndex === -1 ? '' : file.name.slice(dotIndex);
                                     setFiles({
-                                        file_name:
-                                            dotIndex === -1
-                                                ? file.name
-                                                : file.name.slice(0, dotIndex),
-                                        file_extension:
-                                            dotIndex === -1
-                                                ? ''
-                                                : file.name.slice(dotIndex),
+                                        file_name: fileName,
+                                        file_extension: fileExtension
                                     });
+                                    setFileExtension(fileExtension);
+                                    setFileName(fileName);
                                 }}
                             />
                             <AddAnswerFile
@@ -198,6 +199,9 @@ export default function StudentTaskContent({
                                 openFilePicker={() =>
                                     fileInputRef.current?.click()
                                 }
+                                setFileName={setFileName}
+                                fileExtension={fileExtension ?? ""}
+                                fileName={fileName ?? ""}
                             />
                         </>
                     )}
