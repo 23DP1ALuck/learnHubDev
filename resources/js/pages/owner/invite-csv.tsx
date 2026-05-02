@@ -32,7 +32,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const roleOptions = ['STUDENT', 'TEACHER'];
-const statusOptions = ['active', 'pending', 'disabled'];
 
 export default function OwnerInviteCsvPage({
     organization,
@@ -50,7 +49,6 @@ export default function OwnerInviteCsvPage({
                 />
                 <InviteCsvReviewCard
                     roleOptions={roleOptions}
-                    statusOptions={statusOptions}
                     users={users}
                 />
             </div>

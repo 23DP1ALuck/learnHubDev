@@ -660,8 +660,15 @@ class TeacherContentController extends Controller
         if (! $user) {
             return redirect()->route('login');
         }
-        $module = Module::query()->where('id', $module)->first();
-        if(!$module->creator()->first()->id === $user->id){
+        $organizationId = $request->session()->get('activeOrganization');
+
+        $module = Module::query()
+            ->where('id', $module)
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if(!$module){
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
         }
         $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();
@@ -751,8 +758,15 @@ class TeacherContentController extends Controller
         if (! $user) {
             return redirect()->route('login');
         }
-        $module = Module::query()->where('id', $module)->first();
-        if(!$module->creator()->first()->id === $user->id){
+        $organizationId = $request->session()->get('activeOrganization');
+
+        $module = Module::query()
+            ->where('id', $module)
+            ->where('creator_id', $user->id)
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if(!$module){
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
         }
         $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();

@@ -14,15 +14,12 @@ import {route} from "ziggy-js";
 
 type InviteCsvReviewCardProps = {
     roleOptions: string[];
-    statusOptions: string[];
     submitAction?: string;
     users: ParsedCsvUser[];
 };
 
 export function InviteCsvReviewCard({
     roleOptions,
-    statusOptions,
-    submitAction,
     users,
 }: InviteCsvReviewCardProps) {
     const { t } = useTranslation();
