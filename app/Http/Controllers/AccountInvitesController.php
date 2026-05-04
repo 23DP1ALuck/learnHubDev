@@ -8,8 +8,8 @@ use App\Exceptions\InviteExpiredException;
 use App\Exceptions\InviteNotFoundException;
 use App\Exceptions\InviteUsedException;
 use App\Exceptions\OnboardingRequestNotFoundException;
-use App\Http\Requests\StoreOrganizationInviteRequest;
 use App\Http\Requests\Storeaccount_invitesRequest;
+use App\Http\Requests\StoreOrganizationInviteRequest;
 use App\Http\Requests\Updateaccount_invitesRequest;
 use App\Mail\InviteEmail;
 use App\Models\AccountInvites;
@@ -241,11 +241,11 @@ class AccountInvitesController extends Controller
 
             return redirect()->route('login')->with('success', 'Invite accepted successfully.');
         } catch (
-            InviteNotFoundException |
-            InvalidTokenFormatException |
-            IncorrectVerifierException |
-            InviteUsedException |
-            InviteExpiredException |
+            InviteNotFoundException|
+            InvalidTokenFormatException|
+            IncorrectVerifierException|
+            InviteUsedException|
+            InviteExpiredException|
             OnboardingRequestNotFoundException $e
         ) {
             return redirect()->route('login')->with('error', $e->getMessage());
@@ -282,10 +282,10 @@ class AccountInvitesController extends Controller
                 'invite' => $this->invitePayload($invite),
             ]);
         } catch (
-            InviteNotFoundException |
-            InvalidTokenFormatException |
-            IncorrectVerifierException |
-            InviteUsedException |
+            InviteNotFoundException|
+            InvalidTokenFormatException|
+            IncorrectVerifierException|
+            InviteUsedException|
             InviteExpiredException $e
         ) {
             return redirect()->route('login')->with('error', $e->getMessage());
@@ -301,19 +301,19 @@ class AccountInvitesController extends Controller
     private function assertInviteValid(?AccountInvites $invite, string $verifier): AccountInvites
     {
         if (! $invite) {
-            throw new InviteNotFoundException();
+            throw new InviteNotFoundException;
         }
 
         if ($invite->used_at !== null) {
-            throw new InviteUsedException();
+            throw new InviteUsedException;
         }
 
         if ($invite->expires_at->isPast()) {
-            throw new InviteExpiredException();
+            throw new InviteExpiredException;
         }
 
         if (! hash_equals($invite->verifier_hash, hash('sha256', $verifier))) {
-            throw new IncorrectVerifierException();
+            throw new IncorrectVerifierException;
         }
 
         return $invite;
@@ -327,7 +327,7 @@ class AccountInvitesController extends Controller
         $parts = explode('.', $token, 2);
 
         if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
-            throw new InvalidTokenFormatException();
+            throw new InvalidTokenFormatException;
         }
 
         return $parts;
@@ -341,7 +341,7 @@ class AccountInvitesController extends Controller
         $onboardingRequest = $accountInvite->onboardingRequest;
 
         if (! $onboardingRequest) {
-            throw new OnboardingRequestNotFoundException();
+            throw new OnboardingRequestNotFoundException;
         }
 
         return $onboardingRequest;
@@ -368,7 +368,6 @@ class AccountInvitesController extends Controller
      */
     private function acceptOnboardingInvite(Request $request, AccountInvites $invite): void
     {
-//        TODO: add db transaction
         $onboardingRequest = $this->verifyOnboardingRequest($invite);
         $password = $this->validatedPassword($request);
 
@@ -377,40 +376,46 @@ class AccountInvitesController extends Controller
                 'password' => 'A user with this email already exists.',
             ]);
         }
+        try {
+            DB::transaction(function () use ($onboardingRequest, $password, $invite) {
+                $organization = Organization::create([
+                    'organization_name' => $onboardingRequest->organization_name,
+                    'organization_type' => $onboardingRequest->organization_type,
+                ]);
 
-        $organization = Organization::create([
-            'organization_name' => $onboardingRequest->organization_name,
-            'organization_type' => $onboardingRequest->organization_type,
-        ]);
+                $user = User::create([
+                    'email' => $onboardingRequest->email,
+                    'name' => trim($onboardingRequest->first_name.' '.$onboardingRequest->last_name),
+                    'password' => Hash::make($password),
+                    'role' => 'user',
+                    'status' => 'active',
+                ]);
 
-        $user = User::create([
-            'email' => $onboardingRequest->email,
-            'name' => trim($onboardingRequest->first_name.' '.$onboardingRequest->last_name),
-            'password' => Hash::make($password),
-            'role' => 'user',
-            'status' => 'active',
-        ]);
+                $user->forceFill(['email_verified_at' => now()])->save();
 
-        $user->forceFill(['email_verified_at' => now()])->save();
+                $user->organizations()->attach($organization->id, [
+                    'joined_on' => now()->toDateString(),
+                    'role_in_org' => 'ORGANIZATION_OWNER',
+                    'admin_privileges' => true,
+                ]);
 
-        $user->organizations()->attach($organization->id, [
-            'joined_on' => now()->toDateString(),
-            'role_in_org' => 'ORGANIZATION_OWNER',
-            'admin_privileges' => true,
-        ]);
+                $invite->forceFill(['used_at' => now()])->save();
 
-        $invite->forceFill(['used_at' => now()])->save();
+                if ($organization->organization_type === 'individual') {
+                    Teacher::query()->firstOrCreate( // individual is also a teacher
+                        ['user_id' => $user->id],
+                        ['speciality' => null],
+                    );
+                    SchoolGroup::create([   // default group for individual
+                        'group_id' => 1,
+                        'school_id' => $organization->id,
+                        'name' => 'Course group',
+                    ]);
+                }
+            });
 
-        if($organization->organization_type === 'individual'){
-            Teacher::query()->firstOrCreate( // individual is also a teacher
-                ['user_id' => $user->id],
-                ['speciality' => null],
-            );
-            SchoolGroup::create([   // default group for individual
-                "group_id" => 1,
-                "school_id" => $organization->id,
-                "name" => "Course group"
-            ]);
+        } catch (\Exception $exception) {
+            report($exception);
         }
 
     }
