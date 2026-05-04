@@ -415,11 +415,14 @@ class TeacherContentController extends Controller
         $groupIdFilter = $request->query('group_id');
 
         $submissions = collect();
-        $studentsInGroup = collect();
+        $studentsInGroup = null;
         if($groupIdFilter){
             $studentsInGroup = SchoolGroup::query()->where('group_id', $groupIdFilter)
                 ->with('school')
                 ->first();
+            if (! $studentsInGroup) {
+                return redirect()->route('teacher.marks')->with('error', 'Group not found.');
+            }
             $studentsInGroup = $studentsInGroup->school->students()->wherePivot('group_id', $groupIdFilter)->pluck('id');
 
         }
@@ -427,7 +430,7 @@ class TeacherContentController extends Controller
             ->where('assignment_id', $assignmentId)
             ->with(['student.user', 'assignment.topics.module'])
             ->get();
-        $submissions = $studentsInGroup ? $submissions->whereIn('student_id', $studentsInGroup) : $submissions;
+        $submissions = $studentsInGroup !== null ? $submissions->whereIn('student_id', $studentsInGroup) : $submissions;
         $submissions = $submissions->map(function (Submission $submission) use ($organization, $assignment){
             $submitter = $submission->student->user;
 

@@ -11,12 +11,10 @@ use App\Models\ChatUser;
 use App\Models\Organization;
 use App\Models\SchoolGroup;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,18 +24,18 @@ class ChatController extends Controller
     public function chats(Request $request, ?int $chat = null): Response|RedirectResponse
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
         $organizationId = $request->session()->get('activeOrganization');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
 
         $organization = $user->organizations()->where('organizations.id', $organizationId)->first();
 
-        if (!$organization) {
+        if (! $organization) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
 
@@ -48,7 +46,6 @@ class ChatController extends Controller
         $organizationPools = $this->getOrganizationPools($organization, $user) ?? []; // for user list inside org
         $chatsUsers = $this->getChats($user, $organizationId);
 
-
         $activeChat = null;
 
         if ($chat !== null) {
@@ -57,24 +54,25 @@ class ChatController extends Controller
                 ->where('organization_id', $organizationId)
                 ->with(['users', 'messages'])
                 ->first();
-            if(!$activeChat){
+            if (! $activeChat) {
                 return redirect()->route('chats')->with('error', 'Chat not found');
             }
-            $belongsToChat =  $activeChat->users()->where('user_id', $user->id)->exists();
-            if(!$belongsToChat){
+            $belongsToChat = $activeChat->users()->where('user_id', $user->id)->exists();
+            if (! $belongsToChat) {
                 return redirect()->route('chats')->with('error', 'You are not a member of this chat');
             }
 
             $messages = $activeChat->messages()->with('sender')->get();
-            $chatMessages = $messages->map(function (ChatMessage $message) use ($user){
+            $chatMessages = $messages->map(function (ChatMessage $message) use ($user) {
                 $sender = $message->sender;
+
                 return [
                     'id' => $message->message_id,
                     'sender_id' => $message->sender_id,
                     'sender_name' => $sender->name,
                     'text' => $message->text,
                     'sent_at' => $message->sent_at,
-                    'is_mine' =>  $sender->id === $user->id,
+                    'is_mine' => $sender->id === $user->id,
                     'is_seen' => false,
                     'files' => [],
                 ];
@@ -121,9 +119,12 @@ class ChatController extends Controller
             ],
         ]);
     }
-    private function getChats(User $user, int $activeOrganization){
+
+    private function getChats(User $user, int $activeOrganization)
+    {
         $chats = $user->chats()->where('organization_id', $activeOrganization)->get();
-        return $chats->map(function (Chat $chat) use($user){
+
+        return $chats->map(function (Chat $chat) use ($user) {
             $lastMessage = $chat->messages()->latest('sent_at')->first();
 
             $chatUser = ChatUser::query()
@@ -139,7 +140,7 @@ class ChatController extends Controller
 
             $unreadMessages = $unreadMessagesQuery->count();
             // if group chat, set group name, if private - set recipient's name
-            if($chat->type === 'GROUP'){
+            if ($chat->type === 'GROUP') {
                 return [
                     'id' => $chat->chat_id,
                     'name' => $chat->name,
@@ -148,9 +149,9 @@ class ChatController extends Controller
                     'last_message_text' => $lastMessage->text ?? null,
                     'last_message_at' => $lastMessage?->sent_at ?? null,
                     'last_sender_name' => $lastMessage?->sender?->name ?? null,
-                    'participants_preview' => ['qwe','qweqwe'],
+                    'participants_preview' => ['qwe', 'qweqwe'],
                 ];
-            } else if($chat->type === 'PRIVATE'){
+            } elseif ($chat->type === 'PRIVATE') {
                 return [
                     'id' => $chat->chat_id,
                     'name' => $chat->users()->where('user_id', '!=', $user->id)->first()->name,
@@ -159,13 +160,16 @@ class ChatController extends Controller
                     'last_message_text' => $lastMessage->text ?? null,
                     'last_message_at' => $lastMessage?->sent_at ?? null,
                     'last_sender_name' => $lastMessage?->sender?->name ?? null,
-                    'participants_preview' => ['qwe','qweqwe'],
+                    'participants_preview' => ['qwe', 'qweqwe'],
                 ];
             }
+
             return null;
         });
     }
-    private function getClassPools(SchoolGroup $group, $user, $organization){
+
+    private function getClassPools(SchoolGroup $group, $user, $organization)
+    {
         // get all modules/teachers for current group
         $moduleTeachers = $group->groupModulesTeachers()->with(['teacher.user', 'module'])->get();
         $groupMembers = $organization
@@ -173,7 +177,7 @@ class ChatController extends Controller
             ->wherePivot('group_id', $organization->pivot->group_id)
             ->where('id', '!=', $user->id)
             ->get();
-        $teachers = $moduleTeachers->map(function ($groupModuleTeacher) use ($group) {
+        $teachers = $moduleTeachers->map(function ($groupModuleTeacher) {
             $teacher = $groupModuleTeacher->teacher?->user;
             if (! $teacher) {
                 return null;
@@ -197,8 +201,10 @@ class ChatController extends Controller
                 'group_name' => $group->name ?? null,
             ];
         });
+
         return $classMates->concat($teachers)->unique('id')->values()->toArray();
     }
+
     private function getOrganizationPools(Organization $organization, User $user)
     {
         // get all modules/teachers for current group
@@ -207,23 +213,25 @@ class ChatController extends Controller
             ->orderByPivot('role_in_org')
             ->get();
 
-        return $users->map(function (User $user) use($organization){
+        return $users->map(function (User $user) use ($organization) {
             $group = null;
-            if($user->pivot?->role_in_org === 'STUDENT' && $user->pivot?->group_id !== null){
+            if ($user->pivot?->role_in_org === 'STUDENT' && $user->pivot?->group_id !== null) {
                 $group = SchoolGroup::query()
                     ->where('group_id', $user->pivot?->group_id)
                     ->where('school_id', $organization->id)
                     ->first();
             }
-           return [
-               'id' => $user->id,
-               'name' => $user->name,
-               'email' => $user->email,
-               'role_in_org' => $user->pivot?->role_in_org,
-               'group_name' => $group->name ?? null,
-           ];
+
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role_in_org' => $user->pivot?->role_in_org,
+                'group_name' => $group->name ?? null,
+            ];
         })->values()->toArray();
     }
+
     private function getGroup($groupId, $organization): ?SchoolGroup
     {
         return SchoolGroup::query()
@@ -231,23 +239,24 @@ class ChatController extends Controller
             ->where('school_id', $organization->id)
             ->first();
     }
+
     public function createChat(StoreChatRequest $request): RedirectResponse
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
         $validated = $request->validated();
 
         $organizationId = $request->session()->get('activeOrganization');
-        if(!$organizationId){
+        if (! $organizationId) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
         $organization = Organization::query()->where('id', $organizationId)->first();
-        if (!$organization){
+        if (! $organization) {
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
-        try{
+        try {
             $chats = $user->chatMemberships()->pluck('chat_id')->toArray();
             $recipients = collect($validated['recipient_ids'])
                 ->map(fn ($recipientId) => (int) $recipientId)
@@ -257,10 +266,10 @@ class ChatController extends Controller
                 ->whereIn('users.id', $recipients)
                 ->pluck('users.id');
             $chatExists = null;
-            if($allowedRecipientIds->count() == 1){
+            if ($allowedRecipientIds->count() == 1) {
                 $chatExists = $this->existingChat($user, $allowedRecipientIds->first());
             }
-            if($chatExists){
+            if ($chatExists) {
                 return redirect()
                     ->route('chats.show', $chatExists->chat_id)
                     ->with('error', 'You are already a member of this chat');
@@ -269,54 +278,55 @@ class ChatController extends Controller
                 $recipients,
                 $allowedRecipientIds,
                 $organization,
-                $user)
-            {
+                $user) {
                 $sender = $user->id;
 
                 if ($allowedRecipientIds->count() !== $recipients->count()) {
                     throw new Exception('One or more recipients do not belong to the active organization.');
                 }
-                $chat =Chat::create([
+                $chat = Chat::create([
                     'name' => $validated['name'] ?? null,
                     'type' => $validated['type'],
-                    'organization_id'  => $organization->id,
+                    'organization_id' => $organization->id,
                 ]);
                 ChatUser::create([
                     'chat_id' => $chat->chat_id,
                     'user_id' => $sender,
                     'role' => 'OWNER',
                 ]);
-                foreach ($allowedRecipientIds as $recipient){
+                foreach ($allowedRecipientIds as $recipient) {
                     ChatUser::create([
                         'chat_id' => $chat->chat_id,
                         'user_id' => $recipient,
-                        'role' => 'MEMBER'
+                        'role' => 'MEMBER',
                     ]);
                 }
             });
-        } catch (Exception $e){
+        } catch (Exception $e) {
             return redirect()->route('chats')->with('error', 'Failed to create chat');
         }
 
-
         return redirect()->route('chats');
     }
-    private function existingChat(User $user, $recipient): ChatUser|null
+
+    private function existingChat(User $user, $recipient): ?ChatUser
     {
         $senderChats = $user->chats()->where('type', '!=', 'GROUP')->get();
-        $senderChats = $senderChats->map(function (Chat $chat) use ($user, $recipient){
+        $senderChats = $senderChats->map(function (Chat $chat) use ($recipient) {
             return $chat->memberships()->where('user_id', $recipient)->first();
         })->filter()->first();
-        if(!$senderChats){
+        if (! $senderChats) {
             return null;
         }
+
         return $senderChats;
     }
+
     public function storeMessage(StoreChatMessageRequest $request, int $chat): JsonResponse|RedirectResponse
     {
         // send here json response, because we do not want to redirect to chats page, so work with this approac
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return $request->expectsJson()
                 ? response()->json(['message' => 'Unauthenticated.'], 401)
                 : redirect()->route('login');
@@ -326,25 +336,25 @@ class ChatController extends Controller
         $organizationId = $request->session()->get('activeOrganization');
         $chatModel = Chat::query()->where('chat_id', $chat)->with('users')->first();
 
-        if (!$chatModel || $chatModel->organization_id !== $organizationId) {
+        if (! $chatModel || $chatModel->organization_id !== $organizationId) {
             return $request->expectsJson()
                 ? response()->json(['message' => 'Chat not found.'], 404)
                 : redirect()->route('chats')->with('error', 'Chat not found');
         }
 
         $isMember = $chatModel->users()->where('user_id', $user->id)->exists();
-        if (!$isMember) {
+        if (! $isMember) {
             return $request->expectsJson()
                 ? response()->json(['message' => 'You are not a member of this chat.'], 403)
                 : redirect()->route('chats')->with('error', 'You are not a member of this chat');
         }
 
         $message = ChatMessage::create([
-           'chat_id' => $chatModel->chat_id,
-           'sender_id' => $user->id,
-           'text' => $validated['text'],
-           'sent_at' => now(),
-           'is_seen' => false,
+            'chat_id' => $chatModel->chat_id,
+            'sender_id' => $user->id,
+            'text' => $validated['text'],
+            'sent_at' => now(),
+            'is_seen' => false,
         ]);
 
         $message->load('sender');
