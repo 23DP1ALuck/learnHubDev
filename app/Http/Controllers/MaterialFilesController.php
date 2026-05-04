@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMaterialFileRequest;
 use App\Models\Material;
 use App\Models\MaterialFile;
+use App\Models\Module;
 use App\Models\StoredFile;
 use App\Models\Topic;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -17,12 +18,29 @@ class MaterialFilesController extends Controller
 {
     public function store(StoreMaterialFileRequest $request): RedirectResponse
     {
-        // TODO: check if context is for current user
+        $user = $request->user();
         $validated = $request->validated();
         $file = $request->file('file');
         $moduleId = (int) $validated['module_id'];
         $topicId = (int) $validated['topic_id'];
         $materialId = (int) $validated['material_id'];
+        $module = Module::find($moduleId);
+        if (! $module) {
+            dd('no module found');
+            return redirect()->route('dashboard')->with('error', 'Module not found.');
+        }
+        $topic = Topic::query()
+            ->where('topic_id', $topicId)
+            ->where('module_id', $moduleId)
+            ->first();
+        if ($module->creator_id !== $user->id) {
+            dd('incorrect creator id');
+            return redirect()->route('dashboard')->with('error', 'You have no permission to access this module.');
+        }
+        if (! $topic) {
+            dd('no permission found');
+            return redirect()->route('dashboard')->with('error', 'Topic not found.');
+        }
         $fileExtension = $file->getClientOriginalExtension();
 
         $storedPath = $file->store("materials/{$moduleId}/{$topicId}/{$materialId}");
@@ -38,7 +56,7 @@ class MaterialFilesController extends Controller
                     ->firstOrFail();
 
                 $storedFile = StoredFile::create([
-                    'file_name' => $displayName . '.' . $fileExtension,
+                    'file_name' => $displayName.'.'.$fileExtension,
                     'file_path' => $storedPath,
                 ]);
 
@@ -57,7 +75,9 @@ class MaterialFilesController extends Controller
 
         return redirect()->back()->with('success', 'File uploaded.');
     }
-    public function download(Request $request, int $module, int $topic, int $material, int $file) {
+
+    public function download(Request $request, int $module, int $topic, int $material, int $file)
+    {
         $moduleId = $module;
         $topicId = $topic;
         $materialId = $material;
@@ -70,6 +90,7 @@ class MaterialFilesController extends Controller
             ->firstOrFail();
 
         $storedFile = $file->file()->first();
+
         return Storage::download(
             $storedFile->file_path,
             $storedFile->file_name
