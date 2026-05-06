@@ -63,11 +63,6 @@ export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
     const { auth, chatUnreadCount = 0 } = usePage<SharedData>().props;
     const navItems = setNavItems(auth, chatUnreadCount);
-    const homeHref = auth.canManageOrganization
-        ? ownerDashboard()
-        : auth.organizationRole === 'STUDENT'
-          ? '/dashboard'
-          : dashboard();
 
     return (
         <UISidebar collapsible="icon" variant="inset">

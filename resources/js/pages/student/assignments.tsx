@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Flash } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Assignments',
@@ -39,8 +40,15 @@ export default function StudentAssignmentsPage({
                         )}
                     </p>
                 </div>
-
-                <StudentAssignmentsList assignments={assignments} />
+                {assignments ?
+                    <StudentAssignmentsList assignments={assignments} /> :
+                <Card>
+                    <CardHeader>
+                        <CardTitle>
+                            {t('student.No assignments are available yet.')}
+                        </CardTitle>
+                    </CardHeader>
+                </Card>}
             </div>
         </AppLayout>
     );

@@ -13,12 +13,12 @@ use App\Models\Task;
 use App\Models\Topic;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 
 class StudentContentController extends Controller
 {
-    public function dashboard(Request $request){
+    public function dashboard(Request $request)
+    {
 
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
@@ -32,21 +32,24 @@ class StudentContentController extends Controller
         $studentModuleSummary = [];
         $studentAssignmentSummary = [];
 
-        if($groupId){
+        if ($groupId) {
             $group = $this->getOrganizationGroup($organization);
 
             $dashboardSummary = $this->getDashboardSummary($user, $group);
             $studentModuleSummary = $this->getStudentModuleSummary($group);
             $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
         }
-//        TODO: send isAssignedToGroup
+
+        //        TODO: send isAssignedToGroup
         return Inertia::render('student/dashboard', [
-            "stats" => $dashboardSummary,
-            "modules" => $studentModuleSummary,
-            "upcomingAssignments" => $studentAssignmentSummary,
+            'stats' => $dashboardSummary,
+            'modules' => $studentModuleSummary,
+            'upcomingAssignments' => $studentAssignmentSummary,
         ]);
     }
-    private function getDashboardSummary(User $user, SchoolGroup $group): array{
+
+    private function getDashboardSummary(User $user, SchoolGroup $group): array
+    {
 
         $moduleCount = $group->groupModulesTeachers()
             ->distinct()
@@ -65,7 +68,7 @@ class StudentContentController extends Controller
         });
 
         $assignmentsCount = $topics->flatMap(function ($topic) {
-           return $topic->assignments()->get();
+            return $topic->assignments()->get();
         })->unique('id')->count();
 
         $assignments = $topics->flatMap(function ($topic) {
@@ -84,14 +87,17 @@ class StudentContentController extends Controller
         $averagePercent = $submissions
             ->where('student_id', $user->id)
             ->avg('total_percent') ?? 0;
-        return[
+
+        return [
             'modules' => $moduleCount,
             'assignments' => $assignmentsCount,
             'pending' => $pending,
             'averagePercent' => $averagePercent,
         ];
     }
-    private function getStudentModuleSummary(SchoolGroup $group): array{
+
+    private function getStudentModuleSummary(SchoolGroup $group): array
+    {
 
         $groupsModules = $group->groupModulesTeachers()
             ->with('module')
@@ -101,7 +107,7 @@ class StudentContentController extends Controller
             return $groupModuleTeacher->module;
         })->filter(); // filter removes null values
 
-        return $modules->map(function ($module){
+        return $modules->map(function ($module) {
             return [
                 'id' => $module->id,
                 'name' => $module->name,
@@ -113,7 +119,9 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
-    private function getStudentAssignmentSummary(SchoolGroup $group, User $user): array{
+
+    private function getStudentAssignmentSummary(SchoolGroup $group, User $user): array
+    {
 
         $groupsModules = $group->groupModulesTeachers()
             ->with('module')
@@ -122,7 +130,6 @@ class StudentContentController extends Controller
         $modules = $groupsModules->map(function ($groupModuleTeacher) {
             return $groupModuleTeacher->module;
         })->filter();
-
 
         $topics = $modules->flatMap(function (Module $module) {
             return $module->topics()->get();
@@ -136,6 +143,7 @@ class StudentContentController extends Controller
             $status = $submission?->status ?? 'Not started';
 
             $totalPercent = $submission?->total_percent ?? 0;
+
             return [
                 ...$assignment->toArray(),
                 'tasks_count' => $assignment->tasks()->count(),
@@ -143,56 +151,61 @@ class StudentContentController extends Controller
                 'module_names' => $assignment->topics()->pluck('topics.name')->values(),
                 'total_points' => $assignment->totalPoints(),
                 'total_percent' => $totalPercent,
-                'status' => $status
+                'status' => $status,
             ];
         })->toArray();
 
     }
 
-    public function modules(Request $request){
+    public function modules(Request $request)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
         $group = $this->getOrganizationGroup($organization);
-        if($group === null){
+        if ($group === null) {
             return Inertia::render('student/modules', [
-                "modules" => null,
+                'modules' => null,
             ]);
         }
         $studentModuleSummary = $this->getStudentModuleSummary($group);
+
         return Inertia::render('student/modules', [
-            "modules" => $studentModuleSummary,
+            'modules' => $studentModuleSummary,
         ]);
     }
 
-    public function module(Request $request, int $moduleId){
+    public function module(Request $request, int $moduleId)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
 
         $group = $this->getOrganizationGroup($organization);
 
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
 
         $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
-        if(!$groupsModules){
+        if (! $groupsModules) {
             return redirect()->back()->with('error', 'You have no access to this module');
         }
         $module = $groupsModules->module;
 
-
         $studentModuleSummary = $this->getStudentSpecificModuleSummary($module);
         $studentTopicSummary = $this->getStudentTopicSummary($group);
+
         return Inertia::render('student/module', [
-            "module" => $studentModuleSummary,
-            "topics" => $studentTopicSummary
+            'module' => $studentModuleSummary,
+            'topics' => $studentTopicSummary,
         ]);
     }
-    private function getStudentTopicSummary(SchoolGroup $group): array{
+
+    private function getStudentTopicSummary(SchoolGroup $group): array
+    {
         $groupsModules = $group->groupModulesTeachers()
             ->with('module')
             ->get();
@@ -205,7 +218,9 @@ class StudentContentController extends Controller
             return $module->topics()->withCount('materials', 'assignments')->get();
         })->toArray();
     }
-    private function getStudentSpecificModuleSummary(Module $module): array{
+
+    private function getStudentSpecificModuleSummary(Module $module): array
+    {
         return [
             'id' => $module->id,
             'name' => $module->name,
@@ -216,40 +231,45 @@ class StudentContentController extends Controller
             'assignments_count' => $module->assignments()->count(),
         ];
     }
-    public function topic(Request $request, int $moduleId, int $topicId){
+
+    public function topic(Request $request, int $moduleId, int $topicId)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
 
         $group = $this->getOrganizationGroup($organization);
 
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
 
         $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
-        if(!$groupsModules){
+        if (! $groupsModules) {
             return redirect()->back()->with('error', 'You have no access to this module');
         }
         $module = $groupsModules->module;
         $topic = $module->topics()->where('topics.topic_id', $topicId)->first();
-        if(!$topic){
+        if (! $topic) {
             return redirect()->back()->with('error', 'Topic not found');
         }
         $studentTopicSummary = $this->getSpecificTopicSummary($topic);
         $studentModuleSummary = $this->getStudentSpecificModuleSummary($module);
         $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
+
         return Inertia::render('student/topic', [
-            "module" => $studentModuleSummary,
-            "topic" => $studentTopicSummary,
-            "materials" => $topic->materials()->get()->toArray(),
-            "assignments" => $studentAssignmentSummary,
+            'module' => $studentModuleSummary,
+            'topic' => $studentTopicSummary,
+            'materials' => $topic->materials()->get()->toArray(),
+            'assignments' => $studentAssignmentSummary,
         ]);
     }
-    private function getSpecificTopicSummary(Topic $topic): array{
+
+    private function getSpecificTopicSummary(Topic $topic): array
+    {
         return [
             'topic_id' => $topic->topic_id,
             'name' => $topic->name,
@@ -260,15 +280,17 @@ class StudentContentController extends Controller
             'assignments_count' => $topic->assignments()->count(),
         ];
     }
-    public function assignment(Request $request, int $assignmentId){
+
+    public function assignment(Request $request, int $assignmentId)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
         $group = $this->getOrganizationGroup($organization);
 
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
 
@@ -276,33 +298,37 @@ class StudentContentController extends Controller
             ->where('id', $assignmentId)
             ->first();
 
-        if(!$assignment){
+        if (! $assignment) {
             return redirect()->back()->with('error', 'Assignment not found');
         }
         $module = $this->getAssignmentModule($assignment);
         $groupsModules = $this->getEnrolledGroupModule($group, $module->id);
 
-        if(!$groupsModules){
+        if (! $groupsModules) {
             return redirect()->back()->with('error', 'You have no access to this module');
         }
         $assignmentSummary = $this->getSpecificAssignmentSummary($assignment, $user);
         $assignmentTopicsSummary = $this->getSpecificAssignmentTopicsSummary($assignment, $user);
+
         return Inertia::render('student/assignment', [
-            "assignment" => $assignmentSummary,
-            "topics" => $assignmentTopicsSummary,
+            'assignment' => $assignmentSummary,
+            'topics' => $assignmentTopicsSummary,
         ]);
 
     }
-    private function getSpecificAssignmentSummary(Assignment $assignment, User $user): array{
+
+    private function getSpecificAssignmentSummary(Assignment $assignment, User $user): array
+    {
         $tasks = $assignment->tasks()->get();
         $points = $tasks->sum('max_points');
-        $answers = $tasks->map(function ($task) use ($user){
+        $answers = $tasks->map(function ($task) use ($user) {
             return $task
                 ->answers()
                 ->where('student_id', $user->id)
                 ->value('task_id');
         });
         $lastIncompletedTask = $tasks->whereNotIn('task_id', $answers)->sortBy('task_id')->first();
+
         return [
             ...$assignment->toArray(),
             'tasks_count' => $assignment->tasks()->count(),
@@ -313,9 +339,12 @@ class StudentContentController extends Controller
             'last_incompleted_task' => $lastIncompletedTask->task_id ?? null,
         ];
     }
-    private function getSpecificAssignmentTopicsSummary(Assignment $assignment, User $user): array{
+
+    private function getSpecificAssignmentTopicsSummary(Assignment $assignment, User $user): array
+    {
         $topics = $assignment->topics()->get();
-        return $topics->map(function ($topic){
+
+        return $topics->map(function ($topic) {
             return [
                 'module_id' => $topic->module_id,
                 'module_name' => $topic->module->name,
@@ -324,63 +353,68 @@ class StudentContentController extends Controller
             ];
         })->toArray();
     }
-    public function task(Request $request, int $assignmentId, int $taskId){
+
+    public function task(Request $request, int $assignmentId, int $taskId)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
         $group = $this->getOrganizationGroup($organization);
 
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
-
 
         $assignment = Assignment::query()
             ->where('id', $assignmentId)
             ->first();
 
-        if(!$assignment){
+        if (! $assignment) {
             return redirect()->back()->with('error', 'Assignment not found');
         }
         $module = $this->getAssignmentModule($assignment);
         $groupsModules = $this->getEnrolledGroupModule($group, $module->id);
 
-        if(!$groupsModules){
+        if (! $groupsModules) {
             return redirect()->back()->with('error', 'You have no access to this module');
         }
 
         $assignmentSummary = [
-            "id" => $assignment->id,
-            "title" => $assignment->title,
-            "description" => $assignment->description,
-            "due_date" => $assignment->due_date,
-            "status" => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
-            "tasks_count" => $assignment->tasks()->count(),
+            'id' => $assignment->id,
+            'title' => $assignment->title,
+            'description' => $assignment->description,
+            'due_date' => $assignment->due_date,
+            'status' => $assignment->submissions()->where('student_id', $user->id)->first()?->status ?? 'Not started',
+            'tasks_count' => $assignment->tasks()->count(),
         ];
         $task = $assignment->tasks()->where('task_id', $taskId)->first();
-        if(!$task){
+        if (! $task) {
             return redirect()->back()->with('error', 'Task not found');
         }
         $taskSummary = $this->getSpecificTaskSummary($task, $user);
         $taskNavigation = $this->getTaskNavigation($assignment, $user);
+
         return Inertia::render('student/task', [
-            "moduleId" => $module->id,
-            "assignment" => $assignmentSummary,
-            "task" => $taskSummary,
-            "taskNavigation" => $taskNavigation
+            'moduleId' => $module->id,
+            'assignment' => $assignmentSummary,
+            'task' => $taskSummary,
+            'taskNavigation' => $taskNavigation,
         ]);
     }
-    private function getSpecificTaskSummary(Task $task, User $user): array{
+
+    private function getSpecificTaskSummary(Task $task, User $user): array
+    {
         $answer = $task->answers()->where('student_id', $user->id)->first();
         $answerFiles = $answer?->fileLinks()->with('file')->get();
-        $answerFiles = $answerFiles?->map(function (AnswerFile $answerFile){
+        $answerFiles = $answerFiles?->map(function (AnswerFile $answerFile) {
             return [
                 'file_name' => $answerFile->file?->file_name,
                 'file_path' => $answerFile->file?->file_path,
             ];
         });
+
         return [
             'task_id' => $task->task_id,
             'question_text' => $task->question_text,
@@ -391,53 +425,61 @@ class StudentContentController extends Controller
             'answer_files' => $answerFiles ?? null,
         ];
     }
-    private function getTaskNavigation(Assignment $assignment, User $user): array{
+
+    private function getTaskNavigation(Assignment $assignment, User $user): array
+    {
         $isCompleted = $assignment
-                ->submissions()
-                ->where('student_id', auth()->id())->first()?->status === 'COMPLETED';
+            ->submissions()
+            ->where('student_id', auth()->id())->first()?->status === 'COMPLETED';
         $tasks = $assignment->tasks()->get();
+
         return $tasks->map(function ($task) use ($user) {
             return [
                 'task_type' => $task->task_type,
                 'task_id' => $task->task_id,
                 'max_points' => $task->max_points,
                 'is_completed' => $task
-                        ->answers()
-                        ->where('student_id', $user->id)->exists()
+                    ->answers()
+                    ->where('student_id', $user->id)->exists(),
             ];
         })->toArray();
     }
-    public function assignments(Request $request){
+
+    public function assignments(Request $request)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
         $group = $this->getOrganizationGroup($organization);
-
-        $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
-
+        $studentAssignmentSummary = null;
+        if ($group) {
+            $studentAssignmentSummary = $this->getStudentAssignmentSummary($group, $user);
+        }
         return Inertia::render('student/assignments', [
-            "assignments" => $studentAssignmentSummary,
+            'assignments' => $studentAssignmentSummary,
         ]);
     }
-    public function material(Request $request, int $moduleId, int $topicId, int $materialId){
+
+    public function material(Request $request, int $moduleId, int $topicId, int $materialId)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
         $group = $this->getOrganizationGroup($organization);
 
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
         $groupsModules = $this->getEnrolledGroupModule($group, $moduleId);
 
-        if(!$groupsModules){
+        if (! $groupsModules) {
             return redirect()->back()->with('error', 'You have no access to this module');
         }
         $module = $groupsModules->module;
 
         $topic = $module->topics()->where('topics.topic_id', $topicId)->first();
-        if(!$topic){
+        if (! $topic) {
             return redirect()->back()->with('error', 'Topic not found');
         }
         $studentModuleSummary = $this->getStudentSpecificModuleSummary($module);
@@ -446,16 +488,19 @@ class StudentContentController extends Controller
         $files = $this->getMaterialFiles($studentMaterialSummary);
 
         return Inertia::render('student/material', [
-            "module" => $studentModuleSummary,
-            "topic" => $studentTopicSummary,
-            "material" => $studentMaterialSummary,
-            "files" => $files,
+            'module' => $studentModuleSummary,
+            'topic' => $studentTopicSummary,
+            'material' => $studentMaterialSummary,
+            'files' => $files,
         ]);
 
     }
-    public function getMaterialFiles(Material $material){
+
+    public function getMaterialFiles(Material $material)
+    {
         $files = $material->fileLinks()->with('file')->get();
-        return $files->map(function ($file){
+
+        return $files->map(function ($file) {
             return [
                 'module_id' => $file->module_id,
                 'topic_id' => $file->topic_id,
@@ -464,10 +509,11 @@ class StudentContentController extends Controller
                 'file' => [
                     'file_name' => $file->file->file_name,
                     'file_path' => $file->file->file_path,
-                ]
+                ],
             ];
         })->toArray();
     }
+
     private function getActiveOrganization(User $user, Request $request): ?Organization
     {
         $organizationId = $request->session()->get('activeOrganization');
@@ -506,14 +552,16 @@ class StudentContentController extends Controller
             ->module()
             ->first();
     }
-    public function marks(Request $request){
+
+    public function marks(Request $request)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
         $group = $this->getOrganizationGroup($organization);
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
         $groupsModules = $group->groupModulesTeachers()->with('module')->get();
@@ -524,11 +572,13 @@ class StudentContentController extends Controller
         $stats = $this->getStudentMarksStats($user);
 
         return Inertia::render('student/marks', [
-            "marks" => $marks,
-            "stats" => $stats,
+            'marks' => $marks,
+            'stats' => $stats,
         ]);
     }
-    private function getStudentMarksInfo(User $user): array{
+
+    private function getStudentMarksInfo(User $user): array
+    {
         $submissions = Submission::query() // get completed assignment submissions ids
             ->where('student_id', $user->id)
             ->whereIn('status', ['SUBMITTED', 'GRADED'])
@@ -536,8 +586,10 @@ class StudentContentController extends Controller
         $assignments = Assignment::query()
             ->whereIn('id', $submissions)
             ->get();
+
         return $assignments->map(function ($assignment) use ($user) {
             $submission = $assignment->submissions()->where('student_id', $user->id)->first();
+
             return [
                 'id' => $assignment->id,
                 'title' => $assignment->title,
@@ -549,27 +601,32 @@ class StudentContentController extends Controller
         })->toArray();
 
     }
-    private function getStudentMarksStats(User $user){
+
+    private function getStudentMarksStats(User $user)
+    {
         $submissions = Submission::query()
             ->where('student_id', $user->id)
             ->get();
         $graded = $submissions->where('status', 'GRADED')->count();
         $submitted = $submissions->where('status', 'SUBMITTED')->count();
         $averagePercent = $submissions->avg('total_percent');
+
         return [
             'graded' => $graded,
             'submitted' => $submitted,
             'averagePercent' => $averagePercent,
         ];
     }
-    public function marksTablePreview(Request $request){
+
+    public function marksTablePreview(Request $request)
+    {
         $user = $request->user();
         $organization = $this->getActiveOrganization($user, $request);
-        if(!$organization){
+        if (! $organization) {
             return redirect()->back()->with('error', 'Organization not found');
         }
         $group = $this->getOrganizationGroup($organization);
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
         $marks = $this->getStudentMarksTableInfo($user);
@@ -577,32 +634,35 @@ class StudentContentController extends Controller
             ->groupModulesTeachers()
             ->with('module')
             ->get()
-            ->pluck('module.name')->toArray();;
+            ->pluck('module.name')->toArray();
 
         return Inertia::render('student/marks-table-preview', [
-            "marks" => $marks,
-            "enrolledModules" => $enrolledModules,
+            'marks' => $marks,
+            'enrolledModules' => $enrolledModules,
         ]);
 
-
     }
-    private function getStudentMarksTableInfo(User $user){
+
+    private function getStudentMarksTableInfo(User $user)
+    {
         $submissions = Submission::query() // get completed assignment submissions ids
-        ->where('student_id', $user->id)
+            ->where('student_id', $user->id)
             ->whereIn('status', ['SUBMITTED', 'GRADED'])
             ->pluck('assignment_id');
         $assignments = Assignment::query()
             ->whereIn('id', $submissions)
             ->with('topics.module')
             ->get();
+
         return $assignments->map(function ($assignment) use ($user) {
             $submission = $assignment->submissions()->where('student_id', $user->id)->first();
             $moduleName = $assignment->topics()->with('module')->first()->module->name;
+
             return [
                 'module_name' => $moduleName,
                 'percent' => $submission->total_percent,
                 'grading_policy' => $assignment->grading_policy,
-                'grade' =>  $assignment->grading_policy === 'SUMMATIVE' ? round($submission->total_percent / 10)
+                'grade' => $assignment->grading_policy === 'SUMMATIVE' ? round($submission->total_percent / 10)
                     : null,
                 'submitted_on' => $assignment->grading_policy === 'FORMATIVE' ? $submission->submitted_on : null,
             ];
