@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountInvitesController;
 use App\Http\Controllers\AssignmentsController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaterialFilesController;
 use App\Http\Controllers\MaterialsController;
@@ -34,7 +35,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::post('onboarding-requests', [OnboardingRequestController::class, 'store'])->name('onboarding-requests.store');
-
+Route::post('contact-us', [ContactUsController::class, 'send'])->name('contact-us.send');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/chats', [ChatController::class, 'chats'])->name('chats');
