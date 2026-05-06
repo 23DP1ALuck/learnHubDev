@@ -66,7 +66,7 @@ export function Sidebar() {
     const homeHref = auth.canManageOrganization
         ? ownerDashboard()
         : auth.organizationRole === 'STUDENT'
-          ? '/student/dashboard'
+          ? '/dashboard'
           : dashboard();
 
     return (
@@ -74,8 +74,8 @@ export function Sidebar() {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={homeHref} prefetch>
+                        <SidebarMenuButton size="lg" asChild className="p-0">
+                            <Link href='/dashboard' prefetch>
                                 <div className="flex w-full items-center group-data-[collapsible=icon]:justify-center">
                                     <Logo className="h-12 w-auto group-data-[collapsible=icon]:h-5" />
                                 </div>
@@ -90,7 +90,7 @@ export function Sidebar() {
                     {navItems.map((item) => {
                         if (!item.embedItems) {
                             return (
-                                <SidebarMenuItem key={item.title}>
+                                <SidebarMenuItem key={item.title} className="flex items-center justify-center">
                                     <SidebarMenuButton
                                         asChild
                                         isActive={urlIsActive(
