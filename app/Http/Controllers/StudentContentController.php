@@ -392,7 +392,6 @@ class StudentContentController extends Controller
         ];
     }
     private function getTaskNavigation(Assignment $assignment, User $user): array{
-//        TODO: send isCompleted flag
         $isCompleted = $assignment
                 ->submissions()
                 ->where('student_id', auth()->id())->first()?->status === 'COMPLETED';

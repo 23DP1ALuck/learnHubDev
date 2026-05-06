@@ -12,10 +12,8 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -157,6 +155,7 @@ class OrganizationOwnerController extends Controller
             'students' => $this->organizationStudents($organization),
         ]);
     }
+
     public function assignStudents(Request $request)
     {
         $studentId = $request->input('student_id');
@@ -164,24 +163,25 @@ class OrganizationOwnerController extends Controller
         $organizationId = $request->session()->get('activeOrganization');
         $organization = Organization::query()->where('id', $organizationId)->first();
         $student = User::query()->where('id', $studentId)->first();
-        if(!$student){
+        if (! $student) {
             return redirect()->back()->with('error', 'Student not found');
         }
-        if(!$student->organizations()->wherePivot('organization_id', $organizationId)->exists()){
+        if (! $student->organizations()->wherePivot('organization_id', $organizationId)->exists()) {
             return redirect()->back()->with('error', 'Student doesn\'t belong to this organization');
         }
         $group = SchoolGroup::query()->where('group_id', $groupId)->first();
-        if(!$group){
+        if (! $group) {
             return redirect()->back()->with('error', 'Group not found');
         }
-        if(!$organization->schoolGroups()->where('group_id', $groupId)->exists()){
+        if (! $organization->schoolGroups()->where('group_id', $groupId)->exists()) {
             return redirect()->back()->with('error', 'Group is not a part of this organization');
         }
 
-        $student->organizations()->updateExistingPivot($organization, array('group_id' => $groupId));
+        $student->organizations()->updateExistingPivot($organization, ['group_id' => $groupId]);
 
         return redirect()->route('groups')->with('success', 'Student assigned to group successfully');
     }
+
     public function assignModules(Request $request)
     {
         $groupId = (int) $request->input('group_id');
@@ -208,10 +208,9 @@ class OrganizationOwnerController extends Controller
             ->get()
             ->keyBy('id');
 
-
-        DB::transaction(function () use ($organization, $groupId, $moduleIds, $modules) {
-            $semester = date("m") > 8 && date("m") <= 12 ? "1" : "2";
-            $schoolYear = $semester == 1 ? date("Y") ."/".(int) date("Y")+1 : (int) date("Y")-1 ."/".(int) date("Y");
+        DB::transaction(function () use ($organization, $groupId, $modules) {
+            $semester = date('m') > 8 && date('m') <= 12 ? '1' : '2';
+            $schoolYear = $semester == 1 ? date('Y').'/'.(int) date('Y') + 1 : (int) date('Y') - 1 .'/'.(int) date('Y');
             foreach ($modules as $module) {
                 GroupModuleTeacher::query()
                     ->where('school_id', $organization->id)
@@ -237,6 +236,7 @@ class OrganizationOwnerController extends Controller
 
         return redirect()->route('groups')->with('success', 'Modules assigned to group successfully');
     }
+
     private function organizationStudents(Organization $organization): array
     {
         return $organization->users()
@@ -246,6 +246,7 @@ class OrganizationOwnerController extends Controller
             ->toArray();
 
     }
+
     public function availableModules(int $organizationId, int $groupId): JsonResponse
     {
         // TODO: finish this
@@ -261,15 +262,16 @@ class OrganizationOwnerController extends Controller
             ->where('organization_id', $organizationId)
             ->with('creator')
             ->get();
-        $moduleSummary = $modules->map(function (Module $module){
+        $moduleSummary = $modules->map(function (Module $module) {
             return [
                 ...$module->toArray(),
-                'teacher_name' => $module->creator?->name ?? ''
+                'teacher_name' => $module->creator?->name ?? '',
             ];
         });
 
         return response()->json($moduleSummary);
     }
+
     private function ownedOrganization(Request $request): Organization
     {
         $organization = $request->user()?->currentOwnedOrganization();
@@ -305,6 +307,7 @@ class OrganizationOwnerController extends Controller
             'updated_at' => optional($organization->updated_at)?->toISOString(),
         ];
     }
+
     private function memberPayload(User $user): array
     {
         return [
@@ -342,27 +345,32 @@ class OrganizationOwnerController extends Controller
             'inviter_name' => $invite->inviter?->name,
         ];
     }
-    public function inviteCSV(Request $request){
+
+    public function inviteCSV(Request $request)
+    {
         $user = $request->user();
         $organizationId = $request->session()->get('activeOrganization');
         $organization = Organization::query()->where('id', $organizationId)->first();
-        if(!$organization){
+        if (! $organization) {
             return redirect()->route('dashboard')->with('error', 'Organization not found');
         }
+
         return Inertia::render('owner/invite-csv', [
             'organization' => $organization,
             'users' => [],
         ]);
     }
-    public function inviteCSVParse(Request $request){
+
+    public function inviteCSVParse(Request $request)
+    {
         $user = $request->user();
         $organizationId = $request->session()->get('activeOrganization');
         $organization = Organization::query()->where('id', $organizationId)->first();
-        if(!$organization){
+        if (! $organization) {
             return redirect()->route('dashboard')->with('error', 'Organization not found');
         }
         $csvFile = $request->file('csv_file');
-        if(!$csvFile){
+        if (! $csvFile) {
             return redirect()->back()->with('error', 'Please select a CSV file');
         }
         $contents = file_get_contents($csvFile->getRealPath());
@@ -374,24 +382,27 @@ class OrganizationOwnerController extends Controller
         // 2. Extract the header and convert it into a Laravel collection.
         // https://stackoverflow.com/questions/54145035/cant-remove-ufeff-from-a-string
         // need to remove the BOM from the beginning of the string (if file was exported from Excel)
-                $header = collect(str_getcsv(array_shift($lines), separator: ',', enclosure: '"', escape: ""))
-                ->map(fn($value) => preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value));
+        $header = collect(str_getcsv(array_shift($lines), separator: ',', enclosure: '"', escape: ''))
+            ->map(fn ($value) => preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value));
 
         // 3. Convert the rows into a Laravel collection.
-                $rows = collect($lines);
+        $rows = collect($lines);
 
         // 4. Map through the rows and combine them with the header to produce the final collection.
-                $data = $rows->map(fn($row) => $header->combine(str_getcsv($row, separator: ',', enclosure: '"', escape: "")));
+        $data = $rows->map(fn ($row) => $header->combine(str_getcsv($row, separator: ',', enclosure: '"', escape: '')));
+
         return Inertia::render('owner/invite-csv', [
             'organization' => $organization,
             'users' => $data,
         ]);
     }
-    public function invitePeopleByCSV(Request $request){
+
+    public function invitePeopleByCSV(Request $request)
+    {
         $user = $request->user();
         $organizationId = $request->session()->get('activeOrganization');
         $organization = Organization::query()->where('id', $organizationId)->first();
-        if(!$organization){
+        if (! $organization) {
             return redirect()->route('dashboard')->with('error', 'Organization not found');
         }
         $users = $request->input('users', []);
@@ -402,7 +413,7 @@ class OrganizationOwnerController extends Controller
             'users.*.email' => ['required', 'string', 'email', 'max:255'],
             'users.*.role' => ['required', Rule::in(['STUDENT', 'TEACHER'])],
         ]);
-        $usersCount = sizeof($validated['users']); // initial invite users count
+        $usersCount = count($validated['users']); // initial invite users count
         $sentCount = 0;
         foreach ($validated['users'] as $invitedUser) {
             $result = $this->invite($organization, $user, [
@@ -418,13 +429,16 @@ class OrganizationOwnerController extends Controller
             }
             sleep(1);
         }
-        if($sentCount < $usersCount){ // if not all invites were sent, redirect back to the invitations message with an error message
+        if ($sentCount < $usersCount) { // if not all invites were sent, redirect back to the invitations message with an error message
             return redirect()->route('invitations')
-                ->with('error', "{$sentCount} out of {$usersCount} invites were sent. " . implode(' ', $errors));;
+                ->with('error', "{$sentCount} out of {$usersCount} invites were sent. ".implode(' ', $errors));
         }
+
         return redirect()->route('invitations')->with('success', 'Invites sent successfully');
     }
-    private function invite($organization, $user, $invitedUser){
+
+    private function invite($organization, $user, $invitedUser)
+    {
         $pendingInviteExists = AccountInvites::query()
             ->where('invitation_type', 'join_org')
             ->where('organization_id', $organization->id)
@@ -460,19 +474,20 @@ class OrganizationOwnerController extends Controller
         try {
             Mail::to($invitedUser['email'])->send(new InviteEmail(
                 inviteUrl: $url,
-                recipientName: $invitedUser['first_name'] . ' ' . $invitedUser['last_name'],
+                recipientName: $invitedUser['first_name'].' '.$invitedUser['last_name'],
                 organizationName: $organization->organization_name,
                 expiresAt: $invite->expires_at,
             ));
             $mailSent = true;
         } catch (\Throwable $e) {
             report($e);
-            $mailError = 'Invite created, but email failed to send. Error: ' . $e->getMessage();
+            $mailError = 'Invite created, but email failed to send. Error: '.$e->getMessage();
             $invite->delete();
         }
+
         return [
             'mail_sent' => $mailSent,
             'mail_error' => $mailError,
         ];
-}
+    }
 }

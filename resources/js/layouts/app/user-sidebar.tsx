@@ -96,7 +96,7 @@ export function Sidebar() {
                                         isActive={urlIsActive(
                                             item.href,
                                             undefined,
-                                            false,
+                                            item.title === "Chats",
                                         )}
                                         tooltip={t(item.title)}
                                     >
