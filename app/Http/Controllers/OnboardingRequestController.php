@@ -6,7 +6,6 @@ use App\Http\Requests\StoreOnboardingRequestRequest;
 use App\Http\Requests\UpdateOnboardingRequestRequest;
 use App\Models\OnboardingRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class OnboardingRequestController extends Controller
@@ -14,11 +13,11 @@ class OnboardingRequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $statuses = ['pending', 'approved', 'rejected']; // allowed statuses
         $queryParam = request()->query('status', 'pending'); // get query param
-        if (!in_array($queryParam, $statuses)) {    // check if query param is valid
+        if (! in_array($queryParam, $statuses)) {    // check if query param is valid
             return redirect()->route('onboarding-requests')->with('error', 'Invalid status parameter.');
         }
         $requests = OnboardingRequest::where('status', $queryParam)
@@ -33,23 +32,22 @@ class OnboardingRequestController extends Controller
             ")
             ->first();
         $metrics = [
-            "approved" => $countsByStatus->approved ?? 0,
-            "pending" => $countsByStatus->rejected ?? 0,
-            "rejected" => $countsByStatus->penidng ?? 0,
+            'approved' => $countsByStatus->approved ?? 0,
+            'pending' => $countsByStatus->rejected ?? 0,
+            'rejected' => $countsByStatus->penidng ?? 0,
         ];
+
         return Inertia::render('admin/onboarding-requests', [
             'onboardingRequests' => $requests,
-            'metrics' => $metrics
+            'metrics' => $metrics,
+            'currentStatusFilter' => $queryParam,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
