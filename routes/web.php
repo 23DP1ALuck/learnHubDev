@@ -19,6 +19,7 @@ use App\Http\Controllers\TaskAnswersController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TeacherContentController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\UserErrorMessageController;
 use App\Http\Middleware\CheckCanManageLearningContent;
 use App\Http\Middleware\CheckIsAdmin;
 use App\Http\Middleware\CheckIsOrganizationOwner;
@@ -41,9 +42,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chats', [ChatController::class, 'chats'])->name('chats');
     Route::get('/chats/{chat}', [ChatController::class, 'chats'])->name('chats.show');
     Route::get('/download-material/{module}/{topic}/{material}/{file}', [MaterialFilesController::class, 'download'])->name('download-material');
+    Route::get('/error-reports/create', [UserErrorMessageController::class, 'create'])->name('error-reports.create');
     Route::post('/chats', [ChatController::class, 'createChat'])->name('chats.store');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'storeMessage'])->name('chats.messages.store');
     Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
+    Route::post('/error-reports', [UserErrorMessageController::class, 'store'])->name('error-reports.store');
 });
 Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () {
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');

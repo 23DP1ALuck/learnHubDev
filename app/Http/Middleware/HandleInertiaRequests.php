@@ -68,6 +68,7 @@ class HandleInertiaRequests extends Middleware
                 'settings' => trans('settings'),
                 'auth_ui' => trans('auth_ui'),
                 'admin' => trans('admin'),
+                'error_reports' => trans('error_reports'),
             ],
             'auth' => [
                 'user' => $request->user(),

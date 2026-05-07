@@ -16,6 +16,7 @@ import {
 import type { NavItem } from '@/types';
 import {
     BookOpen,
+    Bug,
     Building,
     Calendar,
     FileText,
@@ -36,6 +37,11 @@ export const userNavItems: NavItem[] = [
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
+    },
+    {
+        title: 'Report issue',
+        href: '/error-reports/create',
+        icon: Bug,
     },
 ];
 
@@ -59,6 +65,11 @@ export const adminNavItems: NavItem[] = [
         title: 'Organizations',
         href: organizations(),
         icon: Building,
+    },
+    {
+        title: 'Error reports',
+        href: '/admin/error-reports',
+        icon: Bug,
     },
 ];
 
@@ -87,6 +98,11 @@ export const teacherNavItems: NavItem[] = [
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
+    },
+    {
+        title: 'Report issue',
+        href: '/error-reports/create',
+        icon: Bug,
     },
 ];
 
@@ -127,6 +143,11 @@ export const schoolOwnerNavItems: NavItem[] = [
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
+    },
+    {
+        title: 'Report issue',
+        href: '/error-reports/create',
+        icon: Bug,
     },
 ];
 
@@ -173,6 +194,11 @@ export const individualOwnerNavItems: NavItem[] = [
         href: editProfile(),
         icon: Settings,
     },
+    {
+        title: 'Report issue',
+        href: '/error-reports/create',
+        icon: Bug,
+    },
 ];
 
 export const studentNavItems: NavItem[] = [
@@ -205,5 +231,10 @@ export const studentNavItems: NavItem[] = [
         title: 'Settings',
         href: editProfile(),
         icon: Settings,
+    },
+    {
+        title: 'Report issue',
+        href: '/error-reports/create',
+        icon: Bug,
     },
 ];
