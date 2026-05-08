@@ -44,7 +44,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chats/{chat}', [ChatController::class, 'chats'])->name('chats.show');
     Route::get('/download-material/{module}/{topic}/{material}/{file}', [MaterialFilesController::class, 'download'])->name('download-material');
     Route::get('/error-reports/create', [UserErrorMessageController::class, 'create'])->name('error-reports.create');
-    Route::get('download-error-file/{error_id}/{user_id}/{file_id}', [AdminErrorMessageController::class, 'downloadFile'])->name('download-error-file');
     Route::post('/chats', [ChatController::class, 'createChat'])->name('chats.store');
     Route::post('/chats/{chat}/messages', [ChatController::class, 'storeMessage'])->name('chats.messages.store');
     Route::patch('/session/active-organization', [SessionController::class, 'setActiveOrganization'])->name('active-organization');
@@ -54,6 +53,8 @@ Route::middleware(['auth', 'verified', CheckIsAdmin::class])->group(function () 
     Route::get('onboarding-requests', [OnboardingRequestController::class, 'index'])->name('onboarding-requests');
     Route::get('organizations', [OrganizationsPageController::class, 'index'])->name('organizations');
     Route::get('/admin/error-reports', [AdminErrorMessageController::class, 'index'])->name('admin.error-reports');
+    Route::get('download-error-file/{error_id}/{user_id}/{file_id}', [AdminErrorMessageController::class, 'downloadFile'])->name('download-error-file');
+    Route::patch('/admin/error-reports/{error_id}/status', [AdminErrorMessageController::class, 'updateStatus'])->name('admin.error-reports.update-status');
     Route::post('/account-invites', [AccountInvitesController::class, 'store'])->name('account-invites.store');
 });
 

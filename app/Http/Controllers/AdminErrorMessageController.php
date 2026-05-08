@@ -45,6 +45,7 @@ class AdminErrorMessageController extends Controller
 
         $reports = $reports->map(function ($report) {
             $files = $report->fileLinks;
+
             return [
 
                 'error_id' => $report->error_id,
@@ -66,6 +67,7 @@ class AdminErrorMessageController extends Controller
                 }),
             ];
         });
+
         //        'reports' => [
         //            [
         //                'error_id' => int,
@@ -92,6 +94,7 @@ class AdminErrorMessageController extends Controller
             'reports' => $reports,
         ]);
     }
+
     public function downloadFile(Request $request, int $errorId, int $userId, int $fileId)
     {
 
@@ -101,9 +104,27 @@ class AdminErrorMessageController extends Controller
             ->where('file_id', $fileId)
             ->first();
         $storedFile = $file->file()->first();
+
         return Storage::download(
             $storedFile->file_path,
             $storedFile->file_name
         );
+    }
+
+    public function updateStatus(Request $request, int $errorId)
+    {
+        $user = $request->user();
+
+        $error = ErrorReport::query()->where('error_id', $errorId)->first();
+        if (! $error) {
+            return redirect()->back()->with('error', 'Error report not found');
+        }
+        $error = $error->update([
+            'resolved_at' => now(),
+        ]);
+        if (! $error) {
+            return redirect()->back()->with('error', 'Error updating status');
+        }
+        return redirect()->back()->with('success', 'Status updated successfully');
     }
 }

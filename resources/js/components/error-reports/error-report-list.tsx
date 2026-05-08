@@ -9,9 +9,11 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/use-translation';
-import { Link } from '@inertiajs/react';
+import { Form, Link } from '@inertiajs/react';
 import { FileText } from 'lucide-react';
 import { route } from 'ziggy-js';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+
 
 type ErrorReportListProps = {
     reports: ErrorReportSummary[];
@@ -108,7 +110,7 @@ export default function ErrorReportList({ reports }: ErrorReportListProps) {
                                 </div>
 
                                 {report.files.length > 0 ? (
-                                    <div className="mt-4 flex flex-wrap gap-2">
+                                    <div className="mt-4 flex flex-wrap gap-2 justify-between">
                                         {report.files.map((file) => (
                                             <Button
                                                 key={file.id}
@@ -127,6 +129,40 @@ export default function ErrorReportList({ reports }: ErrorReportListProps) {
                                                 </a>
                                             </Button>
                                         ))}
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="default" className="bg-green-400 hover:bg-green-400/70">
+                                                    Mark as completed
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <Form action={route('admin.error-reports.update-status', report.error_id)} method={"PATCH"}>
+                                                    {({processing}) => {
+                                                        return <>
+                                                            <DialogHeader>
+                                                                <DialogTitle>
+                                                                    {t('error_reports.Mark report as completed?')}
+                                                                </DialogTitle>
+                                                                <DialogDescription>
+                                                                    {t(
+                                                                        'error_reports.This will mark the report as resolved. You can use this after the issue has been checked or fixed.',
+                                                                    )}
+                                                                </DialogDescription>
+                                                            </DialogHeader>
+                                                            <DialogFooter>
+                                                                <Button variant="outline" disabled={processing}>
+                                                                    {t('common.Cancel')}
+                                                                </Button>
+                                                                <Button>
+                                                                    {t('error_reports.Mark as completed')}
+                                                                </Button>
+                                                            </DialogFooter>
+                                                        </>
+                                                    }}
+                                                </Form>
+
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
                                 ) : null}
                             </article>
