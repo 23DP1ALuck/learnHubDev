@@ -52,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                 $unreadMessages = $this->getUnreadMessages($currentUser, $currentOrganization->id);
             }
         }
+//        dd(app()->getLocale());
         return [
             ...parent::share($request),
             'name' => config('app.name'),

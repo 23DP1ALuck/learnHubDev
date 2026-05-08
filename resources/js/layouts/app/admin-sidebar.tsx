@@ -13,9 +13,10 @@ import { useActiveUrl } from '@/hooks/use-active-url';
 import { adminNavItems } from '@/layouts/app/navitems';
 import { dashboard } from '@/routes';
 import { Link } from '@inertiajs/react';
+import { useTranslation } from '@/hooks/use-translation';
 export function Sidebar() {
     const { urlIsActive } = useActiveUrl();
-    console.log(adminNavItems);
+    const { t } = useTranslation();
     return (
         <UISidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -47,7 +48,7 @@ export function Sidebar() {
                             >
                                 <Link href={item.href} prefetch>
                                     {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
+                                    <span> {t(`common.${item.title}`)}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

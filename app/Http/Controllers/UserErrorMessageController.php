@@ -28,21 +28,19 @@ class UserErrorMessageController extends Controller
         $storedPath = null;
         $fileName = null;
         if ($file) {
-            $fileExtension = $file->getClientOriginalExtension();
             $storedPath = $file->store('error-reports');
             $fileName = $file->getClientOriginalName();
         }
 
         try {
-            DB::transaction(function () use ($user, $fileExtension, $validated, $file, $fileName, $storedPath) {
+            DB::transaction(function () use ($user, $validated, $file, $fileName, $storedPath) {
                 $error = ErrorReport::create([
                     'user_id' => $user->id,
                     'report_text' => json_encode($validated['report_text']),
-                    'file_name' => $fileExtension,
                 ]);
                 if ($file) {
                     $storedFile = StoredFile::create([
-                        'file_name' => $fileName.'.'.$fileExtension,
+                        'file_name' => $fileName,
                         'file_path' => $storedPath,
                     ]);
                     ErrorReportFile::create([
@@ -53,8 +51,6 @@ class UserErrorMessageController extends Controller
                 }
             });
         } catch (Exception $e) {
-            dd($e);
-
             return redirect()->back()->with('error', 'Failed to submit error report');
         }
 

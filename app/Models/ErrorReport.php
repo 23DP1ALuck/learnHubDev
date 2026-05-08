@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ErrorReport extends Model
 {
-    use HasFactory;
+    use HasFactory, Compoships;
 
     public const UPDATED_AT = null;
 
@@ -34,9 +35,12 @@ class ErrorReport extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function files(): BelongsToMany
+    public function fileLinks(): HasMany
     {
-        return $this->belongsToMany(StoredFile::class, 'error_images', 'error_id', 'file_id', 'error_id', 'id')
-            ->withPivot('user_id');
+        return $this->hasMany(ErrorReportFile::class, [
+            'error_id', 'user_id',
+        ], [
+            'error_id', 'user_id',
+        ]);
     }
 }

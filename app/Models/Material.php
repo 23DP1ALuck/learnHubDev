@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Material extends Model
 {
-    use HasFactory, Compoships;
+    use Compoships, HasFactory;
 
     public $incrementing = false;
+
     protected $primaryKey = 'material_id';
 
     protected $keyType = 'int';
+
     protected $fillable = [
         'module_id',
         'topic_id',
