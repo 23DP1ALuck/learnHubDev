@@ -26,4 +26,7 @@ return [
     'What you clicked or submitted.' => 'What you clicked or submitted.',
     'When users submit system issues, they will appear here.' => 'When users submit system issues, they will appear here.',
     'With files' => 'With files',
+    'Mark report as completed?' => 'Mark report as completed?',
+    'This will mark the report as resolved. You can use this after the issue has been checked or fixed.' => 'This will mark the report as resolved. You can use this after the issue has been checked or fixed.',
+    'Mark as completed' => 'Mark as completed',
 ];

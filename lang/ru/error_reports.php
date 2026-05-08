@@ -26,4 +26,7 @@ return [
     'What you clicked or submitted.' => 'Что вы нажали или отправили.',
     'When users submit system issues, they will appear here.' => 'Когда пользователи отправят системные проблемы, они появятся здесь.',
     'With files' => 'С файлами',
+    'Mark report as completed?' => 'Отметить отчёт как завершённый?',
+    'This will mark the report as resolved. You can use this after the issue has been checked or fixed.' => 'Это отметит отчёт как решённый. Используйте это после того, как проблема была проверена или исправлена.',
+    'Mark as completed' => 'Отметить как завершённый',
 ];

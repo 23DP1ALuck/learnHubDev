@@ -26,4 +26,7 @@ return [
     'What you clicked or submitted.' => 'Ko tu nospiedi vai iesniedzi.',
     'When users submit system issues, they will appear here.' => 'Kad lietotāji iesniegs sistēmas problēmas, tās parādīsies šeit.',
     'With files' => 'Ar failiem',
+    'Mark report as completed?' => 'Atzīmēt ziņojumu kā pabeigtu?',
+    'This will mark the report as resolved. You can use this after the issue has been checked or fixed.' => 'Tas atzīmēs ziņojumu kā atrisinātu. To var izmantot pēc tam, kad problēma ir pārbaudīta vai novērsta.',
+    'Mark as completed' => 'Atzīmēt kā pabeigtu',
 ];

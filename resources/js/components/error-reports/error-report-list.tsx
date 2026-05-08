@@ -13,6 +13,7 @@ import { Form, Link } from '@inertiajs/react';
 import { FileText } from 'lucide-react';
 import { route } from 'ziggy-js';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { useState } from 'react';
 
 
 type ErrorReportListProps = {
@@ -36,6 +37,7 @@ function formatDate(value: string | null): string {
 export default function ErrorReportList({ reports }: ErrorReportListProps) {
     const { t } = useTranslation();
     console.log('reports', reports);
+    const [open, setOpen] = useState(false);
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>
@@ -129,40 +131,42 @@ export default function ErrorReportList({ reports }: ErrorReportListProps) {
                                                 </a>
                                             </Button>
                                         ))}
-                                        <Dialog>
+                                        {!report.resolved_at &&
+                                        <Dialog open={open} onOpenChange={setOpen}>
                                             <DialogTrigger asChild>
                                                 <Button variant="default" className="bg-green-400 hover:bg-green-400/70">
                                                     Mark as completed
                                                 </Button>
                                             </DialogTrigger>
                                             <DialogContent>
-                                                <Form action={route('admin.error-reports.update-status', report.error_id)} method={"PATCH"}>
-                                                    {({processing}) => {
-                                                        return <>
-                                                            <DialogHeader>
-                                                                <DialogTitle>
-                                                                    {t('error_reports.Mark report as completed?')}
-                                                                </DialogTitle>
-                                                                <DialogDescription>
-                                                                    {t(
-                                                                        'error_reports.This will mark the report as resolved. You can use this after the issue has been checked or fixed.',
-                                                                    )}
-                                                                </DialogDescription>
-                                                            </DialogHeader>
-                                                            <DialogFooter>
-                                                                <Button variant="outline" disabled={processing}>
-                                                                    {t('common.Cancel')}
-                                                                </Button>
-                                                                <Button>
-                                                                    {t('error_reports.Mark as completed')}
-                                                                </Button>
-                                                            </DialogFooter>
-                                                        </>
-                                                    }}
-                                                </Form>
 
+                                                    <Form action={route('admin.error-reports.update-status', report.error_id)} method={"PATCH"} onSubmit={() => setOpen(false)}>
+                                                        {({processing}) => {
+                                                            return <>
+                                                                <DialogHeader>
+                                                                    <DialogTitle>
+                                                                        {t('error_reports.Mark report as completed?')}
+                                                                    </DialogTitle>
+                                                                    <DialogDescription>
+                                                                        {t(
+                                                                            'error_reports.This will mark the report as resolved. You can use this after the issue has been checked or fixed.',
+                                                                        )}
+                                                                    </DialogDescription>
+                                                                </DialogHeader>
+                                                                <DialogFooter>
+                                                                    <Button variant="outline" disabled={processing}>
+                                                                        {t('common.Cancel')}
+                                                                    </Button>
+                                                                    <Button>
+                                                                        {t('error_reports.Mark as completed')}
+                                                                    </Button>
+                                                                </DialogFooter>
+                                                            </>
+                                                        }}
+                                                    </Form>
                                             </DialogContent>
                                         </Dialog>
+                                        }
                                     </div>
                                 ) : null}
                             </article>
