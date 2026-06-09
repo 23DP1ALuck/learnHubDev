@@ -11,6 +11,13 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useTranslation } from '@/hooks/use-translation';
+import {
+    Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader,
+    DialogTitle, DialogTrigger
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Form } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 type StudentAssignmentSummaryProps = {
     assignment: TeacherStudentAssignment;
@@ -36,10 +43,50 @@ export default function StudentAssignmentSummary({
     return (
         <Card className="border-sidebar-border/70">
             <CardHeader>
-                <CardTitle>{assignment.title}</CardTitle>
-                <CardDescription>
-                    {assignment.description || t('common.No description')}
-                </CardDescription>
+                <div className="flex justify-between">
+                    <div className="flex flex-col gap-1">
+                        <CardTitle>{assignment.title}</CardTitle>
+                        <CardDescription>
+                            {assignment.description || t('common.No description')}
+                        </CardDescription>
+                    </div>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                                <Button variant={"outline"}>
+                                    {t('common.Mark as graded')}
+                                </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {t('common.Mark submission as graded?')}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {t(
+                                        'common.This will mark the student submission as graded. Make sure all task points have been checked before continuing.',
+                                    )}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <Form action="/" method="patch">
+                                {({ processing }) => (
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button type="button" variant="outline">
+                                                {t('common.Cancel')}
+                                            </Button>
+                                        </DialogClose>
+                                        <Button type="submit" disabled={processing}>
+                                            {processing
+                                                ? t('common.Saving...')
+                                                : t('common.Confirm grading')}
+                                        </Button>
+                                    </DialogFooter>
+                                )}
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
             </CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-4">
                 <div className="rounded-2xl border p-4">

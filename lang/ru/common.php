@@ -139,4 +139,8 @@ return [
     'Oct' => 'Октябрь',
     'Nov' => 'Ноябрь',
     'Dec' => 'Декабрь',
+    'Mark submission as graded?' => 'Отметить работу как проверенную?',
+    'This will mark the student submission as graded. Make sure all task points have been checked before continuing.' => 'Это отметит работу студента как проверенную. Перед продолжением убедитесь, что все задания были оценены.',
+    'Confirm grading' => 'Подтвердить оценивание',
+    'Mark as graded' => 'Отметить как проверенное',
 ];

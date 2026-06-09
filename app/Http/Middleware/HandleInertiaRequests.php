@@ -49,10 +49,13 @@ class HandleInertiaRequests extends Middleware
                     ->organizations()
                     ->where('id', $currentOrganizationId)
                     ->first();
-                $unreadMessages = $this->getUnreadMessages($currentUser, $currentOrganization->id);
+                if ($currentOrganization !== null) {
+                    $unreadMessages = $this->getUnreadMessages($currentUser, $currentOrganization->id);
+                }
             }
         }
-//        dd(app()->getLocale());
+
+        //        dd(app()->getLocale());
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -79,7 +82,7 @@ class HandleInertiaRequests extends Middleware
                 'organizations' => $currentUser instanceof User ? $this->listOrganizations($request->user()) : null,
             ],
             'session' => [
-                'activeOrganization' => (int) $currentOrganizationId ?? null,
+                'activeOrganization' => $currentOrganizationId,
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

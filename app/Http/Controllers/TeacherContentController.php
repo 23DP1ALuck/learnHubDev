@@ -49,6 +49,7 @@ class TeacherContentController extends Controller
             ->orderBy('due_date', 'desc')
             ->take(5)
             ->get();
+
         return Inertia::render('teacher/dashboard', [
             'stats' => $stats,
             'recentModules' => $modules,
@@ -74,9 +75,10 @@ class TeacherContentController extends Controller
             ->modules()
             ->where('modules.creator_id', $user->id)
             ->get();
-        $assignments = $moduleList->map(function ($module) use ($studentList) { // get all assignments for all modules
+        $assignments = $moduleList->map(function ($module) { // get all assignments for all modules
             $topics = $module->topics()->get();
-            return $topics->map(function ($topic) use ($studentList) {
+
+            return $topics->map(function ($topic) {
                 return $topic->assignments()->get();
             });
         })->flatten(2)->unique('id');
@@ -84,18 +86,19 @@ class TeacherContentController extends Controller
         $studentId = $request->query('student_id');
         $moduleId = $request->query('module_id');
         $assignmentId = $request->query('assignment_id');
-        if(!$studentId && !$moduleId && !$assignmentId){ // default state on page load
+        if (! $studentId && ! $moduleId && ! $assignmentId) { // default state on page load
             $submissions = Submission::query()
-                ->whereIn('assignment_id', $assignmentIds)->whereIn('status', ['SUBMITTED','GRADED'])->get();
+                ->whereIn('assignment_id', $assignmentIds)->whereIn('status', ['SUBMITTED', 'GRADED'])->get();
             $submissions = $submissions->map(function (Submission $submission) {
                 $assignment = $submission->assignment()->first();
                 $module = $assignment->topics()->first()->module()->first();
+
                 return [
                     ...$submission->toArray(),
                     'assignment_title' => $assignment->title,
                     'student_name' => $submission->student()->first()->user()->first()->name,
                     'module_name' => $module->name,
-                    ];
+                ];
             })->toArray();
         } else {
             $student = User::query()->where('id', $studentId)->first();
@@ -107,23 +110,24 @@ class TeacherContentController extends Controller
                 'assignment' => $assignment,
             ];
             $submissionIds = null;
-            if($filters['student']){
+            if ($filters['student']) {
                 $submissions = $this->filterByStudent($filters['student'], $assignmentIds);
                 // if first filter just add found submissions, otherwise intersect with previous filters
                 $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
             }
-            if($filters['module']){
+            if ($filters['module']) {
                 $submissions = $this->filterMarksByModule($filters['module'], $assignmentIds);
                 // if first filter just add found submissions, otherwise intersect with previous filters
                 $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
             }
-            if($filters['assignment']){
+            if ($filters['assignment']) {
                 $submissions = $this->filterMarksByAssignment($filters['assignment']);
                 // if first filter just add found submissions, otherwise intersect with previous filters
                 $submissionIds = $submissionIds === null ? $submissions : $submissionIds->intersect($submissions);
             }
             $submissionIds = $submissionIds?->values() ?? collect(); // reindex array, create an empty collection if null
             $submissions = $this->applyFilters($submissionIds, $assignmentIds);
+
             return Inertia::render('teacher/marks', [
                 'filters' => [
                     'student_id' => (string) $request->query('student_id', ''),
@@ -137,12 +141,10 @@ class TeacherContentController extends Controller
             ]);
         }
 
-
-
-//        if($student && $module && $assignment){
-//            $submission = Submission::query()
-//                ->where('')
-//        }
+        //        if($student && $module && $assignment){
+        //            $submission = Submission::query()
+        //                ->where('')
+        //        }
 
         return Inertia::render('teacher/marks', [
             'filters' => [
@@ -156,51 +158,64 @@ class TeacherContentController extends Controller
             'marks' => $submissions,
         ]);
     }
-    private function filterByStudent(User $student, $assignmentIds){
-        $submissions =  Submission::query()
+
+    private function filterByStudent(User $student, $assignmentIds)
+    {
+        $submissions = Submission::query()
             ->whereIn('assignment_id', $assignmentIds)
-            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
             ->where('student_id', $student->id)
-            ->get();
-        return $submissions->map(function (Submission $submission) {
-            return $submission->student_id . ':' . $submission->assignment_id;
-        });
-    }
-    private function filterMarksByModule(Module $module, $assignmentIds){
-        $assignments = $module->topics()->get()->map(function (Topic $topic) use ($assignmentIds){
-            return $topic->assignments()->whereIn('id', $assignmentIds)->get();
-        })->flatten(2)->unique('id')->pluck('id')->toArray();
-       $submissions = Submission::query()
-           ->whereIn('assignment_id', $assignments)
-            ->whereIn('status', ['SUBMITTED','GRADED'])
             ->get();
 
         return $submissions->map(function (Submission $submission) {
-            return $submission->student_id . ':' . $submission->assignment_id;
+            return $submission->student_id.':'.$submission->assignment_id;
         });
     }
-    private function filterMarksByAssignment(Assignment $assignment){
+
+    private function filterMarksByModule(Module $module, $assignmentIds)
+    {
+        $assignments = $module->topics()->get()->map(function (Topic $topic) use ($assignmentIds) {
+            return $topic->assignments()->whereIn('id', $assignmentIds)->get();
+        })->flatten(2)->unique('id')->pluck('id')->toArray();
+        $submissions = Submission::query()
+            ->whereIn('assignment_id', $assignments)
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
+            ->get();
+
+        return $submissions->map(function (Submission $submission) {
+            return $submission->student_id.':'.$submission->assignment_id;
+        });
+    }
+
+    private function filterMarksByAssignment(Assignment $assignment)
+    {
         $submissions = Submission::query()
             ->where('assignment_id', $assignment->id)
-            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
             ->get();
+
         return $submissions->map(function (Submission $submission) {
-            return $submission->student_id . ':' . $submission->assignment_id;
+            return $submission->student_id.':'.$submission->assignment_id;
         });
     }
-    private function applyFilters($submissionIds, array $assignmentIds){
+
+    private function applyFilters($submissionIds, array $assignmentIds)
+    {
         $submissionIds = $submissionIds->unique()->values();
         $submissions = Submission::query()
             ->whereIn('assignment_id', $assignmentIds)
-            ->whereIn('status', ['SUBMITTED','GRADED'])
+            ->whereIn('status', ['SUBMITTED', 'GRADED'])
             ->get()
             ->filter(function (Submission $submission) use ($submissionIds) {
-                $key = $submission->student_id . ":" . $submission->assignment_id;
+                $key = $submission->student_id.':'.$submission->assignment_id;
+
                 return $submissionIds->contains($key);
             })->values();
+
         return $submissions->map(function (Submission $submission) {
             $assignment = $submission->assignment()->first();
             $module = $assignment->topics()->first()->module()->first();
+
             return [
                 ...$submission->toArray(),
                 'assignment_title' => $assignment->title,
@@ -277,6 +292,7 @@ class TeacherContentController extends Controller
             ],
             'tasks' => $assignmentModel->tasks->map(function (Task $task) use ($answers) {
                 $answer = $answers->get($task->task_id);
+
                 return [
                     'assignment_id' => $task->assignment_id,
                     'task_id' => $task->task_id,
@@ -354,10 +370,10 @@ class TeacherContentController extends Controller
                 ->where('student_id', $student)
                 ->where('assignment_id', $assignmentModel->id)
                 ->update([
-                'status' => 'GRADED',
-                'total_points' => round((float) $totalPoints, 2),
-                'total_percent' => $assignmentTotal > 0 ? round(((float) $totalPoints / $assignmentTotal) * 100, 2) : null,
-            ]);
+                    'status' => 'GRADED',
+                    'total_points' => round((float) $totalPoints, 2),
+                    'total_percent' => $assignmentTotal > 0 ? round(((float) $totalPoints / $assignmentTotal) * 100, 2) : null,
+                ]);
         });
 
         return redirect()
@@ -388,7 +404,7 @@ class TeacherContentController extends Controller
             return redirect()->route('dashboard')->with('afterLogin', true);
         }
         $organization = Organization::query()->where('id', $organizationId)->first();
-        if(!$organization){
+        if (! $organization) {
             return redirect()->route('dashboard')->with('error', 'Organization not found');
         }
         $assignment = Assignment::query()
@@ -416,7 +432,7 @@ class TeacherContentController extends Controller
 
         $submissions = collect();
         $studentsInGroup = null;
-        if($groupIdFilter){
+        if ($groupIdFilter) {
             $studentsInGroup = SchoolGroup::query()->where('group_id', $groupIdFilter)
                 ->with('school')
                 ->first();
@@ -431,7 +447,7 @@ class TeacherContentController extends Controller
             ->with(['student.user', 'assignment.topics.module'])
             ->get();
         $submissions = $studentsInGroup !== null ? $submissions->whereIn('student_id', $studentsInGroup) : $submissions;
-        $submissions = $submissions->map(function (Submission $submission) use ($organization, $assignment){
+        $submissions = $submissions->map(function (Submission $submission) use ($organization, $assignment) {
             $submitter = $submission->student->user;
 
             $group = $submitter
@@ -441,20 +457,21 @@ class TeacherContentController extends Controller
             $group = SchoolGroup::query()->where('group_id', $group)->first();
 
             $module = $assignment->topics->first()->module;
-           return [
-               'student_id' => $submitter->id,
-               'student_name' => $submitter->name,
-               'student_email' => $submitter->email,
-               'group_id' => $group->group_id,
-               'group_name' => $group->name,
-               'assignment_id' => $assignment->id,
-               'assignment_title' => $assignment->title,
-               'module_name' => $module->name,
-               'status' => $submission->status,
-               'total_points' => $submission->total_points,
-               'total_percent' => $submission->total_percent,
-               'submitted_on' => $submission->submitted_on,
-           ];
+
+            return [
+                'student_id' => $submitter->id,
+                'student_name' => $submitter->name,
+                'student_email' => $submitter->email,
+                'group_id' => $group->group_id,
+                'group_name' => $group->name,
+                'assignment_id' => $assignment->id,
+                'assignment_title' => $assignment->title,
+                'module_name' => $module->name,
+                'status' => $submission->status,
+                'total_points' => $submission->total_points,
+                'total_percent' => $submission->total_percent,
+                'submitted_on' => $submission->submitted_on,
+            ];
         });
 
         return Inertia::render('teacher/submissions', [
@@ -489,6 +506,7 @@ class TeacherContentController extends Controller
             ->latest()
             ->get();
         $stats = $this->getStats($user, $organizationId);
+
         return Inertia::render('teacher/modules', [
             'stats' => $stats,
             'modules' => $modules,
@@ -554,6 +572,7 @@ class TeacherContentController extends Controller
             return redirect()->route('login');
         }
         $data = $this->getModulePageInfo($request, $module);
+
         return Inertia::render('teacher/module', [
             'module' => $data['moduleSummary'],
             'stats' => $data['moduleStats'],
@@ -620,23 +639,26 @@ class TeacherContentController extends Controller
             'materials' => $topics->sum('materials_count'),
             'topic_assignments' => (int) $assignmentCounts->sum(),
         ];
+
         return [
             'moduleSummary' => $module,
             'moduleStats' => $moduleStats,
             'topicSummary' => $topicSummary,
         ];
     }
-    private function getTopicPageInfo(Request $request, Topic $topic): array{
+
+    private function getTopicPageInfo(Request $request, Topic $topic): array
+    {
         $assignments = Assignment::query()->whereIn('id', DB::table('topic_assignments')
             ->where('module_id', $topic->module_id)
             ->where('topic_id', $topic->topic_id)
             ->pluck('assignment_id')->toArray()
         )->withCount('tasks')->get();
 
-        $assignmentsSummary = $assignments->map(function (Assignment $assignment){
+        $assignmentsSummary = $assignments->map(function (Assignment $assignment) {
             return [
                 'id' => $assignment->id,
-                'title' =>$assignment->title,
+                'title' => $assignment->title,
                 'description' => $assignment->description,
                 'grading_policy' => $assignment->grading_policy,
                 'due_date' => $assignment->due_date,
@@ -650,12 +672,14 @@ class TeacherContentController extends Controller
             ->where('module_id', $topic->module_id)
             ->orderBy('topic_id')
             ->get(['topic_id', 'module_id', 'name']);
+
         return [
             'assignmentsSummary' => $assignmentsSummary,
             'materials' => $materials,
             'moduleTopics' => $moduleTopics,
         ];
     }
+
     public function topic(Request $request, int $module, int $topic): Response|RedirectResponse
     {
         $user = $request->user();
@@ -671,20 +695,21 @@ class TeacherContentController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if(!$module){
+        if (! $module) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
         }
         $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();
-        if(!$topic){
+        if (! $topic) {
             return redirect()->route('dashboard')->with('error', 'Topic not found.');
         }
 
         $moduleSummary = [
             'id' => $module->id,
             'name' => $module->name,
-            'description' => $module->description
+            'description' => $module->description,
         ];
         $data = $this->getTopicPageInfo($request, $topic);
+
         return Inertia::render('teacher/topic', [
             'module' => $moduleSummary,
             'topic' => $topic,
@@ -693,6 +718,7 @@ class TeacherContentController extends Controller
             'moduleTopics' => $data['moduleTopics'],
         ]);
     }
+
     public function editTopic(Request $request, int $module, int $topic): Response|RedirectResponse
     {
         $user = $request->user();
@@ -748,14 +774,18 @@ class TeacherContentController extends Controller
             ],
         ]);
     }
-    private function getMaterialPageInfo(Material $material): array{
+
+    private function getMaterialPageInfo(Material $material): array
+    {
         $files = $material->fileLinks()->with('file')->get();
 
         return [
             'files' => $files,
         ];
     }
-    public function material(Request $request, int $module, int $topic, int $material): Response|RedirectResponse{
+
+    public function material(Request $request, int $module, int $topic, int $material): Response|RedirectResponse
+    {
         $user = $request->user();
 
         if (! $user) {
@@ -769,11 +799,11 @@ class TeacherContentController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if(!$module){
+        if (! $module) {
             return redirect()->route('dashboard')->with('error', 'You do not have permission to view this module.');
         }
         $topic = Topic::query()->where('topic_id', $topic)->where('module_id', $module->id)->first();
-        if(!$topic){
+        if (! $topic) {
             return redirect()->route('dashboard')->with('error', 'Topic not found.');
         }
         $material = Material::query()
@@ -781,23 +811,24 @@ class TeacherContentController extends Controller
             ->where('topic_id', $topic->topic_id)
             ->where('material_id', $material)
             ->first();
-        if(!$material){
+        if (! $material) {
             return redirect()->route('dashboard')->with('error', 'Material not found.');
         }
         $moduleSummary = [
             'id' => $module->id,
             'name' => $module->name,
-            'description' => $module->description
+            'description' => $module->description,
         ];
         $topicSummary = [
-            "topic_id"=>$topic->topic_id,
-            "module_id"=>$topic->module_id,
-            "name"=>$topic->name,
-            "description"=>$topic->description,
-            "created_at"=>$topic->created_at,
+            'topic_id' => $topic->topic_id,
+            'module_id' => $topic->module_id,
+            'name' => $topic->name,
+            'description' => $topic->description,
+            'created_at' => $topic->created_at,
         ];
 
         $data = $this->getMaterialPageInfo($material);
+
         return Inertia::render('teacher/material', [
             'module' => $moduleSummary,
             'topic' => $topicSummary,
@@ -805,12 +836,15 @@ class TeacherContentController extends Controller
             'files' => $data['files'],
         ]);
     }
-    public function assignment(Request $request, Assignment $assignment): Response|RedirectResponse{
+
+    public function assignment(Request $request, Assignment $assignment): Response|RedirectResponse
+    {
         $user = $request->user();
         if (! $user) {
             return redirect()->route('login');
         }
         $data = $this->getAssignmentPageInfo($assignment);
+
         return Inertia::render('teacher/assignment', [
             'assignment' => $assignment,
             'topics' => $data['topics'],
@@ -818,10 +852,12 @@ class TeacherContentController extends Controller
         ]);
 
     }
-    private function getAssignmentPageInfo(Assignment $assignment): array{
+
+    private function getAssignmentPageInfo(Assignment $assignment): array
+    {
         $topics = $assignment->topics()->get();
         $tasks = $assignment->tasks()->get();
-        $tasksSummary = $tasks->map(function (Task $task) use ($assignment){
+        $tasksSummary = $tasks->map(function (Task $task) use ($assignment) {
             return [
                 'assignment_id' => $assignment->id,
                 'task_id' => $task->task_id,
@@ -833,22 +869,27 @@ class TeacherContentController extends Controller
                 'created_at' => $task->created_at,
             ];
         });
+
         return [
             'topics' => $topics,
             'tasks' => $tasksSummary,
         ];
     }
 
-    public function task(Request $request, int $assignmentId, int $taskId): Response|RedirectResponse{
+    public function task(Request $request, int $assignmentId, int $taskId): Response|RedirectResponse
+    {
 
         $data = $this->getTaskPageInfo($assignmentId, $taskId);
+
         return Inertia::render('teacher/task', [
             'assignment' => $data['assignment'],
             'task' => $data['task'],
             'taskNavigation' => $data['taskNavigation'],
         ]);
     }
-    private function getTaskPageInfo(int $assignmentId, int $taskId): array{
+
+    private function getTaskPageInfo(int $assignmentId, int $taskId): array
+    {
         $assignment = Assignment::query()
             ->where('id', $assignmentId)
             ->first();
@@ -857,24 +898,27 @@ class TeacherContentController extends Controller
             ->where('assignment_id', $assignment->id)
             ->first();
         $correctAnswers = $task->correctAnswers()->pluck('answer')->values();
-        $options = $task->options()->select(['option_id','option_text'])->get();
+        $options = $task->options()->select(['option_id', 'option_text'])->get();
         $taskNavigation = $assignment->tasks()->select(['task_id', 'task_type'])->get();
         $taskSummary = [
-                ...$task->toArray(),
-                'correct_answers' => $correctAnswers,
-                'options' => $options,
-            ];
+            ...$task->toArray(),
+            'correct_answers' => $correctAnswers,
+            'options' => $options,
+        ];
+
         return [
             'assignment' => [
                 'id' => $assignment->id,
                 'title' => $assignment->title,
-                'due_date' => $assignment->due_date
+                'due_date' => $assignment->due_date,
             ],
             'task' => $taskSummary,
-            'taskNavigation' => $taskNavigation
+            'taskNavigation' => $taskNavigation,
         ];
     }
-    public function editTask(int $assignmentId, int $taskId){
+
+    public function editTask(int $assignmentId, int $taskId)
+    {
         $assignment = Assignment::query()
             ->where('id', $assignmentId)
             ->first();
@@ -884,15 +928,14 @@ class TeacherContentController extends Controller
             ->where('assignment_id', $assignment->id)
             ->first();
 
-
         $assignmentData = [
             ...$assignment->toArray(),
             'topics' => $assignment->topics()->get(),
         ];
         $taskData = [
             ...$task->toArray(),
-            'options' => $task->options()->select(['option_id','option_text'])->get(),
-            'correct_answers' => $task->correctAnswers()->select(['answer_id','answer'])->get(),
+            'options' => $task->options()->select(['option_id', 'option_text'])->get(),
+            'correct_answers' => $task->correctAnswers()->select(['answer_id', 'answer'])->get(),
         ];
 
         return Inertia::render('teacher/edit-task', [

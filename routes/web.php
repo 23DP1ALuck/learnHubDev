@@ -101,7 +101,7 @@ Route::middleware(['auth', 'verified', CheckCanManageLearningContent::class])->g
     Route::patch('/teacher/assignments/{assignment}/students/{student}/tasks/{task}', [TeacherContentController::class, 'gradeStudentTask'])->name('teacher.assignments.students.tasks.grade');
     Route::patch('/modules/{module_id}', [ModulesController::class, 'update'])->name('modules.update');
     Route::patch('/modules/{module_id}/topics/{topic_id}', [TopicController::class, 'update'])->name('topics.update');
-
+    Route::patch('/teacher/assignments/{assignment_id}/students/{student_id}', [AssignmentsController::class, 'assignmentStatusUpdate'])->name('teacher.assignments.students.update');
     Route::delete('/modules/{module_id}', [ModulesController::class, 'destroy'])->name('modules.destroy');
     Route::delete('/topics/modules/{module_id}/topics/{topic_id}', [TopicController::class, 'destroy'])->name('topics.destroy');
 });

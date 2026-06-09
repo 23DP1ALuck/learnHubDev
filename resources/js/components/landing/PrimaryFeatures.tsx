@@ -3,7 +3,10 @@
 import { Container } from '@/components/landing/Container';
 import { useTranslation } from '@/hooks/use-translation';
 import backgroundImage from '@/images/background-features.jpg';
-import learnHubDashboard from '@/images/learnHubDashboard.jpg';
+import learnHubDashboard from '@/images/learnHubDashboard.png';
+import materialsLearnHub from '@/images/materialsLearnHub.png';
+import marksLearnHub from '@/images/marksLearnHub.png';
+import assignmentLearnhub from '@/images/assignmentLearnhub.png';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
@@ -18,19 +21,19 @@ const features = [
         title: 'Materiāli un faili',
         description:
             'Pievieno prezentācijas, PDF un citus failus tieši pie konkrētās tēmas, lai nekas nepazūd čatos vai e-pastos.',
-        image: learnHubDashboard,
+        image: materialsLearnHub,
     },
     {
         title: 'Darbi un uzdevumi',
         description:
             'Izveido mājasdarbus, testus un kontroldarbus ar termiņiem instrukcijām un punktu sistēmu.',
-        image: learnHubDashboard,
+        image: marksLearnHub,
     },
     {
         title: 'Iesniegumi un vērtēšana',
         description:
             'Saņem iesniegumus vienotā skatā, pārbaudi atbildes pa uzdevumiem un pievieno komentārus.',
-        image: learnHubDashboard,
+        image: assignmentLearnhub,
     },
 ];
 export function PrimaryFeatures() {

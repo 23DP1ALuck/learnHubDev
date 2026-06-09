@@ -26,9 +26,9 @@ export default function StudentMarksTable({
     stats,
 }: StudentMarksTableProps) {
     const { t } = useTranslation();
-    console.log('Marks:', marks);
+
     return (
-        <div className="grid gap-4">
+        <div className="grid min-w-0 gap-4">
             <div className="grid gap-4 md:grid-cols-3">
                 <Card className="border-sidebar-border/70">
                     <CardHeader className="pb-2">
@@ -58,21 +58,21 @@ export default function StudentMarksTable({
                 </Card>
             </div>
 
-            <Card className="border-sidebar-border/70">
+            <Card className="min-w-0 border-sidebar-border/70">
                 <CardHeader>
                     <CardTitle>{t('common.Marks')}</CardTitle>
                     <CardDescription>
                         {t('learning.Assignment results and grading status.')}
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="min-w-0">
                     {marks.length === 0 ? (
                         <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
                             {t('student.No marks are available yet.')}
                         </div>
                     ) : (
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full text-sm">
+                        <div className="w-full max-w-full touch-pan-x overflow-x-auto overscroll-x-contain">
+                            <table className="min-w-max text-sm">
                                 <thead className="text-left text-muted-foreground">
                                     <tr>
                                         <th className="px-4 py-3 font-medium">

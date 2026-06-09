@@ -139,4 +139,8 @@ return [
     'Oct' => 'Oktobris',
     'Nov' => 'Novembris',
     'Dec' => 'Decembris',
+    'Mark submission as graded?' => 'Atzīmēt iesniegumu kā novērtētu?',
+    'This will mark the student submission as graded. Make sure all task points have been checked before continuing.' => 'Tas atzīmēs studenta iesniegumu kā novērtētu. Pirms turpināt, pārliecinieties, ka visi uzdevumu punkti ir pārbaudīti.',
+    'Confirm grading' => 'Apstiprināt vērtēšanu',
+    'Mark as graded' => 'Atzīmēt kā novērtētu',
 ];

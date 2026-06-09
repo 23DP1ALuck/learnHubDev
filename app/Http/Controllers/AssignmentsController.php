@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AssignmentsController extends Controller
@@ -44,5 +45,22 @@ class AssignmentsController extends Controller
         });
 
         return redirect()->back()->with('success', 'Assignment created.');
+    }
+
+    public function assignmentStatusUpdate(Request $request, int $assignmentId, int $studentId): RedirectResponse
+    {
+        $user = $request->user();
+        $assignment = Assignment::query()->where('id', $assignmentId)->first();
+        if (! $assignment) {
+            return redirect()->back()->with('error', 'Assignment not found');
+        }
+        $submission = $assignment->submissions()->where('student_id', $studentId)->first();
+        if (! $submission) {
+            return redirect()->back()->with('error', 'Submission not found');
+        }
+        $assignment->submissions()->where('student_id', $studentId)->first()->update([
+            'status' => 'GRADED',
+        ]);
+        return redirect()->back()->with('success', 'Assignment status updated.');
     }
 }

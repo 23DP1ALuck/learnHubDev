@@ -67,24 +67,23 @@ class TaskAnswersController extends Controller
             $result = 0; // initial value for calculating the score
             $maxPoints = $task->max_points;
 
-            if($task->task_type == 'CHECKBOX'){
+            if ($task->task_type == 'CHECKBOX') {
 
                 $taskCorrectAnswer = $task->correctAnswers()->get();
                 $correctAnswersLength = $taskCorrectAnswer->count();
                 $step = $maxPoints / $correctAnswersLength; // calculate the step for 1 correct answer
 
-                foreach($taskCorrectAnswer as $correctAnswer){
+                foreach ($taskCorrectAnswer as $correctAnswer) {
                     // add the step to the result if the answer is correct
-                    if(in_array($correctAnswer->answer, $validated['answer_text'])){
+                    if (in_array($correctAnswer->answer, $validated['answer_text'])) {
                         $result += $step;
                     }
                 }
-        }else{
+            } else {
                 $taskCorrectAnswer = $task->correctAnswers()->first();
                 $result = $taskCorrectAnswer->answer == $validated['answer_text'][0] ? $maxPoints : 0; // max points for correct answer
             }
         }
-
 
         if ($task->task_type == 'FILE') {
             $this->storeTaskAnswerFile($request, $user, $task, $assignment);
@@ -109,7 +108,7 @@ class TaskAnswersController extends Controller
             ->orderBy('task_id')
             ->value('task_id');
 
-        if (!$nextTaskId) {
+        if (! $nextTaskId) {
             $submission = $assignment
                 ->submissions()
                 ->where('student_id', $user->id)
