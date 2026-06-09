@@ -72,7 +72,7 @@ export default function StudentMarksTable({
                         </div>
                     ) : (
                         <div className="w-full max-w-full touch-pan-x overflow-x-auto overscroll-x-contain">
-                            <table className="min-w-max text-sm">
+                            <table className="min-w-max w-full text-sm">
                                 <thead className="text-left text-muted-foreground">
                                     <tr>
                                         <th className="px-4 py-3 font-medium">
