@@ -406,11 +406,7 @@ class AccountInvitesController extends Controller
                         ['user_id' => $user->id],
                         ['speciality' => null],
                     );
-                    SchoolGroup::create([   // default group for individual
-                        'group_id' => 1,
-                        'school_id' => $organization->id,
-                        'name' => 'Course group',
-                    ]);
+                    $this->defaultCourseGroup($organization);
                 }
             });
 
@@ -467,19 +463,20 @@ class AccountInvitesController extends Controller
             ->where('organization_id', $organization->id)
             ->exists();
 
+        $groupId = null;
+        if ($invite->role_in_org === 'STUDENT' && $organization->organization_type === 'individual') {
+            $groupId = $this->defaultCourseGroup($organization)->group_id;
+        }
+
         if (! $membershipExists) {
-            $groupId = null;
-
-            if ($invite->role_in_org === 'STUDENT' && $organization->organization_type === 'individual') {
-                $groupId = $organization->schoolGroups()
-                    ->where('name', 'Course group')
-                    ->value('group_id');
-            }
-
             $user->organizations()->attach($organization->id, [
                 'joined_on' => now()->toDateString(),
                 'role_in_org' => $invite->role_in_org,
                 'admin_privileges' => false,
+                'group_id' => $groupId,
+            ]);
+        } elseif ($groupId !== null) {
+            $user->organizations()->updateExistingPivot($organization->id, [
                 'group_id' => $groupId,
             ]);
         }
@@ -497,6 +494,17 @@ class AccountInvitesController extends Controller
         }
 
         $invite->forceFill(['used_at' => now()])->save();
+    }
+
+    private function defaultCourseGroup(Organization $organization): SchoolGroup
+    {
+        return SchoolGroup::query()->firstOrCreate(
+            [
+                'school_id' => $organization->id,
+                'group_id' => 1,
+            ],
+            ['name' => 'Course group'],
+        );
     }
 
     /**
