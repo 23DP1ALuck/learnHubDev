@@ -1,108 +1,156 @@
-# learnHubDev
+# LearnHub
 
-## Project Overview
-This is a Laravel 12 application using Inertia.js with a React (TypeScript) frontend.
-It includes a Fortify-based authentication flow, user settings pages, and an onboarding request submission flow.
-The UI uses role-based navigation (admin vs user) and supports appearance (light/dark/system) via cookies.
+LearnHub is a learning management platform for organizations, teachers, and
+students. It provides course content management, assignments, submissions,
+grading, organization administration, invitations, and real-time
+communication in a single application.
 
-## Features (Current)
-- Inertia pages for landing (`/`), dashboards (`/dashboard`), settings, and admin views.
-- Authentication via Laravel Fortify: login, password reset, email verification, two-factor auth, and password confirmation.
-- Role-based access:
-  - `users.role` enum (`admin` | `user`) and `CheckIsAdmin` middleware for admin-only routes.
-  - Role-based sidebar/layout selection on the frontend.
-- Onboarding requests:
-  - Public POST endpoint to create an `onboarding_requests` record.
-  - Admin-only page route for viewing onboarding requests (UI currently scaffolded).
-- Settings:
-  - Profile update and account deletion.
-  - Password update.
-  - Appearance settings page.
-  - Two-factor authentication settings page (Fortify feature-gated).
-- Flash success messages shared via Inertia and displayed in the frontend.
+## Features
 
-## Project Structure
-- `app/Http/Controllers/` — dashboards, onboarding requests, and settings controllers.
-- `app/Http/Middleware/` — Inertia shared props, appearance cookie handling, admin checks.
-- `routes/web.php` and `routes/settings.php` — application routes.
-- `resources/views/app.blade.php` — Inertia root view + early theme application.
-- `resources/js/` — React app entry (`app.tsx`), pages (`pages/`), layouts (`layouts/`), components (`components/`).
-- `database/migrations/` — schema for users/sessions, cache, jobs, onboarding requests, and roles.
-- `tests/` — Pest feature tests for auth, dashboard, and settings.
+- Organization workspaces with owner, teacher, and student roles
+- School and individual-course organization types
+- Student and teacher invitations, including CSV imports
+- Groups with assigned students, teachers, and learning modules
+- Modules, topics, materials, assignments, and task management
+- Student assignment submissions and file uploads
+- Teacher submission review, grading, and marks filtering
+- Student progress and marks views
+- Real-time chat and application notifications
+- Admin organization and user management
+- Authentication, email verification, password reset, and two-factor
+  authentication
+- Responsive interface with light and dark themes
 
-## Getting Started
+## Technologies
 
-### Prerequisites
-- PHP `^8.2` (see `composer.json`).
-- Composer (see `composer.json`).
-- Node.js + npm (see `package.json`).
-- Database: defaults to SQLite (see `.env.example`).
+### Backend
 
-### Setup
-Quick setup (uses the repo’s Composer script):
-```sh
+- PHP 8.2+
+- Laravel 12
+- Laravel Fortify for authentication
+- Laravel Reverb and Echo for real-time features
+- Inertia.js Laravel adapter
+- Eloquent ORM and Compoships (composite primary keys)
+- Ziggy and Laravel Wayfinder for typed application routes
+
+### Frontend
+
+- React 19
+- TypeScript
+- Inertia.js
+- Tailwind CSS 4
+- Vite 7
+- Radix UI and Headless UI primitives
+- Lucide React icons
+- jsPDF and html2canvas for document generation
+
+### Development and Testing
+
+- Pest 4
+- PHPUnit
+- Laravel Pint
+- ESLint
+- Prettier
+- React Compiler
+
+## Requirements
+
+- PHP 8.2 or newer
+- Composer
+- Node.js and npm
+- SQLite, MySQL, PostgreSQL, or another Laravel-supported database
+
+## Installation
+
+The project includes a setup script that installs backend and frontend
+dependencies, creates the environment file, generates the application key,
+runs migrations, and builds the frontend:
+
+```bash
 composer run setup
 ```
 
-Manual setup:
-```sh
+For manual setup:
+
+```bash
 composer install
 cp .env.example .env
 php artisan key:generate
 
-# If using SQLite (default), ensure the database file exists
 touch database/database.sqlite
-
 php artisan migrate
+
 npm install
+npm run build
 ```
 
-### Run the project (development)
-Runs the PHP dev server, queue listener, log viewer, and Vite dev server:
-```sh
+Update `.env` before running migrations when using a database other than
+SQLite.
+
+## Development
+
+Start the Laravel server, queue listener, log viewer, and Vite development
+server:
+
+```bash
 composer run dev
 ```
 
+On Windows, use:
 
+```bash
+composer run dev:windows
+```
 
-### Common commands
-Composer scripts (from `composer.json`):
-- `composer run setup`
-- `composer run dev`
-- `composer run lint`
-- `composer run test`
+To run the application with Inertia server-side rendering:
 
-Frontend scripts (from `package.json`):
-- `npm run dev`
-- `npm run build`
-- `npm run build:ssr`
-- `npm run types`
-- `npm run lint`
-- `npm run format`
-- `npm run format:check`
+```bash
+composer run dev:ssr
+```
+
+## Testing and Quality
+
+Run the backend test suite and PHP formatting checks:
+
+```bash
+composer run test
+```
+
+Other useful commands:
+
+```bash
+php artisan test
+composer run lint
+npm run types
+npm run lint
+npm run format:check
+```
+
+## Project Structure
+
+```text
+app/                 Laravel application code
+database/            Migrations, factories, and seeders
+resources/js/        React pages, layouts, components, hooks, and types
+resources/css/       Application styles
+resources/views/     Inertia root Blade view
+routes/              Web, authentication, and settings routes
+tests/               Pest unit and feature tests
+```
 
 ## Configuration
 
-### Environment variables
-An example env file is provided at `.env.example`.
-Key variables used/configured in the repo include:
-- `APP_NAME`, `APP_ENV`, `APP_KEY`, `APP_DEBUG`, `APP_URL`
-- `DB_CONNECTION` (defaults to `sqlite`), plus optional `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
-- `SESSION_DRIVER`, `QUEUE_CONNECTION`, `CACHE_STORE` (default to `database` in `.env.example`)
-- `MAIL_*` (defaults to logging mail in `.env.example`)
-- `VITE_APP_NAME` (used by the frontend app title)
+The available environment settings are documented in `.env.example`. Important
+configuration includes:
 
-### Database
-- Default configuration in `.env.example` uses SQLite (`DB_CONNECTION=sqlite`).
-- The repo includes `database/database.sqlite`.
-- Migrations include tables for `users`, `sessions`, `password_reset_tokens`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`, and `onboarding_requests`, plus a `role` field on `users`.
+- `APP_*` for application name, URL, environment, and debug mode
+- `DB_*` for database access
+- `MAIL_*` for email delivery
+- `QUEUE_CONNECTION` for background jobs
+- `BROADCAST_CONNECTION` and Reverb settings for real-time features
+- `SESSION_DRIVER` and `CACHE_STORE`
+- `VITE_APP_NAME` for the frontend application name
 
-### Inertia SSR
-- SSR is enabled in `config/inertia.php` and configured to use `ssr.url` (defaults to `http://127.0.0.1:13714`).
-- Use `composer run dev:ssr` to run the SSR server expected by that config.
+## License
 
-## Notes / Limitations
-- The admin onboarding requests page is currently scaffolded; `OnboardingRequestController@index` does not yet load data into the page props.
-- `DatabaseSeeder` creates `test@example.com` using the user factory; role defaults to `user` (no admin user is seeded by default).
-- `database/factories/OnboardingRequestFactory.php` and `database/seeders/OnboardingRequestSeeder.php` are currently empty.
-- The migration `database/migrations/2026_02_02_114321_add_role_field_to_user.php` has an incomplete `down()` implementation (rollbacks may not remove the `role` column).
+This project is licensed under the MIT License.
