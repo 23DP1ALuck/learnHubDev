@@ -96,7 +96,7 @@ server:
 composer run dev
 ```
 
-On Windows, use:
+On Windows, please use:
 
 ```bash
 composer run dev:windows
