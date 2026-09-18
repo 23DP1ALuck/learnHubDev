@@ -14,7 +14,7 @@ class ContactUsController extends Controller
         $validated = $request->validated();
 
         try {
-            Mail::to('luckijartem@gmail.com')->send(new ContactUsMail(
+            Mail::to(config('mail.to.address'))->send(new ContactUsMail(
                 firstname: $validated['first_name'],
                 lastname: $validated['last_name'],
                 email: $validated['email'],
